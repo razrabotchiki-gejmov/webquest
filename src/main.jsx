@@ -1,4 +1,5 @@
-import * as THREE from 'three'
+import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
 import './index.css'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -39,6 +40,21 @@ const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.rotation.x = -Math.PI / 2; // Повернуть плоскость
 scene.add(plane);
+
+// Создаём "комнату" с помощью BoxGeometry
+const roomGeometry = new THREE.BoxGeometry(10, 10, 10);
+const roomMaterials = [
+  new THREE.MeshBasicMaterial({ color: 0xffc0cb, side: THREE.DoubleSide }), // Левая стена
+  new THREE.MeshBasicMaterial({ color: 0xffc0cb, side: THREE.DoubleSide }), // Правая стена
+  new THREE.MeshBasicMaterial({ color: 0x87ceeb, side: THREE.DoubleSide }), // Верх (потолок)
+  new THREE.MeshBasicMaterial({ color: 0x87ceeb, side: THREE.DoubleSide }), // Низ (пол)
+  new THREE.MeshBasicMaterial({ color: 0xffc0cb, side: THREE.DoubleSide }), // Задняя стена
+  new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0, side: THREE.DoubleSide }), // Передняя стена (отсутствует)
+];
+
+const room = new THREE.Mesh(roomGeometry, roomMaterials);
+room.position.set(0, 0, 0); // Поднимаем комнату
+scene.add(room);
 
 let keys = {};
 let playerSpeed = 0.1; // Скорость движения
