@@ -12,11 +12,6 @@ renderer.setSize(window.innerWidth, window.innerHeight)
 camera.position.setZ(30)
 renderer.render(scene,camera)
 
-const geometry = new THREE.TorusGeometry(10,3,16,100)
-const material = new THREE.MeshStandardMaterial({color: 0xFF6347})
-const torus = new THREE.Mesh(geometry,material)
-
-scene.add(torus)
 
 const pointLight = new THREE.PointLight(0xffffff)
 pointLight.position.set(5,5,5)
@@ -28,17 +23,53 @@ const lhelper = new THREE.PointLightHelper(pointLight)
 const gridHealper = new THREE.GridHelper(200,50)
 scene.add(lhelper,gridHealper)
 
-const controls = new OrbitControls(camera, renderer.domElement)
+// Добавление куба
+const cubeGeometry = new THREE.BoxGeometry();
+const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+scene.add(cube);
+cube.add(camera);
+camera.position.set(0, 1, 0);
 
 
-function animate(){
-  requestAnimationFrame(animate)
-  torus.rotation.x += 0.01
-  torus.rotation.y += 0.005
-  torus.rotation.z += 0.01
-  controls.update()
-  renderer.render(scene,camera)
+// Добавляем плоскость
+const planeGeometry = new THREE.PlaneGeometry(50, 50);
+const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
+const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.rotation.x = -Math.PI / 2; // Повернуть плоскость
+scene.add(plane);
+
+let keys = {};
+let playerSpeed = 0.1; // Скорость движения
+let rotationSpeed = 0.05; // Скорость поворота
+
+// Обработка нажатий клавиш
+document.addEventListener('keydown', (event) => {
+    keys[event.code] = true;
+});
+
+document.addEventListener('keyup', (event) => {
+    keys[event.code] = false;
+});
+
+// Анимация с перемещением
+function animateCube() {
+    requestAnimationFrame(animateCube);
+
+    const forward = new THREE.Vector3(0, 0, -1); // Ось "вперёд"
+    const right = new THREE.Vector3(1, 0, 0);   // Ось "вправо"
+
+    // Движение куба относительно текущей ориентации
+    if (keys['KeyW']) cube.translateOnAxis(forward, playerSpeed);
+    if (keys['KeyS']) cube.translateOnAxis(forward, -playerSpeed);
+    if (keys['KeyA']) cube.translateOnAxis(right, -playerSpeed);
+    if (keys['KeyD']) cube.translateOnAxis(right, playerSpeed);
+    if (keys['ArrowLeft']) cube.rotation.y += rotationSpeed;  // Поворот влево
+    if (keys['ArrowRight']) cube.rotation.y -= rotationSpeed; // Поворот вправо
+
+    renderer.render(scene, camera);
 }
-animate()
+animateCube();
 
 
