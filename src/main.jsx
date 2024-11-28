@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
+import ReactDOM from 'react-dom';
 import './index.css'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import Open from './Inventory'; // Импорт инвентаря
 
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75,window.innerWidth/ window.innerHeight, 0.1,1000)
@@ -23,6 +25,27 @@ scene.add(pointLight,ambient)
 const lhelper = new THREE.PointLightHelper(pointLight)
 const gridHealper = new THREE.GridHelper(200,50)
 scene.add(lhelper,gridHealper)
+
+
+let yaw = 0; // Вращение вокруг вертикальной оси (влево/вправо)
+let rotationSpeed = 0.005; // Скорость вращения
+
+
+document.body.addEventListener('click', () => {
+  document.body.requestPointerLock();
+});
+document.addEventListener('keydown', (event) => {
+  if (event.code === 'Escape') {
+      document.exitPointerLock();
+  }
+});
+
+document.addEventListener('mousemove', (event) => {
+  if (document.pointerLockElement === document.body) {
+      const deltaX = event.movementX; // Смещение мыши по X
+      yaw -= deltaX * rotationSpeed; // Поворачиваем камеру в сторону движения мыши
+  }
+});
 
 // Добавление куба
 const cubeGeometry = new THREE.BoxGeometry();
@@ -58,7 +81,6 @@ scene.add(room);
 
 let keys = {};
 let playerSpeed = 0.1; // Скорость движения
-let rotationSpeed = 0.05; // Скорость поворота
 
 // Обработка нажатий клавиш
 document.addEventListener('keydown', (event) => {
@@ -75,14 +97,17 @@ function animateCube() {
 
     const forward = new THREE.Vector3(0, 0, -1); // Ось "вперёд"
     const right = new THREE.Vector3(1, 0, 0);   // Ось "вправо"
+    // Обновляем поворот кубa
+    cube.rotation.y = yaw;
+    // Рендерим сцену
+    renderer.render(scene, camera);
 
     // Движение куба относительно текущей ориентации
     if (keys['KeyW']) cube.translateOnAxis(forward, playerSpeed);
     if (keys['KeyS']) cube.translateOnAxis(forward, -playerSpeed);
     if (keys['KeyA']) cube.translateOnAxis(right, -playerSpeed);
     if (keys['KeyD']) cube.translateOnAxis(right, playerSpeed);
-    if (keys['ArrowLeft']) cube.rotation.y += rotationSpeed;  // Поворот влево
-    if (keys['ArrowRight']) cube.rotation.y -= rotationSpeed; // Поворот вправо
+    if (keys['KeyI']) Open();
 
     renderer.render(scene, camera);
 }
