@@ -1,19 +1,24 @@
-import './Inventory.css'; // Подключение стилей для инвентаря
+import React, { useState } from 'react';
+import './Inventory.css';
 
-let isVisible = false;
+const Inventory = () => {
+  const [isVisible, setIsVisible] = useState(false);
 
-function Open() {
-        isVisible = true;
+  const toggleInventory = () => {
+    setIsVisible(!isVisible);
+  };
 
-return (
-    <div>
-        {isVisible && (
-            <div className="inventory-window">
-                <h1>Инвентарь</h1>
-                <p>Здесь будут лежать ваши предметы...</p>
-            </div>
-        )}
-    </div>
-);
-}
-export default Open;
+  return (
+    <>
+      <button onClick={toggleInventory}>Toggle Inventory</button>
+      {isVisible && (
+        <div className="inventory">
+          <h1>Inventory</h1>
+          <p>Your items will be here...</p>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default Inventory;
