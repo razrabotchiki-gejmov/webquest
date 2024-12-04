@@ -1,9 +1,15 @@
 import React from 'react';
 import Scene from './scene';
-import Inventory from './Inventory';
+import Inventory from './inventory';
 
 function App() {
-    return <h1>Приложение запущено!</h1>;
+    console.log('App рендерится');
+  return (
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <Scene />
+      <Inventory />
+    </div>
+  );
 }
 
 export default App;

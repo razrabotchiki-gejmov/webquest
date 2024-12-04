@@ -1,110 +1,123 @@
-import * as THREE from 'three';
-import * as CANNON from 'cannon-es';
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
+import * as THREE from 'three'
 
-const Scene = () => {
-  const canvasRef = useRef(null);
+const Room = () => {
+  console.log('Room загружается');
+  return (
+    <mesh>
+      <boxGeometry args={[10, 10, 10]} />
+      <meshBasicMaterial color="pink" side={THREE.DoubleSide} />
+    </mesh>
+  );
+};
 
+const PlaneFloor = () => (
+  <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+    <planeGeometry args={[50, 50]} />
+    <meshBasicMaterial color="#808080" />
+  </mesh>
+);
+
+const MovableCube = ({ position, rotationSpeed, playerSpeed, camera }) => {
+  console.log('Cube загружается');
+  const ref = useRef();
+  const [yaw, setYaw] = useState(0);
+  const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false });
+  
   useEffect(() => {
-    const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(75,window.innerWidth/ window.innerHeight, 0.1,1000)
-    const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current })
-
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    camera.position.setZ(30)
-
-    let yaw = 0; // Вращение вокруг вертикальной оси (влево/вправо)
-    let rotationSpeed = 0.005; // Скорость вращения
-    let keys = {};
-    let playerSpeed = 0.1; // Скорость движения
-
-
-    document.body.addEventListener('click', () => {
-      document.body.requestPointerLock();
-    });
-    document.addEventListener('keydown', (event) => {
-      if (event.code === 'Escape') {
-          document.exitPointerLock();
-      }
-    });
-
-    document.addEventListener('mousemove', (event) => {
-      if (document.pointerLockElement === document.body) {
-          const deltaX = event.movementX; // Смещение мыши по X
-          yaw -= deltaX * rotationSpeed; // Поворачиваем камеру в сторону движения мыши
-      }
-    });
-
-    // Добавление куба
-    const cubeGeometry = new THREE.BoxGeometry();
-    const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-
-    scene.add(cube);
-    cube.add(camera);
-    camera.position.set(0, 1, 0);
-
-
-    // Добавляем плоскость
-    const planeGeometry = new THREE.PlaneGeometry(50, 50);
-    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
-    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.rotation.x = -Math.PI / 2; // Повернуть плоскость
-    scene.add(plane);
-
-    // Создаём "комнату" с помощью BoxGeometry
-    const roomGeometry = new THREE.BoxGeometry(10, 10, 10);
-    const roomMaterials = [
-      new THREE.MeshBasicMaterial({ color: 0xffc0cb, side: THREE.DoubleSide }), // Левая стена
-      new THREE.MeshBasicMaterial({ color: 0xffc0cb, side: THREE.DoubleSide }), // Правая стена
-      new THREE.MeshBasicMaterial({ color: 0x87ceeb, side: THREE.DoubleSide }), // Верх (потолок)
-      new THREE.MeshBasicMaterial({ color: 0x87ceeb, side: THREE.DoubleSide }), // Низ (пол)
-      new THREE.MeshBasicMaterial({ color: 0xffc0cb, side: THREE.DoubleSide }), // Задняя стена
-      new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0, side: THREE.DoubleSide }), // Передняя стена (отсутствует)
-    ];
-
-    const room = new THREE.Mesh(roomGeometry, roomMaterials);
-    room.position.set(0, 0, 0); // Поднимаем комнату
-    scene.add(room);
-
-    // Обработка нажатий клавиш
-    document.addEventListener('keydown', (event) => {
-        keys[event.code] = true;
-    });
-
-    document.addEventListener('keyup', (event) => {
-        keys[event.code] = false;
-    });
-
-    // Анимация с перемещением
-    function animateCube() {
-        requestAnimationFrame(animateCube);
-
-        const forward = new THREE.Vector3(0, 0, -1); // Ось "вперёд"
-        const right = new THREE.Vector3(1, 0, 0);   // Ось "вправо"
-        // Обновляем поворот кубa
-        cube.rotation.y = yaw;
-        // Движение куба относительно текущей ориентации
-        if (keys['KeyW']) cube.translateOnAxis(forward, playerSpeed);
-        if (keys['KeyS']) cube.translateOnAxis(forward, -playerSpeed);
-        if (keys['KeyA']) cube.translateOnAxis(right, -playerSpeed);
-        if (keys['KeyD']) cube.translateOnAxis(right, playerSpeed);
-
-        renderer.render(scene, camera);
-    }
-    animateCube();
-    return () => {
-      renderer.dispose();
+    const handleKeyDown = (event) => {
+      setKeys((prev) => ({ ...prev, [event.code]: true }));
     };
-  },[]);
+    const handleKeyUp = (event) => {
+      setKeys((prev) => ({ ...prev, [event.code]: false }));
+    };
+    const handleMouseMove = (e) => {
+      if (document.pointerLockElement) {
+        setYaw((prevYaw) => prevYaw - e.movementX * rotationSpeed);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [rotationSpeed]);
+
+  useFrame(() => {
+    if (!ref.current) return;
+
+    const forward = new THREE.Vector3(0, 0, -1);
+    const right = new THREE.Vector3(1, 0, 0);
+    ref.current.rotation.y = yaw;
+
+    if (keys["KeyW"]) 
+      ref.current.translateOnAxis(forward, playerSpeed);
+    if (keys["KeyS"]) 
+      ref.current.translateOnAxis(forward, -playerSpeed);
+    if (keys["KeyA"]) 
+      ref.current.translateOnAxis(right, -playerSpeed);
+    if (keys["KeyD"]) 
+      ref.current.translateOnAxis(right, playerSpeed);
+    if (camera.current) {
+      const distance = 5; // Фиксированное расстояние камеры от куба
+      const height = 2; // Камера будет немного выше куба
+
+      // Камера должна следовать за кубом, но вращаться относительно его позиции
+      camera.current.position.set(
+        Math.sin(yaw) * distance + ref.current.position.x, // Камера позади куба, по оси X
+        height,                        // Камера чуть выше куба
+        Math.cos(yaw) * distance + ref.current.position.z   // Камера позади куба, по оси Z
+      );
+
+      // Камера всегда смотрит на куб
+      camera.current.lookAt(ref.current.position.x, height, ref.current.position.z);
+    }
+  });
 
   return (
-    <canvas
-        ref={canvasRef}
-        style={{ display: 'block', width: '100%', height: '100%' }} // Добавьте стили здесь
-    />
-);
+    <mesh ref={ref} position={position}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshBasicMaterial color="green" />
+    </mesh>
+  );
+};
+
+const Scene = () => {
+  const camera = useRef();
+  useEffect(() => {
+    const handleClick = () => {
+      document.body.requestPointerLock();
+    };
+
+    document.body.addEventListener("click", handleClick);
+    return () => {
+      document.body.removeEventListener("click", handleClick);
+    };
+  }, []);
+  console.log('Scene загружается');
+  return (
+    <Canvas>
+      {/* Камера */}
+      <PerspectiveCamera ref={camera} makeDefault position={[0, 1, 10]} />
+      
+      {/* Освещение */}
+      <ambientLight intensity={0.5} />
+      
+      {/* Плоскость */}
+      <PlaneFloor />
+      
+      {/* Комната */}
+      <Room />
+      
+      {/* Движущийся куб */}
+      <MovableCube position={[0, 0.5, 0]} rotationSpeed={0.005} playerSpeed={0.1} camera={camera}/>
+    </Canvas>
+  );
 };
 
 export default Scene;
-
