@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three'
+import Inventory from './Inventory';
 
 const Room = () => {
   console.log('Room загружается');
@@ -20,7 +21,7 @@ const PlaneFloor = () => (
   </mesh>
 );
 
-const MovableCube = ({ position, rotationSpeed, playerSpeed, camera }) => {
+const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventoryLocked }) => {
   console.log('Cube загружается');
   const ref = useRef();
   const [yaw, setYaw] = useState(0);
@@ -41,12 +42,13 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera }) => {
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     document.addEventListener('mousemove', handleMouseMove);
+
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
       document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [rotationSpeed]);
+  }, [rotationSpeed, isInventoryLocked]);
 
   useFrame(() => {
     if (!ref.current) return;
@@ -54,7 +56,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera }) => {
     const forward = new THREE.Vector3(0, 0, -1);
     const right = new THREE.Vector3(1, 0, 0);
     ref.current.rotation.y = yaw;
-
+    if (!isInventoryLocked) {
     if (keys["KeyW"]) 
       ref.current.translateOnAxis(forward, playerSpeed);
     if (keys["KeyS"]) 
@@ -76,6 +78,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera }) => {
 
       // Камера всегда смотрит на куб
       camera.current.lookAt(ref.current.position.x, height, ref.current.position.z);
+    }
     }
   });
 
@@ -100,6 +103,7 @@ const Scene = () => {
     };
   }, []);
   console.log('Scene загружается');
+  const [isInventoryLocked, setIsInventoryLocked] = useState(false);
   return (
     <Canvas>
       {/* Камера */}
@@ -115,7 +119,7 @@ const Scene = () => {
       <Room />
       
       {/* Движущийся куб */}
-      <MovableCube position={[0, 0.5, 0]} rotationSpeed={0.005} playerSpeed={0.1} camera={camera}/>
+      <MovableCube position={[0, 0.5, 0]} rotationSpeed={0.005} playerSpeed={0.1} camera={camera} isInventoryLocked={isInventoryLocked}/>
     </Canvas>
   );
 };
