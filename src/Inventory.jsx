@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './Inventory.css'; // Подключение стилей для инвентаря
 
-function Inventory() {
+function Inventory({ setIsInventoryLocked }) {
+  console.log('setIsInventoryLocked:', setIsInventoryLocked);
   const [isVisible, setIsVisible] = useState(false); // Состояние видимости инвентаря
-
+  
   let items = [
     { id: 1, name: 'Предмет 1', imageUrl: '/images/листы с подсказками.png' },
     { id: 2, name: 'Предмет 2', imageUrl: '/images/устройство с вопросом.jpg' },
@@ -13,6 +14,7 @@ function Inventory() {
   // Функция для переключения видимости инвентаря
   const toggleInventory = () => {
     setIsVisible((prev) => !prev);
+    setIsInventoryLocked((prev) => !prev);
   };
 
   // Обработчик события для нажатия клавиши "I"
@@ -25,7 +27,7 @@ function Inventory() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isVisible, setIsInventoryLocked]);
 
   return (
     <>

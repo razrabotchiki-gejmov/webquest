@@ -1,6 +1,6 @@
 import React from 'react';
 import Scene from './scene';
-import Inventory from './inventory';
+import Inventory from './Inventory';
 
 function App() {
     console.log('App рендерится');

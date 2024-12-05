@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three'
 import Inventory from './Inventory';
+import CustomCursor from './CustomCursor';
 
 const Room = () => {
   console.log('Room загружается');
@@ -28,6 +29,11 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false });
   
   useEffect(() => {
+    if (isInventoryLocked) {
+      document.body.classList.remove('pointer-locked');
+    } else {
+      document.body.classList.add('pointer-locked');
+    }
     const handleKeyDown = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: true }));
     };
@@ -35,10 +41,9 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
       setKeys((prev) => ({ ...prev, [event.code]: false }));
     };
     const handleMouseMove = (e) => {
-      if (document.pointerLockElement) {
+      if (isInventoryLocked || !document.pointerLockElement) return; 
         setYaw((prevYaw) => prevYaw - e.movementX * rotationSpeed);
-      }
-    };
+      }    
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     document.addEventListener('mousemove', handleMouseMove);
@@ -52,11 +57,12 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
 
   useFrame(() => {
     if (!ref.current) return;
-
+    console.log('isInventoryLocked:', isInventoryLocked);
+    if (isInventoryLocked) return;
     const forward = new THREE.Vector3(0, 0, -1);
     const right = new THREE.Vector3(1, 0, 0);
     ref.current.rotation.y = yaw;
-    if (!isInventoryLocked) {
+    
     if (keys["KeyW"]) 
       ref.current.translateOnAxis(forward, playerSpeed);
     if (keys["KeyS"]) 
@@ -78,7 +84,6 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
 
       // Камера всегда смотрит на куб
       camera.current.lookAt(ref.current.position.x, height, ref.current.position.z);
-    }
     }
   });
 
@@ -104,7 +109,9 @@ const Scene = () => {
   }, []);
   console.log('Scene загружается');
   const [isInventoryLocked, setIsInventoryLocked] = useState(false);
+  console.log(typeof setIsInventoryLocked);
   return (
+    <>
     <Canvas>
       {/* Камера */}
       <PerspectiveCamera ref={camera} makeDefault position={[0, 1, 10]} />
@@ -121,6 +128,9 @@ const Scene = () => {
       {/* Движущийся куб */}
       <MovableCube position={[0, 0.5, 0]} rotationSpeed={0.005} playerSpeed={0.1} camera={camera} isInventoryLocked={isInventoryLocked}/>
     </Canvas>
+    <Inventory setIsInventoryLocked={setIsInventoryLocked} />
+    {isInventoryLocked && <CustomCursor />}
+    </>
   );
 };
 
