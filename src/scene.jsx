@@ -1,15 +1,45 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
-import * as THREE from 'three'
+import * as THREE from 'three';
 import Inventory from './Inventory';
+
 
 const Room = () => {
   console.log('Room загружается');
   return (
-    <mesh>
-      <boxGeometry args={[10, 10, 10]} />
-      <meshBasicMaterial color="pink" side={THREE.DoubleSide} />
+    <mesh receiveShadow castShadow>
+      <boxGeometry args={[100, 100, 100]} />
+      <meshStandardMaterial color="pink" side={THREE.DoubleSide} />
+    </mesh>
+  );
+};
+
+const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
+  const ref = useRef();
+  const [isVisible, setIsVisible] = useState(true);
+  let flag = true
+  useFrame(() => {
+    if (cameraRef?.current && ref.current) {
+      // Вычисляем расстояние между камерой и Item
+      const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
+      const itemPos = new THREE.Vector3(...position);
+      const distance = cameraPos.distanceTo(itemPos);
+
+      // Меняем состояние видимости на основе расстояния
+      if (flag && (distance < threshold)) {
+        flag = false
+        setIsVisible(false)
+        
+      }
+
+    }
+  });
+
+  return (
+    <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
     </mesh>
   );
 };
@@ -17,7 +47,7 @@ const Room = () => {
 const PlaneFloor = () => (
   <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
     <planeGeometry args={[50, 50]} />
-    <meshBasicMaterial color="#808080" />
+    <meshStandardMaterial color="#808080" />
   </mesh>
 );
 
@@ -26,7 +56,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
   const ref = useRef();
   const [yaw, setYaw] = useState(0);
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false });
-  
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: true }));
@@ -36,9 +66,14 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
     };
     const handleMouseMove = (e) => {
       if (document.pointerLockElement) {
-        setYaw((prevYaw) => prevYaw - e.movementX * rotationSpeed);
+        const delta = THREE.MathUtils.clamp(e.movementX, -50, 50);
+        setYaw((prevYaw) => {
+          const newYaw = prevYaw - delta * rotationSpeed;
+          return newYaw % (2 * Math.PI); 
+        });
       }
     };
+    
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     document.addEventListener('mousemove', handleMouseMove);
@@ -57,41 +92,36 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
     const right = new THREE.Vector3(1, 0, 0);
     ref.current.rotation.y = yaw;
     if (!isInventoryLocked) {
-    if (keys["KeyW"]) 
-      ref.current.translateOnAxis(forward, playerSpeed);
-    if (keys["KeyS"]) 
-      ref.current.translateOnAxis(forward, -playerSpeed);
-    if (keys["KeyA"]) 
-      ref.current.translateOnAxis(right, -playerSpeed);
-    if (keys["KeyD"]) 
-      ref.current.translateOnAxis(right, playerSpeed);
-    if (camera.current) {
-      const distance = 5; // Фиксированное расстояние камеры от куба
-      const height = 2; // Камера будет немного выше куба
+      if (keys["KeyW"]) ref.current.translateOnAxis(forward, playerSpeed);
+      if (keys["KeyS"]) ref.current.translateOnAxis(forward, -playerSpeed);
+      if (keys["KeyA"]) ref.current.translateOnAxis(right, -playerSpeed);
+      if (keys["KeyD"]) ref.current.translateOnAxis(right, playerSpeed);
+      if (camera.current) {
+        const distance = 1; // Фиксированное расстояние камеры от куба
+        const height = 2; // Камера будет немного выше куба
 
-      // Камера должна следовать за кубом, но вращаться относительно его позиции
-      camera.current.position.set(
-        Math.sin(yaw) * distance + ref.current.position.x, // Камера позади куба, по оси X
-        height,                        // Камера чуть выше куба
-        Math.cos(yaw) * distance + ref.current.position.z   // Камера позади куба, по оси Z
-      );
+        camera.current.position.set(
+          Math.sin(yaw) * distance + ref.current.position.x,
+          height,
+          Math.cos(yaw) * distance + ref.current.position.z
+        );
 
-      // Камера всегда смотрит на куб
-      camera.current.lookAt(ref.current.position.x, height, ref.current.position.z);
-    }
+        camera.current.lookAt(ref.current.position.x, height, ref.current.position.z);
+      }
     }
   });
 
   return (
-    <mesh ref={ref} position={position}>
+    <mesh ref={ref} position={position} castShadow>
       <boxGeometry args={[1, 1, 1]} />
-      <meshBasicMaterial color="green" />
+      <meshStandardMaterial color="green" />
     </mesh>
   );
 };
 
 const Scene = () => {
   const camera = useRef();
+
   useEffect(() => {
     const handleClick = () => {
       document.body.requestPointerLock();
@@ -102,24 +132,30 @@ const Scene = () => {
       document.body.removeEventListener("click", handleClick);
     };
   }, []);
-  console.log('Scene загружается');
-  const [isInventoryLocked, setIsInventoryLocked] = useState(false);
+  
   return (
-    <Canvas>
-      {/* Камера */}
+    <Canvas shadows>
       <PerspectiveCamera ref={camera} makeDefault position={[0, 1, 10]} />
-      
-      {/* Освещение */}
+
       <ambientLight intensity={0.5} />
-      
-      {/* Плоскость */}
+      <spotLight 
+        position={[0, 2, 0]} 
+        intensity={5} 
+        castShadow
+      />
+
       <PlaneFloor />
-      
-      {/* Комната */}
       <Room />
-      
-      {/* Движущийся куб */}
-      <MovableCube position={[0, 0.5, 0]} rotationSpeed={0.005} playerSpeed={0.1} camera={camera} isInventoryLocked={isInventoryLocked}/>
+
+      {/* Передаём ссылку на камеру и пороговое расстояние */}
+      <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} />
+
+      <MovableCube 
+        position={[0, 0.5, 0]} 
+        rotationSpeed={0.005} 
+        playerSpeed={0.1} 
+        camera={camera} 
+      />
     </Canvas>
   );
 };

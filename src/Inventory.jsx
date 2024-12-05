@@ -10,6 +10,9 @@ function Inventory() {
     { id: 3, name: 'Предмет 3', imageUrl: '/images/уф лампа.avif' },
     { id: 4, name: 'Предмет 4', imageUrl: '/images/шкаф.jpg' }
   ];
+  const addItem = (item) => {
+    setItems((prevItems) => [...prevItems, item]);
+  };
   // Функция для переключения видимости инвентаря
   const toggleInventory = () => {
     setIsVisible((prev) => !prev);
