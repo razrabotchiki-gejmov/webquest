@@ -86,6 +86,7 @@ function Inventory({ setIsInventoryLocked }) {
               onDragStart={(e) => handleDragStart(e, index)}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, index)}
+              onDragEnd={handleDragEnd}
             >
               {cell.item && (
                 <>
