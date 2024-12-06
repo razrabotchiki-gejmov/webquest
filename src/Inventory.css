@@ -1,58 +1,64 @@
-/* Инвентарь - основное окно */
+/* Окно инвентаря */
 .inventory-window {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 90vw; /* 90% ширины экрана */
-    height: 90vh; /* 90% высоты экрана */
-    background-color: rgba(0, 0, 0, 0.7); /* Прозрачный черный фон */
+    width: 50vw; /* Уменьшили размер */
+    height: 40vw; /* Соотношение 5x4 */
+    background-color: rgba(0, 0, 0, 0.8);
     color: white;
     border: 2px solid #fff;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     align-items: center;
     z-index: 1000;
-    padding: 20px;
-}
-
-/* Заголовок инвентаря */
-.inventory-window h1 {
-    margin: 0;
-    font-size: 24px;
-    text-align: center;
-}
-
-/* Сетка для предметов в инвентаре */
-.inventory-items {
+    padding: 10px;
+  }
+  
+  /* Сетка для ячеек */
+  .inventory-items {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 элементов в ряд */
-    gap: 10px;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 5px;
     width: 100%;
-    height: 100%; /* Занимает всю высоту контейнера */
-    padding-top: 20px;
-    overflow-y: auto; /* Если элементов много, будет прокрутка */
-}
-
-/* Элемент инвентаря */
-.inventory-item {
+    height: 100%;
+  }
+  
+  /* Ячейка инвентаря */
+  .inventory-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: grab;
+    height: 100%;
+  }
+  
+  .inventory-item img {
+    width: 80%;
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+  }
+  
+  .inventory-item p {
+    font-size: 12px;
+    margin-top: 5px;
     text-align: center;
-    width: 20%; /* Каждый элемент занимает 20% ширины контейнера */
-    height: auto; /* Высота подстраивается под содержимое */
-}
-
-/* Изображение предмета */
-.inventory-item img {
-    width: 100%; /* Ширина изображения на 100% от контейнера */
-    height: auto; /* Высота изображения пропорциональна ширине */
-    object-fit: cover;
-    border-radius: 10px;
-}
-
-/* Параграф с описанием предмета */
-.inventory-item p {
-    font-size: 14px;
-    margin-top: 10px;
-}
+  }
+/* Стили для ячейки, в которую перетаскивают предмет */
+.inventory-item.drag-over {
+    border: 2px dashed #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .inventory-item.dragging {
+    opacity: 0;
+    pointer-events: none;
+  }
+      

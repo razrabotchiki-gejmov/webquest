@@ -19,7 +19,7 @@ const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
   const ref = useRef();
   const [isVisible, setIsVisible] = useState(true);
   let flag = true
-  const [keys, setKeys] = useState({KeyF : false});
+  const [keys, setKeys] = useState({KeyE : false});
   useEffect(() => {
     const handleKeyDown = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: true }));
@@ -38,12 +38,10 @@ const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
       const distance = cameraPos.distanceTo(itemPos);
 
       // Меняем состояние видимости на основе расстояния
-      if (flag && (distance < threshold) && keys['KeyF']) {
+      if (flag && (distance < threshold) && keys['KeyE']) {
         flag = false
-        setIsVisible(false)
-        
+        setIsVisible(false) 
       }
-
     }
   });
 
@@ -142,9 +140,10 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
 
 const Scene = () => {
   const camera = useRef();
-
+  const [isInventoryLocked, setIsInventoryLocked] = useState(false);
   useEffect(() => {
     const handleClick = () => {
+      if(isInventoryLocked) return;
       document.body.requestPointerLock();
     };
 
@@ -154,7 +153,6 @@ const Scene = () => {
     };
   }, []);
   // console.log('Scene загружается');
-  const [isInventoryLocked, setIsInventoryLocked] = useState(false);
   console.log(typeof setIsInventoryLocked);
   return (
     <>
