@@ -19,6 +19,17 @@ const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
   const ref = useRef();
   const [isVisible, setIsVisible] = useState(true);
   let flag = true
+  const [keys, setKeys] = useState({KeyF : false});
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      setKeys((prev) => ({ ...prev, [event.code]: true }));
+    };
+    const handleKeyUp = (event) => {
+      setKeys((prev) => ({ ...prev, [event.code]: false }));
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+  });
   useFrame(() => {
     if (cameraRef?.current && ref.current) {
       // Вычисляем расстояние между камерой и Item
@@ -27,7 +38,7 @@ const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
       const distance = cameraPos.distanceTo(itemPos);
 
       // Меняем состояние видимости на основе расстояния
-      if (flag && (distance < threshold)) {
+      if (flag && (distance < threshold) && keys['KeyF']) {
         flag = false
         setIsVisible(false)
         
