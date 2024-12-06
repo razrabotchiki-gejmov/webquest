@@ -52,7 +52,7 @@ const PlaneFloor = () => (
 );
 
 const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventoryLocked }) => {
-  console.log('Cube загружается');
+  //console.log('Cube загружается');
   const ref = useRef();
   const [yaw, setYaw] = useState(0);
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false });
@@ -70,6 +70,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
       setKeys((prev) => ({ ...prev, [event.code]: false }));
     };
     const handleMouseMove = (e) => {
+      //console.log('isInventoryLocked blocks rotation on inventory lock:', isInventoryLocked);
       if (isInventoryLocked || !document.pointerLockElement) return; 
         const delta = THREE.MathUtils.clamp(e.movementX, -50, 50);
         setYaw((prevYaw) => {
@@ -91,7 +92,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
 
   useFrame(() => {
     if (!ref.current) return;
-    console.log('isInventoryLocked:', isInventoryLocked);
+    // console.log('isInventoryLocked block movement:', isInventoryLocked);
     if (isInventoryLocked) return;
     const forward = new THREE.Vector3(0, 0, -1);
     const right = new THREE.Vector3(1, 0, 0);
@@ -106,7 +107,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
     if (keys["KeyD"]) 
       ref.current.translateOnAxis(right, playerSpeed);
     if (camera.current) {
-      const distance = 5; // Фиксированное расстояние камеры от куба
+      const distance = 1; // Фиксированное расстояние камеры от куба
       const height = 2; // Камера будет немного выше куба
 
         camera.current.position.set(
@@ -141,7 +142,7 @@ const Scene = () => {
       document.body.removeEventListener("click", handleClick);
     };
   }, []);
-  console.log('Scene загружается');
+  // console.log('Scene загружается');
   const [isInventoryLocked, setIsInventoryLocked] = useState(false);
   console.log(typeof setIsInventoryLocked);
   return (
@@ -166,7 +167,8 @@ const Scene = () => {
         position={[0, 0.5, 0]} 
         rotationSpeed={0.005} 
         playerSpeed={0.1} 
-        camera={camera} 
+        camera={camera}
+        isInventoryLocked={isInventoryLocked} 
       />
     </Canvas>
     <Inventory setIsInventoryLocked={setIsInventoryLocked} />
