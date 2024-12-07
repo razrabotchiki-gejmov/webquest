@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Inventory.css';
 
-function Inventory({ setIsInventoryLocked }) {
+function Inventory({ setIsInventoryLocked, setAddItemToInventory }) {
   const [isVisible, setIsVisible] = useState(false);
   const [grid, setGrid] = useState(
     Array(20).fill(null).map((_, index) => ({
@@ -12,50 +12,50 @@ function Inventory({ setIsInventoryLocked }) {
     }))
   );
 
+  // Функция для добавления предмета
+  const addItemToInventory = (item) => {
+    setGrid((prevGrid) => {
+      const newGrid = [...prevGrid];
+      const firstEmptyIndex = newGrid.findIndex((cell) => cell.item === null);
+      if (firstEmptyIndex !== -1) {
+        newGrid[firstEmptyIndex].item = item;
+      }
+      return newGrid;
+    });
+    console.log(grid);
+  };
+
   // Переключение видимости инвентаря
   const toggleInventory = () => {
     setIsVisible((prev) => !prev);
     setIsInventoryLocked((prev) => !prev);
   };
 
-  // Обработчик нажатия "I"
   useEffect(() => {
+    // Устанавливаем функцию добавления предметов
+    if (setAddItemToInventory) {
+      setAddItemToInventory(() => addItemToInventory);
+    }
+  
+    // Обработчик нажатия "I"
     const handleKeyDown = (event) => {
       if (event.code === 'KeyI') {
         toggleInventory();
       }
     };
-
+  
+    // Добавляем обработчик событий
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [setIsInventoryLocked]);
+  
+    // Очистка эффекта
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [setAddItemToInventory, setIsInventoryLocked]);
 
   // Обработчики перетаскивания
   const handleDragStart = (e, index) => {
     e.dataTransfer.setData('fromIndex', index);
-
-
-    const target = e.currentTarget;
-    target.classList.add('dragging');
-  };
-
-  const handleDragEnd = (e) => {
-    const target = e.currentTarget;
-    target.classList.remove('dragging');
-  };
-  
-  const handleDragEnter = (e, index) => {
-    e.preventDefault();
-  
-    // Добавляем стиль для ячейки, в которую перетаскивается предмет
-    const target = e.currentTarget;
-    target.classList.add('drag-over');
-  };
-
-  const handleDragLeave = (e) => {
-    // Убираем стиль, если курсор покидает ячейку
-    const target = e.currentTarget;
-    target.classList.remove('drag-over');
   };
 
   const handleDrop = (e, toIndex) => {
@@ -64,10 +64,6 @@ function Inventory({ setIsInventoryLocked }) {
     const [movedItem] = newGrid.splice(fromIndex, 1, { id: grid[fromIndex].id, item: null });
     newGrid[toIndex] = { id: grid[toIndex].id, item: movedItem.item };
     setGrid(newGrid);
-  
-    // Убираем стиль ячейки
-    const target = e.currentTarget;
-    target.classList.remove('drag-over');
   };
 
   const handleDragOver = (e) => e.preventDefault();
@@ -86,7 +82,6 @@ function Inventory({ setIsInventoryLocked }) {
               onDragStart={(e) => handleDragStart(e, index)}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, index)}
-              onDragEnd={handleDragEnd}
             >
               {cell.item && (
                 <>

@@ -6,7 +6,7 @@ import Inventory from './Inventory';
 import CustomCursor from './CustomCursor';
 
 const Room = () => {
-  console.log('Room загружается');
+  //console.log('Room загружается');
   return (
     <mesh receiveShadow castShadow>
       <boxGeometry args={[100, 100, 100]} />
@@ -15,11 +15,11 @@ const Room = () => {
   );
 };
 
-const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
+const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2, image, addItemToInventory  }) => {
   const ref = useRef();
-  const [isVisible, setIsVisible] = useState(true);
-  let flag = true
+  const [isDeleted, setIsDeleted] = useState(false);
   const [keys, setKeys] = useState({KeyE : false});
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: true }));
@@ -31,22 +31,22 @@ const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
     document.addEventListener('keyup', handleKeyUp);
   });
   useFrame(() => {
-    if (cameraRef?.current && ref.current) {
+    if (isDeleted || !cameraRef?.current || !ref.current) return; 
       // Вычисляем расстояние между камерой и Item
       const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
       const itemPos = new THREE.Vector3(...position);
       const distance = cameraPos.distanceTo(itemPos);
 
       // Меняем состояние видимости на основе расстояния
-      if (flag && (distance < threshold) && keys['KeyE']) {
-        flag = false
-        setIsVisible(false) 
-      }
-    }
+      if ((!isDeleted && distance < threshold) && keys['KeyE'] && addItemToInventory) {  
+        console.log('Предмет добавлен')      
+        addItemToInventory({name : 'Пистолет', imageUrl : image})
+        setIsDeleted(true) 
+      }    
   });
-
+  if (isDeleted) return null;
   return (
-    <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
+    <mesh ref={ref} position={position} receiveShadow castShadow>
       <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial color="red" side={THREE.DoubleSide} />
     </mesh>
@@ -141,6 +141,8 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
 const Scene = () => {
   const camera = useRef();
   const [isInventoryLocked, setIsInventoryLocked] = useState(false);
+  const [addItemToInventory, setAddItemToInventory] = useState(null)
+
   useEffect(() => {
     const handleClick = () => {
       if(isInventoryLocked) return;
@@ -151,9 +153,9 @@ const Scene = () => {
     return () => {
       document.body.removeEventListener("click", handleClick);
     };
-  }, []);
+  }, [isInventoryLocked]);
   // console.log('Scene загружается');
-  console.log(typeof setIsInventoryLocked);
+  // console.log(typeof setIsInventoryLocked);
   return (
     <>
     <Canvas shadows>
@@ -170,7 +172,7 @@ const Scene = () => {
       <Room />
 
       {/* Передаём ссылку на камеру и пороговое расстояние */}
-      <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} />
+      <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} image={`/images/пистолет.jpg`} addItemToInventory={addItemToInventory} />
 
       <MovableCube 
         position={[0, 0.5, 0]} 
@@ -180,7 +182,7 @@ const Scene = () => {
         isInventoryLocked={isInventoryLocked} 
       />
     </Canvas>
-    <Inventory setIsInventoryLocked={setIsInventoryLocked} />
+    <Inventory setIsInventoryLocked={setIsInventoryLocked} setAddItemToInventory={setAddItemToInventory}/>
     {isInventoryLocked && <CustomCursor />}
     </>
   );
