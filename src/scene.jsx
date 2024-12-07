@@ -4,6 +4,8 @@ import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import Inventory from './Inventory';
 import CustomCursor from './CustomCursor';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { useLoader } from '@react-three/fiber';
 
 const Room = () => {
   console.log('Room загружается');
@@ -138,21 +140,38 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
   );
 };
 
+const Model = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/wardrobe.glb');
+
+  return (
+    <primitive
+      object={gltf.scene}
+      position={position}
+      rotation={[0,80,0]}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
 const Scene = () => {
   const camera = useRef();
   const [isInventoryLocked, setIsInventoryLocked] = useState(false);
+  const lightRef = useRef();
+  const targetRef = useRef();
   useEffect(() => {
+    if (lightRef.current && targetRef.current) {
+      lightRef.current.target = targetRef.current;
+    }
     const handleClick = () => {
       if(isInventoryLocked) return;
       document.body.requestPointerLock();
     };
-
     document.body.addEventListener("click", handleClick);
     return () => {
       document.body.removeEventListener("click", handleClick);
     };
   }, []);
-  // console.log('Scene загружается');
+
   console.log(typeof setIsInventoryLocked);
   return (
     <>
@@ -165,11 +184,20 @@ const Scene = () => {
         intensity={5} 
         castShadow
       />
-
+      <spotLight 
+        ref={lightRef}
+        position={[-10, 7, 10]} 
+        intensity={80} 
+        castShadow
+        angle={Math.PI / 2.5}
+        penumbra={0.5}
+      />
+      <object3D ref={targetRef} position={[10, 10, 10]} />
       <PlaneFloor />
       <Room />
 
-      {/* Передаём ссылку на камеру и пороговое расстояние */}
+      <Model position={[10, 2.5, 8]} scale={2}/>
+
       <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} />
 
       <MovableCube 
