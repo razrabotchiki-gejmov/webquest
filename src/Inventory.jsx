@@ -30,6 +30,10 @@ function Inventory({setAddItemToInventory, setIsInventoryLocked}) {
   const toggleInventory = () => {
     setIsVisible((prev) => !prev);
     setIsInventoryLocked((prev) => !prev);
+    if(isVisible)
+      document.exitPointerLock();
+    else
+      document.body.requestPointerLock();
   };
 
   useEffect(() => {
