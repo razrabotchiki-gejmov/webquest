@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Inventory.css';
 
-function Inventory({ setIsInventoryLocked, setAddItemToInventory }) {
+function Inventory({setAddItemToInventory, setIsInventoryLocked}) {
   const [isVisible, setIsVisible] = useState(false);
   const [grid, setGrid] = useState(
     Array(20).fill(null).map((_, index) => ({
@@ -17,12 +17,13 @@ function Inventory({ setIsInventoryLocked, setAddItemToInventory }) {
     setGrid((prevGrid) => {
       const newGrid = [...prevGrid];
       const firstEmptyIndex = newGrid.findIndex((cell) => cell.item === null);
+      if((newGrid.findIndex((cell) => cell.item === item)) >= 0) return prevGrid;
       if (firstEmptyIndex !== -1) {
         newGrid[firstEmptyIndex].item = item;
       }
       return newGrid;
     });
-    console.log(grid);
+    console.log(grid)
   };
 
   // Переключение видимости инвентаря

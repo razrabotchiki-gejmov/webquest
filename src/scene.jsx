@@ -34,13 +34,14 @@ const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2, image, addItemTo
   });
   useFrame(() => {
     if (isDeleted || !cameraRef?.current || !ref.current) return; 
-      // Вычисляем расстояние между камерой и Item
-      const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
-      const itemPos = new THREE.Vector3(...position);
-      const distance = cameraPos.distanceTo(itemPos);
+      // Создаем луч из камеры в направлении ее взгляда
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera({ x: 0, y: 0 }, cameraRef.current); // Центр экрана (x=0, y=0)
+      const intersects = raycaster.intersectObject(ref.current);
 
       // Меняем состояние видимости на основе расстояния
-      if ((!isDeleted && distance < threshold) && keys['KeyE'] && addItemToInventory) {  
+      if (!isDeleted && intersects.length > 0 &&
+        intersects[0].distance < threshold && keys['KeyE'] && addItemToInventory) {  
         console.log('Предмет добавлен')      
         addItemToInventory({name : 'Пистолет', imageUrl : image})
         setIsDeleted(true) 
@@ -65,7 +66,8 @@ const PlaneFloor = () => (
 const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventoryLocked }) => {
   //console.log('Cube загружается');
   const ref = useRef();
-  const [yaw, setYaw] = useState(0);
+  const [yaw, setYaw] = useState(0); // Угол наклона по горизонтали
+  const [pitch, setPitch] = useState(0); // Угол наклона по вертикали
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false });
 
   useEffect(() => {
@@ -84,9 +86,14 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
       //console.log('isInventoryLocked blocks rotation on inventory lock:', isInventoryLocked);
       if (isInventoryLocked || !document.pointerLockElement) return; 
         const delta = THREE.MathUtils.clamp(e.movementX, -50, 50);
+        const deltaPitch = THREE.MathUtils.clamp(e.movementY, -50, 50);
         setYaw((prevYaw) => {
           const newYaw = prevYaw - delta * rotationSpeed;
           return newYaw % (2 * Math.PI); 
+        });
+        setPitch((prevPitch) => {
+          const newPitch = prevPitch - deltaPitch * rotationSpeed;
+          return THREE.MathUtils.clamp(newPitch, -Math.PI / 6, Math.PI / 6); // Ограничение наклона (-30° до +30°)
         });
       }    
     
@@ -123,7 +130,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
 
         camera.current.position.set(
           Math.sin(yaw) * distance + ref.current.position.x,
-          height,
+          Math.sin(pitch) * -distance + height,
           Math.cos(yaw) * distance + ref.current.position.z
         );
 
@@ -135,7 +142,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
   return (
     <mesh ref={ref} position={position} castShadow>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="green" />
+      <meshStandardMaterial color="green" transparent={true} opacity={0} />
     </mesh>
   );
 };
@@ -153,10 +160,8 @@ const Model = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
   );
 };
 
-const Scene = () => {
+const Scene = ({addItemToInventory, isInventoryLocked }) => {
   const camera = useRef();
-  const [isInventoryLocked, setIsInventoryLocked] = useState(false);
-  const [addItemToInventory, setAddItemToInventory] = useState(null)
 
   const lightRef = useRef();
   const targetRef = useRef();
@@ -210,8 +215,7 @@ const Scene = () => {
         isInventoryLocked={isInventoryLocked} 
       />
     </Canvas>
-    <Inventory setIsInventoryLocked={setIsInventoryLocked} setAddItemToInventory={setAddItemToInventory}/>
-    {isInventoryLocked && <CustomCursor />}
+    <CustomCursor />
     </>
   );
 };

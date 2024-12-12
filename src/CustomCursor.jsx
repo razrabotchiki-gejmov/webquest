@@ -8,10 +8,7 @@ const CustomCursor = () => {
   // Слушаем движение мыши
   useEffect(() => {
     const handleMouseMove = (e) => {
-      setPosition((prevPosition) => ({
-        x: prevPosition.x + e.movementX,
-        y: prevPosition.y + e.movementY,
-      }));
+      setPosition((prevPosition) => prevPosition);
     };
 
     // Отслеживаем события движения мыши
