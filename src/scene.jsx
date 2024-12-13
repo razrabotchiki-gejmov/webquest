@@ -2,8 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
-import Inventory from './Inventory';
-import CustomCursor from './CustomCursor';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
 
@@ -71,11 +69,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false });
 
   useEffect(() => {
-    if (isInventoryLocked) {
-      document.body.classList.remove('pointer-locked');
-    } else {
-      document.body.classList.add('pointer-locked');
-    }
+    if (isInventoryLocked) return;
     const handleKeyDown = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: true }));
     };
@@ -110,7 +104,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
 
   useFrame(() => {
     if (!ref.current) return;
-    // console.log('isInventoryLocked block movement:', isInventoryLocked);
+    //console.log('isInventoryLocked block movement:', isInventoryLocked);
     if (isInventoryLocked) return;
     const forward = new THREE.Vector3(0, 0, -1);
     const right = new THREE.Vector3(1, 0, 0);
@@ -170,7 +164,6 @@ const Scene = ({addItemToInventory, isInventoryLocked }) => {
       lightRef.current.target = targetRef.current;
     }
     const handleClick = () => {
-      if(isInventoryLocked) return;
       document.body.requestPointerLock();
     };
     document.body.addEventListener("click", handleClick);
@@ -215,7 +208,6 @@ const Scene = ({addItemToInventory, isInventoryLocked }) => {
         isInventoryLocked={isInventoryLocked} 
       />
     </Canvas>
-    <CustomCursor />
     </>
   );
 };

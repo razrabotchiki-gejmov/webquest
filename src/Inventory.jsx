@@ -30,10 +30,6 @@ function Inventory({setAddItemToInventory, setIsInventoryLocked}) {
   const toggleInventory = () => {
     setIsVisible((prev) => !prev);
     setIsInventoryLocked((prev) => !prev);
-    if(isVisible)
-      document.exitPointerLock();
-    else
-      document.body.requestPointerLock();
   };
 
   useEffect(() => {
@@ -59,16 +55,30 @@ function Inventory({setAddItemToInventory, setIsInventoryLocked}) {
   }, [setAddItemToInventory, setIsInventoryLocked]);
 
   // Обработчики перетаскивания
-  const handleDragStart = (e, index) => {
-    e.dataTransfer.setData('fromIndex', index);
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [prevIndex, setPrevIndex] = useState(0);
+
+  const handleDragStart = (index) => {
+    console.log(index);
+    setDraggedItem(grid[index]); // Сохраняем перетаскиваемый предмет
+    setPrevIndex(index);
+    console.log(draggedItem);
+    console.log(prevIndex);
   };
 
-  const handleDrop = (e, toIndex) => {
-    const fromIndex = e.dataTransfer.getData('fromIndex');
-    const newGrid = [...grid];
-    const [movedItem] = newGrid.splice(fromIndex, 1, { id: grid[fromIndex].id, item: null });
-    newGrid[toIndex] = { id: grid[toIndex].id, item: movedItem.item };
-    setGrid(newGrid);
+  const handleMouseUp = (index) => {
+    if (draggedItem) {
+      setGrid((prev) =>
+        prev.map((cell, i) =>
+          i === index ? { ...cell, item: draggedItem.item } : cell
+        )
+      );
+      if(grid[index] !== null && index !== prevIndex)
+      {
+        setGrid((prev) => prev.map((cell, i) => (i === prevIndex ? { ...cell, item: null } : cell))); // Убираем предмет из исходной ячейки
+        setDraggedItem(null); // Сбрасываем состояние
+      }
+    }
   };
 
   const handleDragOver = (e) => e.preventDefault();
@@ -83,10 +93,10 @@ function Inventory({setAddItemToInventory, setIsInventoryLocked}) {
               <div
               key={cell.id}
               className="inventory-item"
-              draggable={!!cell.item}
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, index)}
+              //draggable={!!cell.item}
+              onMouseDown={() => handleDragStart(index)}
+              onMouseUp={() => handleMouseUp(index)}
+              onMouseEnter={(e) => e.preventDefault()}
             >
               {cell.item && (
                 <>
