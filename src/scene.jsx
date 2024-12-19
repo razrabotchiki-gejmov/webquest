@@ -2,13 +2,11 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
-import Inventory from './Inventory';
-import CustomCursor from './CustomCursor';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
 
 const Room = () => {
-  console.log('Room загружается');
+  //console.log('Room загружается');
   return (
     <mesh receiveShadow castShadow>
       <boxGeometry args={[100, 100, 100]} />
@@ -17,11 +15,11 @@ const Room = () => {
   );
 };
 
-const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
+const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2, image, addItemToInventory  }) => {
   const ref = useRef();
-  const [isVisible, setIsVisible] = useState(true);
-  let flag = true
+  const [isDeleted, setIsDeleted] = useState(false);
   const [keys, setKeys] = useState({KeyE : false});
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: true }));
@@ -33,60 +31,23 @@ const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
     document.addEventListener('keyup', handleKeyUp);
   });
   useFrame(() => {
-    if (cameraRef?.current && ref.current) {
-      // Вычисляем расстояние между камерой и Item
-      const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
-      const itemPos = new THREE.Vector3(...position);
-      const distance = cameraPos.distanceTo(itemPos);
+    if (isDeleted || !cameraRef?.current || !ref.current) return; 
+      // Создаем луч из камеры в направлении ее взгляда
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera({ x: 0, y: 0 }, cameraRef.current); // Центр экрана (x=0, y=0)
+      const intersects = raycaster.intersectObject(ref.current);
 
       // Меняем состояние видимости на основе расстояния
-      if (flag && (distance < threshold) && keys['KeyE']) {
-        flag = false
-        setIsVisible(false) 
-      }
-    }
+      if (!isDeleted && intersects.length > 0 &&
+        intersects[0].distance < threshold && keys['KeyE'] && addItemToInventory) {  
+        console.log('Предмет добавлен')      
+        addItemToInventory({name : 'Пистолет', imageUrl : image})
+        setIsDeleted(true) 
+      }    
   });
-
+  if (isDeleted) return null;
   return (
-    <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
-    </mesh>
-  );
-};
-
-const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
-  const ref = useRef();
-  const [isVisible, setIsVisible] = useState(true);
-  let flag = true
-  const [keys, setKeys] = useState({KeyE : false});
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      setKeys((prev) => ({ ...prev, [event.code]: true }));
-    };
-    const handleKeyUp = (event) => {
-      setKeys((prev) => ({ ...prev, [event.code]: false }));
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-  });
-  useFrame(() => {
-    if (cameraRef?.current && ref.current) {
-      // Вычисляем расстояние между камерой и Item
-      const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
-      const itemPos = new THREE.Vector3(...position);
-      const distance = cameraPos.distanceTo(itemPos);
-
-      // Меняем состояние видимости на основе расстояния
-      if (flag && (distance < threshold) && keys['KeyE']) {
-        flag = false
-        setIsVisible(false) 
-      }
-    }
-  });
-
-  return (
-    <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
+    <mesh ref={ref} position={position} receiveShadow castShadow>
       <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial color="red" side={THREE.DoubleSide} />
     </mesh>
@@ -103,15 +64,12 @@ const PlaneFloor = () => (
 const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventoryLocked }) => {
   //console.log('Cube загружается');
   const ref = useRef();
-  const [yaw, setYaw] = useState(0);
+  const [yaw, setYaw] = useState(0); // Угол наклона по горизонтали
+  const [pitch, setPitch] = useState(0); // Угол наклона по вертикали
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false });
 
   useEffect(() => {
-    if (isInventoryLocked) {
-      document.body.classList.remove('pointer-locked');
-    } else {
-      document.body.classList.add('pointer-locked');
-    }
+    if (isInventoryLocked) return;
     const handleKeyDown = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: true }));
     };
@@ -122,9 +80,14 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
       //console.log('isInventoryLocked blocks rotation on inventory lock:', isInventoryLocked);
       if (isInventoryLocked || !document.pointerLockElement) return; 
         const delta = THREE.MathUtils.clamp(e.movementX, -50, 50);
+        const deltaPitch = THREE.MathUtils.clamp(e.movementY, -50, 50);
         setYaw((prevYaw) => {
           const newYaw = prevYaw - delta * rotationSpeed;
           return newYaw % (2 * Math.PI); 
+        });
+        setPitch((prevPitch) => {
+          const newPitch = prevPitch - deltaPitch * rotationSpeed;
+          return THREE.MathUtils.clamp(newPitch, -Math.PI / 6, Math.PI / 6); // Ограничение наклона (-30° до +30°)
         });
       }    
     
@@ -141,7 +104,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
 
   useFrame(() => {
     if (!ref.current) return;
-    // console.log('isInventoryLocked block movement:', isInventoryLocked);
+    //console.log('isInventoryLocked block movement:', isInventoryLocked);
     if (isInventoryLocked) return;
     const forward = new THREE.Vector3(0, 0, -1);
     const right = new THREE.Vector3(1, 0, 0);
@@ -161,7 +124,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
 
         camera.current.position.set(
           Math.sin(yaw) * distance + ref.current.position.x,
-          height,
+          Math.sin(pitch) * -distance + height,
           Math.cos(yaw) * distance + ref.current.position.z
         );
 
@@ -173,12 +136,12 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
   return (
     <mesh ref={ref} position={position} castShadow>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="green" />
+      <meshStandardMaterial color="green" transparent={true} opacity={0} />
     </mesh>
   );
 };
 
-const Closet = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+const Model = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
   const gltf = useLoader(GLTFLoader, 'src/models/wardrobe.glb');
 
   return (
@@ -191,62 +154,9 @@ const Closet = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
   );
 };
 
-const Chair = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
-  const gltf = useLoader(GLTFLoader, 'src/models/chair.glb');
-
-  return (
-    <primitive
-      object={gltf.scene}
-      position={position}
-      rotation={[0,80,0]}
-      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
-    />
-  );
-};
-
-const Desk = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
-  const gltf = useLoader(GLTFLoader, 'src/models/desk.glb');
-
-  return (
-    <primitive
-      object={gltf.scene}
-      position={position}
-      rotation={[0,80,0]}
-      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
-    />
-  );
-};
-
-const Nightstand = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
-  const gltf = useLoader(GLTFLoader, 'src/models/nightstand.glb');
-
-  return (
-    <primitive
-      object={gltf.scene}
-      position={position}
-      rotation={[0,80,0]}
-      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
-    />
-  );
-};
-
-const Table = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
-  const gltf = useLoader(GLTFLoader, 'src/models/table.glb');
-
-  return (
-    <primitive
-      object={gltf.scene}
-      position={position}
-      rotation={[0,80,0]}
-      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
-    />
-  );
-};
-
-
-const Scene = () => {
+const Scene = ({addItemToInventory, isInventoryLocked }) => {
   const camera = useRef();
-  const [isInventoryLocked, setIsInventoryLocked] = useState(false);
+
   const lightRef = useRef();
   const targetRef = useRef();
   useEffect(() => {
@@ -254,16 +164,15 @@ const Scene = () => {
       lightRef.current.target = targetRef.current;
     }
     const handleClick = () => {
-      if(isInventoryLocked) return;
       document.body.requestPointerLock();
     };
     document.body.addEventListener("click", handleClick);
     return () => {
       document.body.removeEventListener("click", handleClick);
     };
-  }, []);
-
-  console.log(typeof setIsInventoryLocked);
+  }, [isInventoryLocked]);
+  // console.log('Scene загружается');
+  // console.log(typeof setIsInventoryLocked);
   return (
     <>
     <Canvas shadows>
@@ -287,14 +196,9 @@ const Scene = () => {
       <PlaneFloor />
       <Room />
 
-      <Closet position={[10, 2.5, 8]} scale={2}/>
-      <Chair position={[10, 1, 12]} scale={2}/>
-      <Desk position={[10, 1.5, 15]} scale={2}/>
-      <Nightstand position={[10, 1, 19]} scale={2}/>
-      <Table position={[10, 1, 4]} scale={2}/>
+      <Model position={[10, 2.5, 8]} scale={2}/>
 
-      <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} />
-      <Pager position={[15, 1, -5]} cameraRef={camera} threshold={3} />
+      <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} image={`/images/пистолет.jpg`} addItemToInventory={addItemToInventory} />
 
       <MovableCube 
         position={[0, 0.5, 0]} 
@@ -304,8 +208,6 @@ const Scene = () => {
         isInventoryLocked={isInventoryLocked} 
       />
     </Canvas>
-    <Inventory setIsInventoryLocked={setIsInventoryLocked} />
-    {isInventoryLocked && <CustomCursor />}
     </>
   );
 };

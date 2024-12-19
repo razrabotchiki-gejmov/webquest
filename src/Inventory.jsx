@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Inventory.css';
 
-function Inventory({ setIsInventoryLocked }) {
+function Inventory({setAddItemToInventory, setIsInventoryLocked}) {
   const [isVisible, setIsVisible] = useState(false);
   const [grid, setGrid] = useState(
     Array(20).fill(null).map((_, index) => ({
@@ -12,62 +12,73 @@ function Inventory({ setIsInventoryLocked }) {
     }))
   );
 
+  // Функция для добавления предмета
+  const addItemToInventory = (item) => {
+    setGrid((prevGrid) => {
+      const newGrid = [...prevGrid];
+      const firstEmptyIndex = newGrid.findIndex((cell) => cell.item === null);
+      if((newGrid.findIndex((cell) => cell.item === item)) >= 0) return prevGrid;
+      if (firstEmptyIndex !== -1) {
+        newGrid[firstEmptyIndex].item = item;
+      }
+      return newGrid;
+    });
+    console.log(grid)
+  };
+
   // Переключение видимости инвентаря
   const toggleInventory = () => {
     setIsVisible((prev) => !prev);
     setIsInventoryLocked((prev) => !prev);
   };
 
-  // Обработчик нажатия "I"
   useEffect(() => {
+    // Устанавливаем функцию добавления предметов
+    if (setAddItemToInventory) {
+      setAddItemToInventory(() => addItemToInventory);
+    }
+  
+    // Обработчик нажатия "I"
     const handleKeyDown = (event) => {
       if (event.code === 'KeyI') {
         toggleInventory();
       }
     };
-
+  
+    // Добавляем обработчик событий
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [setIsInventoryLocked]);
+  
+    // Очистка эффекта
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [setAddItemToInventory, setIsInventoryLocked]);
 
   // Обработчики перетаскивания
-  const handleDragStart = (e, index) => {
-    e.dataTransfer.setData('fromIndex', index);
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [prevIndex, setPrevIndex] = useState(0);
 
-
-    const target = e.currentTarget;
-    target.classList.add('dragging');
+  const handleDragStart = (index) => {
+    console.log(index);
+    setDraggedItem(grid[index]); // Сохраняем перетаскиваемый предмет
+    setPrevIndex(index);
+    console.log(draggedItem);
+    console.log(prevIndex);
   };
 
-  const handleDragEnd = (e) => {
-    const target = e.currentTarget;
-    target.classList.remove('dragging');
-  };
-  
-  const handleDragEnter = (e, index) => {
-    e.preventDefault();
-  
-    // Добавляем стиль для ячейки, в которую перетаскивается предмет
-    const target = e.currentTarget;
-    target.classList.add('drag-over');
-  };
-
-  const handleDragLeave = (e) => {
-    // Убираем стиль, если курсор покидает ячейку
-    const target = e.currentTarget;
-    target.classList.remove('drag-over');
-  };
-
-  const handleDrop = (e, toIndex) => {
-    const fromIndex = e.dataTransfer.getData('fromIndex');
-    const newGrid = [...grid];
-    const [movedItem] = newGrid.splice(fromIndex, 1, { id: grid[fromIndex].id, item: null });
-    newGrid[toIndex] = { id: grid[toIndex].id, item: movedItem.item };
-    setGrid(newGrid);
-  
-    // Убираем стиль ячейки
-    const target = e.currentTarget;
-    target.classList.remove('drag-over');
+  const handleMouseUp = (index) => {
+    if (draggedItem) {
+      setGrid((prev) =>
+        prev.map((cell, i) =>
+          i === index ? { ...cell, item: draggedItem.item } : cell
+        )
+      );
+      if(grid[index] !== null && index !== prevIndex)
+      {
+        setGrid((prev) => prev.map((cell, i) => (i === prevIndex ? { ...cell, item: null } : cell))); // Убираем предмет из исходной ячейки
+        setDraggedItem(null); // Сбрасываем состояние
+      }
+    }
   };
 
   const handleDragOver = (e) => e.preventDefault();
@@ -82,11 +93,10 @@ function Inventory({ setIsInventoryLocked }) {
               <div
               key={cell.id}
               className="inventory-item"
-              draggable={!!cell.item}
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, index)}
-              onDragEnd={handleDragEnd}
+              //draggable={!!cell.item}
+              onMouseDown={() => handleDragStart(index)}
+              onMouseUp={() => handleMouseUp(index)}
+              onMouseEnter={(e) => e.preventDefault()}
             >
               {cell.item && (
                 <>
