@@ -55,6 +55,44 @@ const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
   );
 };
 
+const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
+  const ref = useRef();
+  const [isVisible, setIsVisible] = useState(true);
+  let flag = true
+  const [keys, setKeys] = useState({KeyE : false});
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      setKeys((prev) => ({ ...prev, [event.code]: true }));
+    };
+    const handleKeyUp = (event) => {
+      setKeys((prev) => ({ ...prev, [event.code]: false }));
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+  });
+  useFrame(() => {
+    if (cameraRef?.current && ref.current) {
+      // Вычисляем расстояние между камерой и Item
+      const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
+      const itemPos = new THREE.Vector3(...position);
+      const distance = cameraPos.distanceTo(itemPos);
+
+      // Меняем состояние видимости на основе расстояния
+      if (flag && (distance < threshold) && keys['KeyE']) {
+        flag = false
+        setIsVisible(false) 
+      }
+    }
+  });
+
+  return (
+    <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
+    </mesh>
+  );
+};
+
 const PlaneFloor = () => (
   <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
     <planeGeometry args={[50, 50]} />
@@ -140,7 +178,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
   );
 };
 
-const Model = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+const Closet = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
   const gltf = useLoader(GLTFLoader, 'src/models/wardrobe.glb');
 
   return (
@@ -152,6 +190,59 @@ const Model = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
     />
   );
 };
+
+const Chair = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/chair.glb');
+
+  return (
+    <primitive
+      object={gltf.scene}
+      position={position}
+      rotation={[0,80,0]}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const Desk = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/desk.glb');
+
+  return (
+    <primitive
+      object={gltf.scene}
+      position={position}
+      rotation={[0,80,0]}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const Nightstand = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/nightstand.glb');
+
+  return (
+    <primitive
+      object={gltf.scene}
+      position={position}
+      rotation={[0,80,0]}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const Table = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/table.glb');
+
+  return (
+    <primitive
+      object={gltf.scene}
+      position={position}
+      rotation={[0,80,0]}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
 
 const Scene = () => {
   const camera = useRef();
@@ -196,9 +287,14 @@ const Scene = () => {
       <PlaneFloor />
       <Room />
 
-      <Model position={[10, 2.5, 8]} scale={2}/>
+      <Closet position={[10, 2.5, 8]} scale={2}/>
+      <Chair position={[10, 1, 12]} scale={2}/>
+      <Desk position={[10, 1.5, 15]} scale={2}/>
+      <Nightstand position={[10, 1, 19]} scale={2}/>
+      <Table position={[10, 1, 4]} scale={2}/>
 
       <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} />
+      <Pager position={[15, 1, -5]} cameraRef={camera} threshold={3} />
 
       <MovableCube 
         position={[0, 0.5, 0]} 
