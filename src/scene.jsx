@@ -54,6 +54,83 @@ const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2, image, addItemTo
   );
 };
 
+const Modal = ({ onClose }) => {
+  useEffect(() => {
+    // Добавляем обработчик клика на документ
+    const handleOutsideClick = (event) => {
+      onClose(); // Закрыть модальное окно
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+
+    return () => {
+      // Удаляем обработчик при размонтировании компонента
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        background: "white",
+        padding: "20px",
+        boxShadow: "0px 0px 10px rgba(0,0,0,0.25)",
+        zIndex: 1000,
+      }}
+    >
+      <p>1 + 1 = ?</p>
+      <p>Закрыть</p>
+    </div>
+  );
+};
+
+const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2, onActivate }) => {
+  const ref = useRef();
+  const [isVisible, setIsVisible] = useState(true);
+  const [keys, setKeys] = useState({ KeyE: false });
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      setKeys((prev) => ({ ...prev, [event.code]: true }));
+    };
+    const handleKeyUp = (event) => {
+      setKeys((prev) => ({ ...prev, [event.code]: false }));
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  useFrame(() => {
+    if (cameraRef?.current && ref.current) {
+      const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
+      const itemPos = new THREE.Vector3(...position);
+      const distance = cameraPos.distanceTo(itemPos);
+
+      if (isVisible && distance < threshold && keys["KeyE"]) {
+        setIsVisible(false);
+        onActivate(); // Вызов callback для открытия окна
+      }
+    }
+  });
+
+  return (
+    <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
+    </mesh>
+  );
+};
+
+
 const PlaneFloor = () => (
   <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
     <planeGeometry args={[50, 50]} />
@@ -141,21 +218,116 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
   );
 };
 
-const Model = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
-  const gltf = useLoader(GLTFLoader, 'src/models/wardrobe.glb');
-
-  return (
-    <primitive
-      object={gltf.scene}
-      position={position}
-      rotation={[0,80,0]}
-      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
-    />
-  );
+// const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
+//   const ref = useRef();
+//   const [isVisible, setIsVisible] = useState(true);
+//     let flag = true
+//     const [keys, setKeys] = useState({KeyE : false});
+//     useEffect(() => {
+//       const handleKeyDown = (event) => {
+//         setKeys((prev) => ({ ...prev, [event.code]: true }));
+//       };
+//       const handleKeyUp = (event) => {
+//         setKeys((prev) => ({ ...prev, [event.code]: false }));
+//       };
+//       document.addEventListener('keydown', handleKeyDown);
+//       document.addEventListener('keyup', handleKeyUp);
+//     });
+//     useFrame(() => {
+//       if (cameraRef?.current && ref.current) {
+//         // Вычисляем расстояние между камерой и Item
+//         const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
+//         const itemPos = new THREE.Vector3(...position);
+//         const distance = cameraPos.distanceTo(itemPos);
+  
+//         // Меняем состояние видимости на основе расстояния
+//         if (flag && (distance < threshold) && keys['KeyE']) {
+//           flag = false
+//           setIsVisible(false) 
+//         }
+//       }
+//     });
+  
+//     return (
+//       <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
+//         <boxGeometry args={[1, 1, 1]} />
+//         <meshStandardMaterial color="red" side={THREE.DoubleSide} />
+//       </mesh>
+//     );
+// };
+  
+const Closet = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+    const gltf = useLoader(GLTFLoader, 'src/models/wardrobe.glb');
+    
+    return (
+      <primitive
+        object={gltf.scene}
+        position={position}
+        rotation={[0,80,0]}
+        scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+        />
+    );
 };
+  
+const Chair = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+    const gltf = useLoader(GLTFLoader, 'src/models/chair.glb');
+  
+    return (
+      <primitive
+        object={gltf.scene}
+        position={position}
+        rotation={[0,80,0]}
+        scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+      />
+    );
+};
+  
+const Desk = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+    const gltf = useLoader(GLTFLoader, 'src/models/desk.glb');
+  
+    return (
+      <primitive
+        object={gltf.scene}
+        position={position}
+        rotation={[0,80,0]}
+        scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+      />
+    );
+};
+  
+const Nightstand = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+    const gltf = useLoader(GLTFLoader, 'src/models/nightstand.glb');
+  
+    return (
+      <primitive
+        object={gltf.scene}
+        position={position}
+        rotation={[0,80,0]}
+        scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+      />
+    );
+};
+  
+const Table = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
+    const gltf = useLoader(GLTFLoader, 'src/models/table.glb');
+  
+    return (
+      <primitive
+        object={gltf.scene}
+        position={position}
+        rotation={[0,80,0]}
+        scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+      />
+    );
+};
+  
 
 const Scene = ({addItemToInventory, isInventoryLocked }) => {
   const camera = useRef();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
 
   const lightRef = useRef();
   const targetRef = useRef();
@@ -196,9 +368,19 @@ const Scene = ({addItemToInventory, isInventoryLocked }) => {
       <PlaneFloor />
       <Room />
 
-      <Model position={[10, 2.5, 8]} scale={2}/>
+      <Closet position={[10, 2.5, 8]} scale={2}/>
+      <Chair position={[10, 1, 12]} scale={2}/>
+      <Desk position={[10, 1.5, 15]} scale={2}/>
+      <Nightstand position={[10, 1, 19]} scale={2}/>
+      <Table position={[10, 1, 4]} scale={2}/>
 
-      <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} image={`/images/пистолет.jpg`} addItemToInventory={addItemToInventory} />
+      <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} />
+      <Pager 
+        position={[15, 1, -10]} 
+        cameraRef={camera} 
+        threshold={3} 
+        onActivate={() => setIsModalOpen(true)}
+      />
 
       <MovableCube 
         position={[0, 0.5, 0]} 
@@ -208,6 +390,7 @@ const Scene = ({addItemToInventory, isInventoryLocked }) => {
         isInventoryLocked={isInventoryLocked} 
       />
     </Canvas>
+    {isModalOpen && <Modal onClose={handleModalClose} />}
     </>
   );
 };
