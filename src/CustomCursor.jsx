@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './CustomCursor.css';
 
-const CustomCursor = () => {
+const CustomCursor = ({isInventoryLocked}) => {
   const [position, setPosition] = useState({ x: window.innerWidth / 2,
     y: window.innerHeight / 2, });
 
   // Слушаем движение мыши
   useEffect(() => {
     const handleMouseMove = (e) => {
+      if(!isInventoryLocked) return;
       setPosition((prevPosition) => ({
         x: prevPosition.x + e.movementX,
         y: prevPosition.y + e.movementY,

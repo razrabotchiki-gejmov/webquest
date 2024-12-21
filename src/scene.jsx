@@ -374,7 +374,7 @@ const Scene = ({addItemToInventory, isInventoryLocked }) => {
       <Nightstand position={[10, 1, 19]} scale={2}/>
       <Table position={[10, 1, 4]} scale={2}/>
 
-      <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} />
+      <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} addItemToInventory={addItemToInventory} />
       <Pager 
         position={[15, 1, -10]} 
         cameraRef={camera} 
