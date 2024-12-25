@@ -14,11 +14,14 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked }) {
 
   const [hotbar, setHotbar] = useState(Array(5).fill(null));
   const [selectedHotbarIndex, setSelectedHotbarIndex] = useState(0);
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, item: null });
+  const [inspectedItem, setInspectedItem] = useState(null);
 
   // Переключение видимости инвентаря
   const toggleInventory = () => {
     setIsVisible((prev) => !prev);
     setIsInventoryLocked((prev) => !prev);
+    setContextMenu({ visible: false, x: 0, y: 0, item: null }); // Закрыть контекстное меню
   };
 
   // Устанавливаем горячую панель на основе первой строки инвентаря
@@ -85,6 +88,27 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked }) {
     }
   };
 
+  const handleContextMenu = (event, item) => {
+    event.preventDefault();
+    setContextMenu({ visible: true, x: event.clientX, y: event.clientY, item });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu({ visible: false, x: 0, y: 0, item: null });
+  };
+
+  const handleInspectItem = () => {
+    if (contextMenu.item) {
+      setInspectedItem(contextMenu.item); // Установить осматриваемый предмет
+    }
+    closeContextMenu();
+  };
+
+  const closeInspectedItem = () => {
+    setInspectedItem(null); // Закрыть окно осмотра
+  };
+
+  
   return (
     <>
       {/* Инвентарь */}
@@ -98,6 +122,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked }) {
                 className="inventory-item"
                 onMouseDown={() => handleMouseDown(index)}
                 onMouseUp={() => handleMouseUp(index)}
+                onContextMenu={(e) => cell.item && handleContextMenu(e, cell.item)}
               >
                 {cell.item && (
                   <>
@@ -122,6 +147,27 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked }) {
             {cell?.item && <img src={cell?.item.imageUrl} alt="" />}
           </div>
           ))}
+        </div>
+      )}
+
+
+      {contextMenu.visible && (
+        <div
+          className="context-menu"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          onClick={closeContextMenu}
+        >
+          <div className="context-menu-item" onClick={handleInspectItem}>
+            Осмотреть
+          </div>
+        </div>
+      )}
+
+      {inspectedItem && (
+        <div className="inspection-modal" onClick={closeInspectedItem}>
+          <div className="inspection-content">
+            <img src={inspectedItem.imageUrl} alt={inspectedItem.name} />
+          </div>
         </div>
       )}
     </>
