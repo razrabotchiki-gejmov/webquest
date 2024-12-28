@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
 import './scene.css'
 import AddableItem from './AddableItem.jsx'
-extend(AddableItem)
+import IteractableItem from './IteractableItem.jsx';
 
 const Room = () => {
   //console.log('Room загружается');
@@ -340,6 +340,7 @@ const Scene = ({addItemToInventory, isInventoryLocked }) => {
       <Table position={[10, 1, 4]} scale={2}/>
 
       <AddableItem position={[15, 1, 0]} cameraRef={camera} threshold={3} image={'public/images/пистолет.jpg'}addItemToInventory={addItemToInventory} name={'Пистолет'} />
+      <IteractableItem position={[10,3,4]} cameraRef={camera} threshold={3} name={'Лампа'} description={'Лампа, проявляет скрытое'}/>
       <Pager 
         position={[15, 1, -10]} 
         cameraRef={camera} 

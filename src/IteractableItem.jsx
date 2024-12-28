@@ -2,21 +2,18 @@ import React, { useRef, useState, useEffect } from 'react';
 import {useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import './AddableItem.css';
+import './IteractableItem.css';
 
-const AddableItem = ({ 
+const IteractableItem = ({ 
   position = [0, 0, 0], 
   cameraRef, 
-  threshold = 2, 
-  image, 
-  addItemToInventory, 
+  threshold = 2,
   name,
   description = 'Описание 123' }) => {
 
   const ref = useRef();
-  const [isDeleted, setIsDeleted] = useState(false);
   const [keys, setKeys] = useState({KeyE : false});
-  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y:0, z: 0 });
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
 
   useEffect(() => {
@@ -30,15 +27,14 @@ const AddableItem = ({
     document.addEventListener('keyup', handleKeyUp);
   });
   useFrame(() => {
-    if (isDeleted || !cameraRef?.current || !ref.current) return; 
+    if (!cameraRef?.current || !ref.current) return; 
       // Создаем луч из камеры в направлении ее взгляда
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera({ x: 0, y: 0 }, cameraRef.current); // Центр экрана (x=0, y=0)
       const intersects = raycaster.intersectObject(ref.current);
 
       // Меняем состояние видимости на основе расстояния
-      if (intersects.length > 0 && intersects[0].distance < threshold && keys['KeyE']) {  
-        console.log('Предмет добавлен')      
+      if (intersects.length > 0 && intersects[0].distance < threshold && keys['KeyE']) {      
         setContextMenu({
           visible: true,
           x: cameraRef.current.position.x + cameraRef.current.getWorldDirection(new THREE.Vector3()).x * 2 , // Центр экрана
@@ -46,7 +42,6 @@ const AddableItem = ({
           z: cameraRef.current.position.z + cameraRef.current.getWorldDirection(new THREE.Vector3()).z * 2,
         });
         console.log(contextMenu.visible);
-        console.log('Position:', contextMenu.x + ' ' + contextMenu.z);
       }    
   });
  // Закрыть контекстное меню
@@ -55,12 +50,8 @@ const AddableItem = ({
   };
 
   // Подобрать предмет
-  const handlePickup = () => {
-    if (addItemToInventory) {
-      addItemToInventory({ name: name, imageUrl: image });
-      setIsDeleted(true);
+  const handleUse = () => {
       closeContextMenu();
-    }
   };
 
   // Показать описание
@@ -74,7 +65,6 @@ const AddableItem = ({
     setIsInspecting(false);
   };
 
-  if (isDeleted) return null;
   return (
     <>
       {/* Mesh для предмета */}
@@ -92,8 +82,8 @@ const AddableItem = ({
             <div
             className="context-menu"
             >
-                <div className="context-menu-item" onClick={handlePickup}>
-                    Подобрать предмет
+                <div className="context-menu-item" onClick={handleUse}>
+                    Взаимодействие
                 </div>
                 <div className="context-menu-item" onClick={handleInspect}>
                     Описание
@@ -120,4 +110,4 @@ const AddableItem = ({
   );
 };
 
-export default AddableItem;
+export default IteractableItem;
