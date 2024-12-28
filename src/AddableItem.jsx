@@ -111,7 +111,6 @@ const AddableItem = ({
                 <div className="item-description-content">
                     <h2>{name}</h2>
                     <p>{description}</p>
-                    <img src={image} alt={name} />
                 </div>
             </div>
         </Html>
