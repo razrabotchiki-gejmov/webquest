@@ -11,12 +11,12 @@ const AddableItem = ({
   image, 
   addItemToInventory, 
   name,
-  description = '' }) => {
+  description = 'Описание 123' }) => {
 
   const ref = useRef();
   const [isDeleted, setIsDeleted] = useState(false);
   const [keys, setKeys] = useState({KeyE : false});
-  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
 
   useEffect(() => {
@@ -41,16 +41,16 @@ const AddableItem = ({
         console.log('Предмет добавлен')      
         setContextMenu({
           visible: true,
-          x: window.innerWidth / 2, // Центр экрана
-          y: window.innerHeight / 2,
+          x: cameraRef.current.position.x + cameraRef.current.getWorldDirection(new THREE.Vector3()).x * 2 , // Центр экрана
+          z: cameraRef.current.position.z + cameraRef.current.getWorldDirection(new THREE.Vector3()).z * 2,
         });
         console.log(contextMenu.visible);
-        console.log('Position:', contextMenu.x + ' ' + contextMenu.y);
+        console.log('Position:', contextMenu.x + ' ' + contextMenu.z);
       }    
   });
  // Закрыть контекстное меню
   const closeContextMenu = () => {
-    setContextMenu({ visible: false, x: 0, y: 0 });
+    setContextMenu({ visible: false, x: contextMenu.x, z: contextMenu.z });
   };
 
   // Подобрать предмет
@@ -84,13 +84,12 @@ const AddableItem = ({
 
       {/* Контекстное меню */}
       {contextMenu.visible && (
-        <Html 
-        position={[contextMenu.x, contextMenu.y, cameraRef.current.position.z - 2]} 
+        <Html  
+        position={[contextMenu.x, 1.5, contextMenu.z]} 
         center
       >
             <div
             className="context-menu"
-            style={{ top: contextMenu.y, left: contextMenu.x }}
             >
                 <div className="context-menu-item" onClick={handlePickup}>
                     Подобрать предмет
@@ -105,9 +104,9 @@ const AddableItem = ({
       {/* Описание предмета */}
       {isInspecting && (
         <Html 
-        position={[contextMenu.x, contextMenu.y, cameraRef.current.position.z - 2]} 
+        position={[contextMenu.x, 1.5, contextMenu.z]}  
         center
-      >
+        >
             <div className="item-description-modal" onClick={closeInspect}>
                 <div className="item-description-content">
                     <h2>{name}</h2>
