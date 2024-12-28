@@ -1,0 +1,63 @@
+/* Контекстное меню */
+.context-menu {
+    position: absolute;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  width: 150px;
+  text-align: center;
+  }
+  
+  .context-menu-item {
+    margin: 5px 0;
+  cursor: pointer;
+  }
+  
+  .context-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Модальное окно описания */
+  .item-description-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  }
+  
+  .item-description-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .item-description-content img {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+    margin-top: 10px;
+  }
+  
+  .item-description-content h2 {
+    margin: 0;
+    margin-bottom: 10px;
+    color: black;
+  }
+  
+  .item-description-content p {
+    margin: 0;
+    color: black;
+    text-align: center;
+  }
+  

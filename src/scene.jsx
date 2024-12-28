@@ -1,9 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, extend, useFrame } from '@react-three/fiber';
 import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
+import './scene.css'
+import AddableItem from './item.jsx'
+extend(AddableItem)
 
 const Room = () => {
   //console.log('Room загружается');
@@ -11,45 +14,6 @@ const Room = () => {
     <mesh receiveShadow castShadow>
       <boxGeometry args={[100, 100, 100]} />
       <meshStandardMaterial color="pink" side={THREE.DoubleSide} />
-    </mesh>
-  );
-};
-
-const Item = ({ position = [0, 0, 0], cameraRef, threshold = 2, image, addItemToInventory  }) => {
-  const ref = useRef();
-  const [isDeleted, setIsDeleted] = useState(false);
-  const [keys, setKeys] = useState({KeyE : false});
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      setKeys((prev) => ({ ...prev, [event.code]: true }));
-    };
-    const handleKeyUp = (event) => {
-      setKeys((prev) => ({ ...prev, [event.code]: false }));
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-  });
-  useFrame(() => {
-    if (isDeleted || !cameraRef?.current || !ref.current) return; 
-      // Создаем луч из камеры в направлении ее взгляда
-      const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera({ x: 0, y: 0 }, cameraRef.current); // Центр экрана (x=0, y=0)
-      const intersects = raycaster.intersectObject(ref.current);
-
-      // Меняем состояние видимости на основе расстояния
-      if (!isDeleted && intersects.length > 0 &&
-        intersects[0].distance < threshold && keys['KeyE'] && addItemToInventory) {  
-        console.log('Предмет добавлен')      
-        addItemToInventory({name : 'Пистолет', imageUrl : image})
-        setIsDeleted(true) 
-      }    
-  });
-  if (isDeleted) return null;
-  return (
-    <mesh ref={ref} position={position} receiveShadow castShadow>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
     </mesh>
   );
 };
@@ -335,6 +299,7 @@ const Scene = ({addItemToInventory, isInventoryLocked }) => {
     if (lightRef.current && targetRef.current) {
       lightRef.current.target = targetRef.current;
     }
+    if(isInventoryLocked) return;
     const handleClick = () => {
       document.body.requestPointerLock();
     };
@@ -374,7 +339,7 @@ const Scene = ({addItemToInventory, isInventoryLocked }) => {
       <Nightstand position={[10, 1, 19]} scale={2}/>
       <Table position={[10, 1, 4]} scale={2}/>
 
-      <Item position={[15, 1, 0]} cameraRef={camera} threshold={3} image={'public/images/пистолет.jpg'}addItemToInventory={addItemToInventory} />
+      <AddableItem position={[15, 1, 0]} cameraRef={camera} threshold={3} image={'public/images/пистолет.jpg'}addItemToInventory={addItemToInventory} name={'Пистолет'} />
       <Pager 
         position={[15, 1, -10]} 
         cameraRef={camera} 

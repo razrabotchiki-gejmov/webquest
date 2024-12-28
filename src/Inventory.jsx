@@ -114,7 +114,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked }) {
       {/* Инвентарь */}
       {isVisible && (
         <div className="inventory-window">
-          <h1>Inventory</h1>
+          <h1>Инвентарь</h1>
           <div className="inventory-items">
             {grid.map((cell, index) => (
               <div
@@ -150,7 +150,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked }) {
         </div>
       )}
 
-
+      {/* Контекстное меню */}
       {contextMenu.visible && (
         <div
           className="context-menu"
@@ -163,6 +163,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked }) {
         </div>
       )}
 
+      {/* Осматриваемый объект */}
       {inspectedItem && (
         <div className="inspection-modal" onClick={closeInspectedItem}>
           <div className="inspection-content">
