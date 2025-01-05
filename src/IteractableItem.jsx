@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import './IteractableItem.css';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
+import HoverableObject from './HoverableObject';
 
 const IteractableItem = ({ 
   position = [0, 0, 0], 
@@ -14,8 +15,11 @@ const IteractableItem = ({
   itemInHand,
   description = 'Описание 123',
   meshBeforeIteract = 'src/models/desk.glb',
-  meshAfterIteract = 'src/models/chair.glb'}) => {
-
+  meshAfterIteract = 'src/models/chair.glb'
+}) => {
+  const handleHoverChange = (isHovered) => {
+    console.log(isHovered ? "Hovered" : "Not Hovered");
+  };
   const ref = useRef();
   const [keys, setKeys] = useState({KeyE : false});
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, z: 0 });
@@ -24,7 +28,6 @@ const IteractableItem = ({
   const initialMesh = useLoader(GLTFLoader, meshBeforeIteract);
   const afterMesh = useLoader(GLTFLoader, meshAfterIteract);
   
-
   useEffect(() => {
     const handleKeyDown = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: true }));
@@ -35,6 +38,7 @@ const IteractableItem = ({
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
   });
+  
   useFrame(() => {
     if (!cameraRef?.current || !ref.current) return; 
       // Создаем луч из камеры в направлении ее взгляда
@@ -82,24 +86,34 @@ const IteractableItem = ({
 
   return (
     <>
+    
       {/* Mesh для предмета */}
-      {!isIteracted && (
-      <primitive
-      ref={ref}
-      object={initialMesh.scene}
-      position={position}
-      rotation={[0,80,0]}
-      scale={Array.isArray(1) ? 1 : [1, 1, 1]}
-      />)}
 
-      {isIteracted && (
-      <primitive
-      ref={ref}
-      object={afterMesh.scene}
-      position={position}
-      rotation={[0,80,0]}
-      scale={Array.isArray(1) ? 1 : [1, 1, 1]}
-      />)}
+      <HoverableObject
+        cameraRef={cameraRef}
+        onHoverChange={handleHoverChange}
+        scaleOnHover={1.1}
+        colorOnHover="yellow"
+        baseColor="red"
+      >
+        {!isIteracted ? (
+          <primitive
+            ref={ref}
+            object={initialMesh.scene}
+            position={position}
+            rotation={[0, 80, 0]}
+            scale={1}
+          />
+        ) : (
+          <primitive
+            ref={ref}
+            object={afterMesh.scene}
+            position={position}
+            rotation={[0, 80, 0]}
+            scale={1}
+          />
+        )}
+      </HoverableObject>
 
       {/* Контекстное меню */}
       {contextMenu.visible && (

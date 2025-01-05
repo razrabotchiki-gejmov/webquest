@@ -7,6 +7,7 @@ import { useLoader } from '@react-three/fiber';
 import './scene.css'
 import AddableItem from './AddableItem.jsx'
 import IteractableItem from './IteractableItem.jsx';
+import HoverableObject from './HoverableObject';
 
 const Room = () => {
   //console.log('Room загружается');
@@ -53,14 +54,12 @@ const Modal = ({ onClose }) => {
 };
 
 const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2, onActivate }) => {
+  const handleHoverChange = (isHovered) => {
+    console.log(isHovered ? "Hovered" : "Not Hovered");
+  };
   const ref = useRef();
-  const [isHovered, setIsHovered] = useState(false); 
   const [isVisible, setIsVisible] = useState(true);
   const [keys, setKeys] = useState({ KeyE: false });
-  
-
-  const raycaster = useRef(new THREE.Raycaster());
-  const mouse = useRef(new THREE.Vector2());
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -69,35 +68,20 @@ const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2, onActivate }) =
     const handleKeyUp = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: false }));
     };
-    const handleMouseMove = (event) => {
-      mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    };
-
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keyup", handleKeyUp);
-    document.addEventListener('mousemove', handleMouseMove);
+
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
-      document.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
-  useFrame(({ scene }) => {
-    if (cameraRef.current && ref.current) {
-      raycaster.current.setFromCamera(mouse.current, cameraRef.current);
-      const intersects = raycaster.current.intersectObject(ref.current);
-      if (intersects.length > 0) {
-        setIsHovered(true);
-      } else {
-        setIsHovered(false);
-      }
-
+  useFrame(() => {
+    if (cameraRef?.current && ref.current) {
       const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
       const itemPos = new THREE.Vector3(...position);
       const distance = cameraPos.distanceTo(itemPos);
-
 
       if (isVisible && distance < threshold && keys["KeyE"]) {
         setIsVisible(false);
@@ -105,21 +89,20 @@ const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2, onActivate }) =
       }
     }
   });
-  
+
   return (
-    <mesh
-      ref={ref}
-      position={position}
-      receiveShadow
-      castShadow
-      scale={isHovered ? 1.1 : 1} // Увеличиваем объект при наведении
+    <HoverableObject
+      cameraRef={cameraRef}
+      onHoverChange={handleHoverChange}
+      scaleOnHover={1}
+      colorOnHover="yellow"
+      baseColor="red"
     >
+    <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial
-        color={isHovered ? "yellow" : "red"} // Меняем цвет при наведении
-        side={THREE.DoubleSide}
-      />
+      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
     </mesh>
+    </HoverableObject>
   );
 };
 
@@ -313,7 +296,6 @@ const Table = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
     );
 };
   
-
 const Scene = ({addItemToInventory, isInventoryLocked, itemInHand}) => {
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -375,7 +357,6 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand}) => {
         threshold={3} 
         onActivate={() => setIsModalOpen(true)}
       />
-
       <MovableCube 
         position={[0, 0.5, 0]} 
         rotationSpeed={0.005} 
