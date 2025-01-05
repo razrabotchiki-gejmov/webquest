@@ -3,18 +3,26 @@ import {useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import './IteractableItem.css';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { useLoader } from '@react-three/fiber';
 
 const IteractableItem = ({ 
   position = [0, 0, 0], 
   cameraRef, 
   threshold = 2,
   name,
-  description = 'Описание 123' }) => {
+  description = 'Описание 123',
+  meshBeforeIteract = 'src/models/desk.glb',
+  meshAfterIteract = 'src/models/chair.glb'}) => {
 
   const ref = useRef();
   const [keys, setKeys] = useState({KeyE : false});
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
+  const [isIteracted, setIsIteracted] = useState(false);
+  const initialMesh = useLoader(GLTFLoader, meshBeforeIteract);
+  const afterMesh = useLoader(GLTFLoader, meshAfterIteract);
+  
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -51,7 +59,9 @@ const IteractableItem = ({
 
   // Подобрать предмет
   const handleUse = () => {
+      setIsIteracted(true);
       closeContextMenu();
+      console.log(isIteracted);
   };
 
   // Показать описание
@@ -68,10 +78,23 @@ const IteractableItem = ({
   return (
     <>
       {/* Mesh для предмета */}
-      <mesh ref={ref} position={position} receiveShadow castShadow>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="red" side={THREE.DoubleSide} />
-      </mesh>
+      {!isIteracted && (
+      <primitive
+      ref={ref}
+      object={initialMesh.scene}
+      position={position}
+      rotation={[0,80,0]}
+      scale={Array.isArray(1) ? 1 : [1, 1, 1]}
+      />)}
+
+      {isIteracted && (
+      <primitive
+      ref={ref}
+      object={afterMesh.scene}
+      position={position}
+      rotation={[0,80,0]}
+      scale={Array.isArray(1) ? 1 : [1, 1, 1]}
+      />)}
 
       {/* Контекстное меню */}
       {contextMenu.visible && (

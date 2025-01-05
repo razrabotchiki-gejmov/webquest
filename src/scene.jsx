@@ -128,7 +128,7 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
         });
         setPitch((prevPitch) => {
           const newPitch = prevPitch - deltaPitch * rotationSpeed;
-          return THREE.MathUtils.clamp(newPitch, -Math.PI / 6, Math.PI / 6); // Ограничение наклона (-30° до +30°)
+          return THREE.MathUtils.clamp(newPitch, -Math.PI / 3, Math.PI / 3); // Ограничение наклона (-30° до +30°)
         });
       }    
     
@@ -340,7 +340,7 @@ const Scene = ({addItemToInventory, isInventoryLocked }) => {
       <Table position={[10, 1, 4]} scale={2}/>
 
       <AddableItem position={[15, 1, 0]} cameraRef={camera} threshold={3} image={'public/images/пистолет.jpg'}addItemToInventory={addItemToInventory} name={'Пистолет'} />
-      <IteractableItem position={[10,3,4]} cameraRef={camera} threshold={3} name={'Лампа'} description={'Лампа, проявляет скрытое'}/>
+      <IteractableItem position={[15,1,4]} cameraRef={camera} threshold={3} name={'Лампа'} description={'Лампа, проявляет скрытое'}/>
       <Pager 
         position={[15, 1, -10]} 
         cameraRef={camera} 
