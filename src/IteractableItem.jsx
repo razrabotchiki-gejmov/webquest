@@ -11,6 +11,7 @@ const IteractableItem = ({
   cameraRef, 
   threshold = 2,
   name,
+  itemInHand,
   description = 'Описание 123',
   meshBeforeIteract = 'src/models/desk.glb',
   meshAfterIteract = 'src/models/chair.glb'}) => {
@@ -59,7 +60,11 @@ const IteractableItem = ({
 
   // Подобрать предмет
   const handleUse = () => {
+    console.log(itemInHand);
+    if(itemInHand=='уф лампа')
+    {
       setIsIteracted(true);
+    }
       closeContextMenu();
       console.log(isIteracted);
   };
