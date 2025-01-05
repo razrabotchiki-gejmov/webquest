@@ -54,8 +54,13 @@ const Modal = ({ onClose }) => {
 
 const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2, onActivate }) => {
   const ref = useRef();
+  const [isHovered, setIsHovered] = useState(false); 
   const [isVisible, setIsVisible] = useState(true);
   const [keys, setKeys] = useState({ KeyE: false });
+  
+
+  const raycaster = useRef(new THREE.Raycaster());
+  const mouse = useRef(new THREE.Vector2());
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -64,20 +69,35 @@ const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2, onActivate }) =
     const handleKeyUp = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: false }));
     };
+    const handleMouseMove = (event) => {
+      mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    };
+
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keyup", handleKeyUp);
-
+    document.addEventListener('mousemove', handleMouseMove);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
+      document.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
-  useFrame(() => {
-    if (cameraRef?.current && ref.current) {
+  useFrame(({ scene }) => {
+    if (cameraRef.current && ref.current) {
+      raycaster.current.setFromCamera(mouse.current, cameraRef.current);
+      const intersects = raycaster.current.intersectObject(ref.current);
+      if (intersects.length > 0) {
+        setIsHovered(true);
+      } else {
+        setIsHovered(false);
+      }
+
       const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
       const itemPos = new THREE.Vector3(...position);
       const distance = cameraPos.distanceTo(itemPos);
+
 
       if (isVisible && distance < threshold && keys["KeyE"]) {
         setIsVisible(false);
@@ -85,15 +105,23 @@ const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2, onActivate }) =
       }
     }
   });
-
+  
   return (
-    <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
+    <mesh
+      ref={ref}
+      position={position}
+      receiveShadow
+      castShadow
+      scale={isHovered ? 1.1 : 1} // Увеличиваем объект при наведении
+    >
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
+      <meshStandardMaterial
+        color={isHovered ? "yellow" : "red"} // Меняем цвет при наведении
+        side={THREE.DoubleSide}
+      />
     </mesh>
   );
 };
-
 
 const PlaneFloor = () => (
   <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
