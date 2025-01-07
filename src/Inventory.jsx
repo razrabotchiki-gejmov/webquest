@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Inventory.css';
 
-function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand }) {
+function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand, setRemoveItemFromInventory }) {
   const [isVisible, setIsVisible] = useState(false);
   const [grid, setGrid] = useState(
     Array(20).fill(null).map((_, index) => ({
@@ -41,11 +41,22 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand 
       return newGrid;
     });
   };
+  // Функция для удаления предмета из инвентаря
+  const removeItemFromInventory = (itemName) => {
+    setGrid((prevGrid) =>
+      prevGrid.map((cell) =>
+        cell.item?.name === itemName ? { ...cell, item: null } : cell
+      )
+    );
+  };
 
   useEffect(() => {
     
     if (setAddItemToInventory) {
       setAddItemToInventory(() => addItemToInventory);
+    }
+    if (setRemoveItemFromInventory) {
+      setRemoveItemFromInventory(() => removeItemFromInventory);
     }
 
     const handleKeyDown = (event) => {
@@ -64,7 +75,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [setAddItemToInventory, setIsInventoryLocked, setItemInHand, isVisible]);
+  }, [setAddItemToInventory, setIsInventoryLocked, setRemoveItemFromInventory, setItemInHand, isVisible]);
 
   // Обработчики перетаскивания
   const [draggedItem, setDraggedItem] = useState(null);

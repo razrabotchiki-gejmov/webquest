@@ -296,7 +296,7 @@ const Table = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
     );
 };
   
-const Scene = ({addItemToInventory, isInventoryLocked, itemInHand}) => {
+const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory}) => {
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleModalClose = () => {
@@ -350,7 +350,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand}) => {
       <Table position={[10, 1, 4]} scale={2}/>
 
       <AddableItem position={[15, 1, 0]} cameraRef={camera} threshold={3} image={'/images/уф лампа.jpg'}addItemToInventory={addItemToInventory} name={'уф лампа'} />
-      <IteractableItem position={[15,1,4]} cameraRef={camera} threshold={3} name={'Лампа'} itemInHand={itemInHand} description={'Лампа, проявляет скрытое'}/>
+      <IteractableItem position={[15,1,4]} cameraRef={camera} threshold={3} name={'Лампа'} itemInHand={itemInHand} description={'Лампа, проявляет скрытое'} removeItemFromInventory={removeItemFromInventory}/>
       <Pager 
         position={[15, 1, -10]} 
         cameraRef={camera} 

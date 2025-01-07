@@ -15,7 +15,8 @@ const IteractableItem = ({
   itemInHand,
   description = 'Описание 123',
   meshBeforeIteract = 'src/models/desk.glb',
-  meshAfterIteract = 'src/models/chair.glb'
+  meshAfterIteract = 'src/models/chair.glb',
+  removeItemFromInventory
 }) => {
   const handleHoverChange = (isHovered) => {
     console.log(isHovered ? "Hovered" : "Not Hovered");
@@ -65,9 +66,14 @@ const IteractableItem = ({
   // Подобрать предмет
   const handleUse = () => {
     console.log(itemInHand);
-    if(itemInHand=='уф лампа')
+    if(!isIteracted)
     {
-      setIsIteracted(true);
+      if(name == 'Лампа' && itemInHand=='уф лампа')
+      {
+        setIsIteracted(true);
+        if(removeItemFromInventory)
+          removeItemFromInventory(itemInHand);
+      }
     }
       closeContextMenu();
       console.log(isIteracted);
