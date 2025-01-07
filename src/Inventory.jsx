@@ -6,9 +6,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
   const [grid, setGrid] = useState(
     Array(20).fill(null).map((_, index) => ({
       id: index + 1,
-      item: index < 4
-        ? { name: `Item ${index + 1}`, imageUrl: `/images/item${index + 1}.png` }
-        : null,
+      item: null,
     }))
   );
 
@@ -45,7 +43,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
   const removeItemFromInventory = (itemName) => {
     setGrid((prevGrid) =>
       prevGrid.map((cell) =>
-        cell.item?.name === itemName ? { ...cell, item: null } : cell
+        cell.item == itemName ? { ...cell, item: null } : cell
       )
     );
   };
@@ -65,8 +63,8 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       } else if (!isVisible && /^Digit[1-5]$/.test(event.code)) {
         const index = parseInt(event.code.slice(-1)) - 1;
         setSelectedHotbarIndex(index);
-        setItemInHand(grid[index].item.name);
-        console.log(grid[index].item.name)
+        setItemInHand(grid[index].item);
+        console.log(grid[index].item)
       }
     };
 

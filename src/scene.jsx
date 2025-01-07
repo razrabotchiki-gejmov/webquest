@@ -299,6 +299,8 @@ const Table = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
 const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory}) => {
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [wardrobeActive, setWardrobeActive] = useState(false);
+  const [changedWardrobePosition, setChangeWardrobePosition] = useState([10,2.5,8])
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
@@ -318,6 +320,20 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       document.body.removeEventListener("click", handleClick);
     };
   }, [isInventoryLocked]);
+
+    const handleWardrobeActivate = () =>
+    {
+      setWardrobeActive(true);
+      setTimeout(()=> {console.log('wardrobeActive: ' + wardrobeActive)},2000);
+    }
+    
+    const handleChangeWardrobePosition = () =>
+    {
+      setChangeWardrobePosition(prev => {const newPosition = [...prev];
+        newPosition[2] += 2;
+        return newPosition;})
+      setTimeout(()=> {console.log('changedPosition: ' + changedWardrobePosition)},2000);
+    }
   // console.log('Scene загружается');
   // console.log(typeof setIsInventoryLocked);
   return (
@@ -343,14 +359,18 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       <PlaneFloor />
       <Room />
 
-      <Closet position={[10, 2.5, 8]} scale={2}/>
       <Chair position={[10, 1, 12]} scale={2}/>
       <Desk position={[10, 1.5, 15]} scale={2}/>
       <Nightstand position={[10, 1, 19]} scale={2}/>
       <Table position={[10, 1, 4]} scale={2}/>
-
-      <AddableItem position={[15, 1, 0]} cameraRef={camera} threshold={3} image={'/images/уф лампа.jpg'}addItemToInventory={addItemToInventory} name={'уф лампа'} />
-      <IteractableItem position={[15,1,4]} cameraRef={camera} threshold={3} name={'Лампа'} itemInHand={itemInHand} description={'Лампа, проявляет скрытое'} removeItemFromInventory={removeItemFromInventory}/>
+      //Подбираемая УФ лампа
+      <AddableItem position={[15, 1, 0]} cameraRef={camera} threshold={3} image={'/images/уф лампа.jpg'} addItemToInventory={addItemToInventory} name={'уф лампа'} />
+      //Подсказка для УФ лампы
+      <AddableItem position={[10,2,4]} cameraRef={camera} threshold={3} image={'/images/Листок до подсказки.jpg'} addItemToInventory={addItemToInventory} name={'Листок с подсказкой'} />
+      //Интерактивная лампа в которую вставляется УФ лампа
+      <IteractableItem position={[15,1,4]} cameraRef={camera} threshold={3} name={'Лампа'} itemInHand={itemInHand} description={'Лампа, проявляет скрытое'} removeItemFromInventory={removeItemFromInventory} addItemToInventory={addItemToInventory} activateItem={handleWardrobeActivate}/>
+      //Шкаф который можно сдвинуть после активции подсказки
+      <IteractableItem position={changedWardrobePosition} size={2} cameraRef={camera} threshold={3} name={'Шкаф'} description='Выглядит так что можно сдвинуть' isActive={wardrobeActive} meshBeforeIteract='/src/models/wardrobe.glb' meshAfterIteract='/src/models/wardrobe.glb' activateItem={handleChangeWardrobePosition}/>
       <Pager 
         position={[15, 1, -10]} 
         cameraRef={camera} 

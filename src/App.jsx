@@ -9,7 +9,7 @@ function App() {
   const [removeItemFromInventory, setRemoveItemFromInventory] = useState(null);
   const [cursorPosition, setCursorPosition] = useState({ x: window.innerWidth / 2,
     y: window.innerHeight / 2, });
-  const [itemInHand, setItemInHand] = useState('');
+  const [itemInHand, setItemInHand] = useState(null);
   //console.log('isInventoryLocked ' + isInventoryLocked);
   return (
     <div style={{ width: '100vw', height: '100vh' }}>

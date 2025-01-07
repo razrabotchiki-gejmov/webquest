@@ -6,17 +6,22 @@ import './IteractableItem.css';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
 import HoverableObject from './HoverableObject';
+import { FixedTimer } from 'three/examples/jsm/Addons.js';
 
 const IteractableItem = ({ 
   position = [0, 0, 0], 
   cameraRef, 
   threshold = 2,
+  size = 1,
   name,
   itemInHand,
   description = 'Описание 123',
   meshBeforeIteract = 'src/models/desk.glb',
   meshAfterIteract = 'src/models/chair.glb',
-  removeItemFromInventory
+  removeItemFromInventory,
+  addItemToInventory,
+  isActive = true,
+  activateItem
 }) => {
   const handleHoverChange = (isHovered) => {
     console.log(isHovered ? "Hovered" : "Not Hovered");
@@ -41,7 +46,7 @@ const IteractableItem = ({
   });
   
   useFrame(() => {
-    if (!cameraRef?.current || !ref.current) return; 
+    if (!cameraRef?.current || !ref.current || !isActive) return; 
       // Создаем луч из камеры в направлении ее взгляда
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera({ x: 0, y: 0 }, cameraRef.current); // Центр экрана (x=0, y=0)
@@ -64,15 +69,31 @@ const IteractableItem = ({
   };
 
   // Подобрать предмет
+  const item = itemInHand;
   const handleUse = () => {
     console.log(itemInHand);
-    if(!isIteracted)
+    console.log(isActive);
+    if(isActive)
     {
-      if(name == 'Лампа' && itemInHand=='уф лампа')
+      if(name == 'Лампа' && itemInHand.name =='уф лампа')
       {
         setIsIteracted(true);
         if(removeItemFromInventory)
           removeItemFromInventory(itemInHand);
+      }
+      if(name == 'Лампа' && itemInHand.name =='Листок с подсказкой' && isIteracted)
+      {
+        if(removeItemFromInventory)
+          removeItemFromInventory(itemInHand);
+          setTimeout(() =>{
+            addItemToInventory({name: item.name, imageUrl: '/images/Листок для часов.jpg'});
+            activateItem();
+          },3000);
+      }
+      if(name == 'Шкаф' && !isIteracted)
+      {
+        setIsIteracted(true);
+        activateItem();
       }
     }
       closeContextMenu();
@@ -95,20 +116,14 @@ const IteractableItem = ({
     
       {/* Mesh для предмета */}
 
-      <HoverableObject
-        cameraRef={cameraRef}
-        onHoverChange={handleHoverChange}
-        scaleOnHover={1.1}
-        colorOnHover="yellow"
-        baseColor="red"
-      >
+      
         {!isIteracted ? (
           <primitive
             ref={ref}
             object={initialMesh.scene}
             position={position}
             rotation={[0, 80, 0]}
-            scale={1}
+            scale={size}
           />
         ) : (
           <primitive
@@ -116,10 +131,9 @@ const IteractableItem = ({
             object={afterMesh.scene}
             position={position}
             rotation={[0, 80, 0]}
-            scale={1}
+            scale={size}
           />
         )}
-      </HoverableObject>
 
       {/* Контекстное меню */}
       {contextMenu.visible && (
