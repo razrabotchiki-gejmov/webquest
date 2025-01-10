@@ -9,13 +9,87 @@ import AddableItem from './AddableItem.jsx'
 import IteractableItem from './IteractableItem.jsx';
 import HoverableObject from './HoverableObject';
 
+const size = 35;
+const color = 'pink'; // Цвет стен
+const floorColor = 'gray'; // Цвет пола
+const doorSize = 5;
+const smallRoomSize = 17.5;
+
 const Room = () => {
   //console.log('Room загружается');
   return (
-    <mesh receiveShadow castShadow>
-      <boxGeometry args={[100, 100, 100]} />
-      <meshStandardMaterial color="pink" side={THREE.DoubleSide} />
-    </mesh>
+    <>
+      {/* Пол */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+        <planeGeometry args={[size*2, size*2]} />
+        <meshStandardMaterial color={floorColor} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Потолок */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, size / 4, 0]}>
+        <planeGeometry args={[size*2, size*2]} />
+        <meshStandardMaterial color="black" side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Задняя стена */}
+      <mesh rotation={[0, 0, 0]} position={[0, 0, -size / 2]}>
+        <planeGeometry args={[size, size]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Передняя стена (с отверстием для двери) */}
+      {/* Левая часть передней стены */}
+      <mesh rotation={[0, -Math.PI, 0]} position={[-size / 6, 0, size / 2]}>
+        <planeGeometry args={[5 * size / 6, size]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Правая часть передней стены */}
+      <mesh rotation={[0, -Math.PI, 0]} position={[size / 2, 0, size / 2]}>
+        <planeGeometry args={[size /  2.5, size]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Верхняя часть передней стены */}
+      <mesh rotation={[0, -Math.PI, 0]} position={[0, 15, size / 2]}>
+        <planeGeometry args={[size, size/1.6]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Левая стена */}
+      <mesh rotation={[0, Math.PI / 2, 0]} position={[-size / 2, 0, 0]}>
+        <planeGeometry args={[size, size]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Правая стена */}
+      <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, 0]}>
+        <planeGeometry args={[size, size]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+
+      {/*Побочная комната*/}
+
+      {/* Правая стена */}
+      //8.75 1/4 стены
+      <mesh rotation={[0, Math.PI/2, 0]} position={[5.5, 0, 5*smallRoomSize/4]}>
+        <planeGeometry args={[smallRoomSize/2, smallRoomSize]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Левая стена */}
+      <mesh rotation={[0, Math.PI/2, 0]} position={[11.5, 0, 5*smallRoomSize/4]}>
+        <planeGeometry args={[smallRoomSize/2, smallRoomSize]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Задняя стена */}
+      <mesh rotation={[0, 0, 0]} position={[8, 0, 3*smallRoomSize/2]}>
+        <planeGeometry args={[smallRoomSize/2, smallRoomSize]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+    </>
   );
 };
 
@@ -106,13 +180,6 @@ const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2, onActivate }) =
   );
 };
 
-const PlaneFloor = () => (
-  <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-    <planeGeometry args={[50, 50]} />
-    <meshStandardMaterial color="#808080" />
-  </mesh>
-);
-
 const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventoryLocked }) => {
   //console.log('Cube загружается');
   const ref = useRef();
@@ -170,6 +237,9 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
       ref.current.translateOnAxis(right, -playerSpeed);
     if (keys["KeyD"]) 
       ref.current.translateOnAxis(right, playerSpeed);
+    const halfSize = size / 2 - 0.6;
+    ref.current.position.x = Math.max(-halfSize, Math.min(halfSize, ref.current.position.x));
+    //ref.current.position.z = Math.max(-halfSize, Math.min(halfSize, ref.current.position.z));
     if (camera.current) {
       const distance = 1; // Фиксированное расстояние камеры от куба
       const height = 2; // Камера будет немного выше куба
@@ -300,7 +370,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [wardrobeActive, setWardrobeActive] = useState(false);
-  const [changedWardrobePosition, setChangeWardrobePosition] = useState([10,2.5,8])
+  const [changedWardrobePosition, setChangeWardrobePosition] = useState([10,2.5,0])
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
@@ -330,7 +400,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
     const handleChangeWardrobePosition = () =>
     {
       setChangeWardrobePosition(prev => {const newPosition = [...prev];
-        newPosition[2] += 2;
+        newPosition[2] -= 3;
         return newPosition;})
       setTimeout(()=> {console.log('changedPosition: ' + changedWardrobePosition)},2000);
     }
@@ -356,19 +426,19 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
         penumbra={0.5}
       />
       <object3D ref={targetRef} position={[10, 10, 10]} />
-      <PlaneFloor />
       <Room />
 
       <Chair position={[10, 1, 12]} scale={2}/>
       <Desk position={[10, 1.5, 15]} scale={2}/>
       <Nightstand position={[10, 1, 19]} scale={2}/>
+      //Стол с лампой
       <Table position={[10, 1, 4]} scale={2}/>
       //Подбираемая УФ лампа
       <AddableItem position={[15, 1, 0]} cameraRef={camera} threshold={3} image={'/images/уф лампа.jpg'} addItemToInventory={addItemToInventory} name={'уф лампа'} />
       //Подсказка для УФ лампы
       <AddableItem position={[10,2,4]} cameraRef={camera} threshold={3} image={'/images/Листок до подсказки.jpg'} addItemToInventory={addItemToInventory} name={'Листок с подсказкой'} />
       //Интерактивная лампа в которую вставляется УФ лампа
-      <IteractableItem position={[15,1,4]} cameraRef={camera} threshold={3} name={'Лампа'} itemInHand={itemInHand} description={'Лампа, проявляет скрытое'} removeItemFromInventory={removeItemFromInventory} addItemToInventory={addItemToInventory} activateItem={handleWardrobeActivate}/>
+      <IteractableItem position={[11,2.5,4]} cameraRef={camera} threshold={3} name={'Лампа'} itemInHand={itemInHand} description={'Лампа, проявляет скрытое'} removeItemFromInventory={removeItemFromInventory} addItemToInventory={addItemToInventory} activateItem={handleWardrobeActivate}/>
       //Шкаф который можно сдвинуть после активции подсказки
       <IteractableItem position={changedWardrobePosition} size={2} cameraRef={camera} threshold={3} name={'Шкаф'} description='Выглядит так что можно сдвинуть' isActive={wardrobeActive} meshBeforeIteract='/src/models/wardrobe.glb' meshAfterIteract='/src/models/wardrobe.glb' activateItem={handleChangeWardrobePosition}/>
       <Pager 

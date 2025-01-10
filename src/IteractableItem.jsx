@@ -50,6 +50,7 @@ const IteractableItem = ({
       // Создаем луч из камеры в направлении ее взгляда
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera({ x: 0, y: 0 }, cameraRef.current); // Центр экрана (x=0, y=0)
+      //console.log(raycaster.intersectObject(ref.current))
       const intersects = raycaster.intersectObject(ref.current);
 
       // Меняем состояние видимости на основе расстояния
@@ -69,26 +70,30 @@ const IteractableItem = ({
   };
 
   // Подобрать предмет
-  const item = itemInHand;
   const handleUse = () => {
+    console.log(!itemInHand)
     console.log(itemInHand);
     console.log(isActive);
+    const item = itemInHand;
     if(isActive)
     {
-      if(name == 'Лампа' && itemInHand.name =='уф лампа')
-      {
-        setIsIteracted(true);
-        if(removeItemFromInventory)
-          removeItemFromInventory(itemInHand);
-      }
-      if(name == 'Лампа' && itemInHand.name =='Листок с подсказкой' && isIteracted)
-      {
-        if(removeItemFromInventory)
-          removeItemFromInventory(itemInHand);
-          setTimeout(() =>{
-            addItemToInventory({name: item.name, imageUrl: '/images/Листок для часов.jpg'});
-            activateItem();
-          },3000);
+      if(itemInHand) 
+      { 
+        if(name == 'Лампа' && itemInHand.name =='уф лампа')
+        {
+          setIsIteracted(true);
+          if(removeItemFromInventory)
+            removeItemFromInventory(itemInHand);
+        }
+        if(name == 'Лампа' && itemInHand.name =='Листок с подсказкой' && isIteracted)
+        {
+          if(removeItemFromInventory)
+            removeItemFromInventory(itemInHand);
+            setTimeout(() =>{
+              addItemToInventory({name: item.name, imageUrl: '/images/Листок для часов.jpg'});
+              activateItem();
+            },3000);
+        }
       }
       if(name == 'Шкаф' && !isIteracted)
       {

@@ -27,11 +27,12 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     setHotbar(grid.slice(0, 5));
   }, [grid]);
 
+  let firstEmptyIndex
   // Функция для добавления предмета в инвентарь
   const addItemToInventory = (item) => {
     setGrid((prevGrid) => {
       const newGrid = [...prevGrid];
-      const firstEmptyIndex = newGrid.findIndex((cell) => cell.item === null);
+      firstEmptyIndex = newGrid.findIndex((cell) => cell.item === null);
       if (newGrid.some((cell) => cell.item === item)) return prevGrid;
       if (firstEmptyIndex !== -1) {
         newGrid[firstEmptyIndex].item = item;
@@ -41,15 +42,28 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
   };
   // Функция для удаления предмета из инвентаря
   const removeItemFromInventory = (itemName) => {
-    setGrid((prevGrid) =>
-      prevGrid.map((cell) =>
-        cell.item == itemName ? { ...cell, item: null } : cell
-      )
+    setGrid((prevGrid) => {
+      const newGrid = [...prevGrid];
+      const index = newGrid.findIndex((cell) => cell.item === itemName);
+      newGrid[index].item = null;
+      return newGrid;
+      }
     );
   };
 
+  const recheckItem = (firstEmptyIndex) =>
+  {
+    if(!grid[firstEmptyIndex]) return;
+    //console.log("Item Rechecked")
+    //console.log(firstEmptyIndex);
+    //console.log(grid);
+    setItemInHand(grid[firstEmptyIndex].item);
+    //console.log(grid[firstEmptyIndex].item)
+  }
+
   useEffect(() => {
     
+    setInterval(() => recheckItem(firstEmptyIndex),1000);
     if (setAddItemToInventory) {
       setAddItemToInventory(() => addItemToInventory);
     }
@@ -62,9 +76,8 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
         toggleInventory();
       } else if (!isVisible && /^Digit[1-5]$/.test(event.code)) {
         const index = parseInt(event.code.slice(-1)) - 1;
+        recheckItem(index);
         setSelectedHotbarIndex(index);
-        setItemInHand(grid[index].item);
-        console.log(grid[index].item)
       }
     };
 
