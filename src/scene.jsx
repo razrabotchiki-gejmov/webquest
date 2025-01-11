@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Canvas, extend, useFrame } from '@react-three/fiber';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -9,6 +9,9 @@ import './scene.css'
 import AddableItem from './AddableItem.jsx'
 import IteractableItem from './IteractableItem.jsx';
 import HoverableObject from './HoverableObject';
+import { Raycaster } from 'three';
+import { SphereGeometry  } from 'three';
+
 
 const size = 35;
 const color = 'pink'; // Цвет стен
@@ -263,44 +266,6 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
     </mesh>
   );
 };
-
-// const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2 }) => {
-//   const ref = useRef();
-//   const [isVisible, setIsVisible] = useState(true);
-//     let flag = true
-//     const [keys, setKeys] = useState({KeyE : false});
-//     useEffect(() => {
-//       const handleKeyDown = (event) => {
-//         setKeys((prev) => ({ ...prev, [event.code]: true }));
-//       };
-//       const handleKeyUp = (event) => {
-//         setKeys((prev) => ({ ...prev, [event.code]: false }));
-//       };
-//       document.addEventListener('keydown', handleKeyDown);
-//       document.addEventListener('keyup', handleKeyUp);
-//     });
-//     useFrame(() => {
-//       if (cameraRef?.current && ref.current) {
-//         // Вычисляем расстояние между камерой и Item
-//         const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
-//         const itemPos = new THREE.Vector3(...position);
-//         const distance = cameraPos.distanceTo(itemPos);
-  
-//         // Меняем состояние видимости на основе расстояния
-//         if (flag && (distance < threshold) && keys['KeyE']) {
-//           flag = false
-//           setIsVisible(false) 
-//         }
-//       }
-//     });
-  
-//     return (
-//       <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
-//         <boxGeometry args={[1, 1, 1]} />
-//         <meshStandardMaterial color="red" side={THREE.DoubleSide} />
-//       </mesh>
-//     );
-// };
   
 const Closet = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
     const gltf = useLoader(GLTFLoader, 'src/models/wardrobe.glb');
@@ -405,6 +370,75 @@ const Table = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
       />
     );
 };
+
+const Projectile = ({ startPosition, direction, speed = 10, onRemove }) => {
+  const sphereGeometry = new SphereGeometry(1, 32, 32);
+  const meshRef = useRef();
+  useFrame((_, delta) => {
+    if (meshRef.current) {
+      meshRef.current.position.addScaledVector(direction, speed * delta);
+      if (meshRef.current.position.length() > 100) {
+        onRemove();
+      }
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={startPosition}>
+      <sphereGeometry args={[0.1, 16, 16]} />
+      <meshStandardMaterial color="yellow" />
+    </mesh>
+  );
+};
+
+const ShootingMechanic = () => {
+  const { camera, scene } = useThree();
+  const [projectiles, setProjectiles] = useState([]);
+  const [canShoot, setCanShoot] = useState(true);
+  const cooldown = 1000; // Cooldown in milliseconds
+
+  const shoot = () => {
+    if (!canShoot) return;
+
+    const raycaster = new Raycaster();
+    raycaster.setFromCamera({ x: 0, y: 0 }, camera); // Center of the screen
+    const direction = raycaster.ray.direction.clone();
+
+    const newProjectile = {
+      id: Date.now(),
+      startPosition: camera.position.clone(),
+      direction: direction.clone(),
+    };
+
+    setProjectiles((prev) => [...prev, newProjectile]);
+    setCanShoot(false);
+    setTimeout(() => setCanShoot(true), cooldown);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.code === 'Space') {
+        shoot();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [canShoot]);
+
+  return (
+    <>
+      {projectiles.map((proj) => (
+        <Projectile
+          key={proj.id}
+          startPosition={proj.startPosition}
+          direction={proj.direction}
+          onRemove={() => setProjectiles((prev) => prev.filter((p) => p.id !== proj.id))}
+        />
+      ))}
+    </>
+  );
+};
   
 const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory}) => {
   const camera = useRef();
@@ -497,6 +531,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
         camera={camera}
         isInventoryLocked={isInventoryLocked} 
       />
+      <ShootingMechanic />
     </Canvas>
     {isModalOpen && <Modal onClose={handleModalClose} />}
     </>
