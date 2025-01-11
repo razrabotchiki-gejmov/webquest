@@ -3,6 +3,7 @@ import { Canvas, extend, useFrame } from '@react-three/fiber';
 import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { useLoader } from '@react-three/fiber';
 import './scene.css'
 import AddableItem from './AddableItem.jsx'
@@ -339,6 +340,45 @@ const Desk = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
       />
     );
 };
+
+const Bulb = ({ position = [0, 0, 0], scale = 1, rotation = [0, 0, 0] }) => {
+  const fbx = useLoader(FBXLoader, 'src/models/bulb.fbx'); // Путь к вашей модели
+
+  return (
+    <primitive
+      object={fbx} // Без `.scene`, так как FBXLoader возвращает Group
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const LampEmpty = ({ position = [0, 0, 0], scale = 1, rotation = [0, 0, 0] }) => {
+  const fbx = useLoader(FBXLoader, 'src/models/lamp_empty.fbx'); // Путь к вашей модели
+
+  return (
+    <primitive
+      object={fbx} // Без `.scene`, так как FBXLoader возвращает Group
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const LampWbulb = ({ position = [0, 0, 0], scale = 1, rotation = [0, 0, 0] }) => {
+  const fbx = useLoader(FBXLoader, 'src/models/lamp_wbulb.fbx'); // Путь к вашей модели
+
+  return (
+    <primitive
+      object={fbx} // Без `.scene`, так как FBXLoader возвращает Group
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
   
 const Nightstand = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
     const gltf = useLoader(GLTFLoader, 'src/models/nightstand.glb');
@@ -430,6 +470,9 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       <Chair position={[10, 1, 12]} scale={2}/>
       <Desk position={[10, 1.5, 15]} scale={2}/>
+      <Bulb position={[0, 7, 0]} scale={0.05}/>
+      <LampWbulb position={[7, 3, 0]} scale={0.02}/>
+      <LampEmpty position={[-2, 4, 0]} scale={0.01}/>
       <Nightstand position={[10, 1, 19]} scale={2}/>
       //Стол с лампой
       <Table position={[10, 1, 4]} scale={2}/>
