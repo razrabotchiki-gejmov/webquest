@@ -7,17 +7,19 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
 import HoverableObject from './HoverableObject';
 import { FixedTimer } from 'three/examples/jsm/Addons.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 const IteractableItem = ({ 
   position = [0, 0, 0], 
   cameraRef, 
   threshold = 2,
   size = 1,
+  rotation = [0, -Math.PI/2, 0],
   name,
   itemInHand,
   description = 'Описание 123',
-  meshBeforeIteract = 'src/models/desk.glb',
-  meshAfterIteract = 'src/models/chair.glb',
+  meshBeforeIteract = '',
+  meshAfterIteract = '',
   removeItemFromInventory,
   addItemToInventory,
   isActive = true,
@@ -31,8 +33,10 @@ const IteractableItem = ({
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
   const [isIteracted, setIsIteracted] = useState(false);
-  const initialMesh = useLoader(GLTFLoader, meshBeforeIteract);
-  const afterMesh = useLoader(GLTFLoader, meshAfterIteract);
+  
+  const loader = meshBeforeIteract.endsWith('.glb') ? GLTFLoader : FBXLoader;
+  const initialMesh = useLoader(loader, meshBeforeIteract);
+  const afterMesh =  useLoader(loader, meshAfterIteract);
   
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -122,23 +126,23 @@ const IteractableItem = ({
       {/* Mesh для предмета */}
 
       
-        {!isIteracted ? (
-          <primitive
-            ref={ref}
-            object={initialMesh.scene}
-            position={position}
-            rotation={[0, 80, 0]}
-            scale={size}
-          />
-        ) : (
-          <primitive
-            ref={ref}
-            object={afterMesh.scene}
-            position={position}
-            rotation={[0, 80, 0]}
-            scale={size}
-          />
-        )}
+      {!isIteracted ? (
+        <primitive
+          ref={ref}
+          object={meshBeforeIteract.endsWith('.glb') ? initialMesh.scene : initialMesh}
+          position={position}
+          rotation={rotation}
+          scale={size}
+        />
+      ) : (
+        <primitive
+          ref={ref}
+          object={meshAfterIteract.endsWith('.glb') ? afterMesh.scene : afterMesh}
+          position={position}
+          rotation={rotation}
+          scale={size}
+        />
+      )}
 
       {/* Контекстное меню */}
       {contextMenu.visible && (

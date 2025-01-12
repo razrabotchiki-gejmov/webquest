@@ -13,11 +13,10 @@ import { Raycaster } from 'three';
 import { SphereGeometry  } from 'three';
 
 
-const size = 35;
+const size = 24;
 const color = 'pink'; // Цвет стен
 const floorColor = 'gray'; // Цвет пола
-const doorSize = 5;
-const smallRoomSize = 17.5;
+const smallRoomSize = size/2;
 
 const Room = () => {
   //console.log('Room загружается');
@@ -35,40 +34,59 @@ const Room = () => {
         <meshStandardMaterial color="black" side={THREE.DoubleSide} />
       </mesh>
 
-      {/* Задняя стена */}
+      {/* Передняя стена */}
       <mesh rotation={[0, 0, 0]} position={[0, 0, -size / 2]}>
         <planeGeometry args={[size, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* Передняя стена (с отверстием для двери) */}
-      {/* Левая часть передней стены */}
+      {/* Правая стена (с отверстием для двери) */}
+      {/* Левая часть */}
       <mesh rotation={[0, -Math.PI, 0]} position={[-size / 6, 0, size / 2]}>
-        <planeGeometry args={[5 * size / 6, size]} />
+        <planeGeometry args={[4.5 * size / 6, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* Правая часть передней стены */}
+      {/* Правая часть*/}
       <mesh rotation={[0, -Math.PI, 0]} position={[size / 2, 0, size / 2]}>
         <planeGeometry args={[size /  2.5, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* Верхняя часть передней стены */}
-      <mesh rotation={[0, -Math.PI, 0]} position={[0, 15, size / 2]}>
+      {/* Верхняя часть*/}
+      <mesh rotation={[0, -Math.PI, 0]} position={[0, 11, size / 2]}>
         <planeGeometry args={[size, size/1.6]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* Левая стена */}
+      {/* Задняя стена */}
       <mesh rotation={[0, Math.PI / 2, 0]} position={[-size / 2, 0, 0]}>
         <planeGeometry args={[size, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* Правая стена */}
+      {/* Правая стена с потайным отверстием */}
+      {/* Левая часть*/}
+      <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, -size/4]}>
+        <planeGeometry args={[size/2, size]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Правая часть*/}
+      <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, size/4+1]}>
+        <planeGeometry args={[size/2, size]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Нижняя часть*/}
       <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, 0]}>
-        <planeGeometry args={[size, size]} />
+        <planeGeometry args={[size, size/8]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Верхняя часть*/}
+      <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 5, 0]}>
+        <planeGeometry args={[size, 1.05*size/5]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
 
@@ -76,24 +94,62 @@ const Room = () => {
       {/*Побочная комната*/}
 
       {/* Правая стена */}
-      //8.75 1/4 стены
-      <mesh rotation={[0, Math.PI/2, 0]} position={[5.5, 0, 5*smallRoomSize/4]}>
+      <mesh rotation={[0, Math.PI/2, 0]} position={[3, 0, 5*smallRoomSize/4]}>
         <planeGeometry args={[smallRoomSize/2, smallRoomSize]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Левая стена */}
-      <mesh rotation={[0, Math.PI/2, 0]} position={[11.5, 0, 5*smallRoomSize/4]}>
+      <mesh rotation={[0, Math.PI/2, 0]} position={[9, 0, 5*smallRoomSize/4]}>
         <planeGeometry args={[smallRoomSize/2, smallRoomSize]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Задняя стена */}
+
+      {/* Левая часть */}
       <mesh rotation={[0, 0, 0]} position={[8, 0, 3*smallRoomSize/2]}>
-        <planeGeometry args={[smallRoomSize/2, smallRoomSize]} />
+        <planeGeometry args={[smallRoomSize/4, smallRoomSize]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+      {/* Правая часть */}
+      <mesh rotation={[0, 0, 0]} position={[4, 0, 3*smallRoomSize/2]}>
+        <planeGeometry args={[smallRoomSize/4, smallRoomSize]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+      {/* Нижняя часть */}
+      <mesh rotation={[0, 0, 0]} position={[6, 0, 3*smallRoomSize/2]}>
+        <planeGeometry args={[smallRoomSize, smallRoomSize/4]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
+      {/* Верхняя часть */}
+      <mesh rotation={[0, 0, 0]} position={[6, 5.5, 3*smallRoomSize/2]}>
+        <planeGeometry args={[smallRoomSize, smallRoomSize/2]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
     </>
+  );
+};
+const BoxForItems = ({position=[0,0,0], scale = 1, rotation =[0,0,0]}) => {
+  const ref=useRef();
+  return (
+    <mesh ref={ref} position={position} rotation={rotation}>
+      {/* Геометрия коробки */}
+      <boxGeometry args={[scale,scale,scale]}/>
+      {/* Материалы для каждой стороны */}
+      <meshStandardMaterial
+        attach="material-0" // Передняя сторона (индекс 0)
+        color="red"
+        transparent={true}
+        opacity={0} // Прозрачность
+        depthWrite={false}
+      />
+      <meshStandardMaterial attach="material-1" color="blue" side={THREE.DoubleSide}/> {/* Задняя сторона */}
+      <meshStandardMaterial attach="material-2" color="green" side={THREE.DoubleSide}/> {/* Верхняя сторона */}
+      <meshStandardMaterial attach="material-3" color="yellow" side={THREE.DoubleSide}/> {/* Нижняя сторона */}
+      <meshStandardMaterial attach="material-4" color="orange" side={THREE.DoubleSide}/> {/* Левая сторона */}
+      <meshStandardMaterial attach="material-5" color="purple" side={THREE.DoubleSide}/> {/* Правая сторона */}
+    </mesh>
   );
 };
 
@@ -318,41 +374,23 @@ const Bulb = ({ position = [0, 0, 0], scale = 1, rotation = [0, 0, 0] }) => {
     />
   );
 };
-
-const LampEmpty = ({ position = [0, 0, 0], scale = 1, rotation = [0, 0, 0] }) => {
-  const fbx = useLoader(FBXLoader, 'src/models/lamp_empty.fbx'); // Путь к вашей модели
-
-  return (
-    <primitive
-      object={fbx} // Без `.scene`, так как FBXLoader возвращает Group
-      position={position}
-      rotation={rotation}
-      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
-    />
-  );
-};
-
-const LampWbulb = ({ position = [0, 0, 0], scale = 1, rotation = [0, 0, 0] }) => {
-  const fbx = useLoader(FBXLoader, 'src/models/lamp_wbulb.fbx'); // Путь к вашей модели
-
-  return (
-    <primitive
-      object={fbx} // Без `.scene`, так как FBXLoader возвращает Group
-      position={position}
-      rotation={rotation}
-      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
-    />
-  );
-};
   
 const Nightstand = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
     const gltf = useLoader(GLTFLoader, 'src/models/nightstand.glb');
+    const ref = useRef();
+
+    useEffect(() => {
+      if (ref.current) {
+        ref.current.add(gltf.scene.clone());
+      }
+    }, [gltf]);
   
     return (
-      <primitive
+      <group
+        ref={ref}
         object={gltf.scene}
         position={position}
-        rotation={[0,80,0]}
+        rotation={[0,-Math.PI/2,0]}
         scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
       />
     );
@@ -444,7 +482,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [wardrobeActive, setWardrobeActive] = useState(false);
-  const [changedWardrobePosition, setChangeWardrobePosition] = useState([10,2.5,0])
+  const [changedWardrobePosition, setChangeWardrobePosition] = useState([11.3,2.2,0])
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
@@ -505,19 +543,24 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       <Chair position={[10, 1, 12]} scale={2}/>
       <Desk position={[10, 1.5, 15]} scale={2}/>
       <Bulb position={[0, 7, 0]} scale={0.05}/>
-      <LampWbulb position={[7, 3, 0]} scale={0.02}/>
-      <LampEmpty position={[-2, 4, 0]} scale={0.01}/>
-      <Nightstand position={[10, 1, 19]} scale={2}/>
-      //Стол с лампой
+      Шкаф в маленькой комнате пустой
+      <Nightstand position={[8, 1, 13]} scale={3}/>
+      Шкаф в маленькой комнате c патронами
+      <Nightstand position={[8, 1, 16]} scale={3}/>
+      Ящик за плакатом
+      <BoxForItems position={[6,2,18.5]} scale={1} rotation={[0,Math.PI/2,0]}/>
+      Стол c лампой
       <Table position={[10, 1, 4]} scale={2}/>
-      //Подбираемая УФ лампа
-      <AddableItem position={[15, 1, 0]} cameraRef={camera} threshold={3} image={'/images/уф лампа.jpg'} addItemToInventory={addItemToInventory} name={'уф лампа'} />
-      //Подсказка для УФ лампы
+      Подбираемая УФ лампа
+      <AddableItem position={[4, 3, 15]} cameraRef={camera} threshold={3} image={'/images/уф лампа.jpg'} addItemToInventory={addItemToInventory} name={'уф лампа'} />
+      Подсказка для УФ лампы
       <AddableItem position={[10,2,4]} cameraRef={camera} threshold={3} image={'/images/Листок до подсказки.jpg'} addItemToInventory={addItemToInventory} name={'Листок с подсказкой'} />
-      //Интерактивная лампа в которую вставляется УФ лампа
-      <IteractableItem position={[11,2.5,4]} cameraRef={camera} threshold={3} name={'Лампа'} itemInHand={itemInHand} description={'Лампа, проявляет скрытое'} removeItemFromInventory={removeItemFromInventory} addItemToInventory={addItemToInventory} activateItem={handleWardrobeActivate}/>
-      //Шкаф который можно сдвинуть после активции подсказки
+      Интерактивная лампа в которую вставляется УФ лампа
+      <IteractableItem position={[9,2,4]} cameraRef={camera} threshold={3} name={'Лампа'} itemInHand={itemInHand} description={'Лампа, проявляет скрытое'} removeItemFromInventory={removeItemFromInventory} addItemToInventory={addItemToInventory} activateItem={handleWardrobeActivate} meshBeforeIteract='/src/models/nightstand.glb' meshAfterIteract='/src/models/chair.glb'/>
+      Шкаф который можно сдвинуть после активции подсказки
       <IteractableItem position={changedWardrobePosition} size={2} cameraRef={camera} threshold={3} name={'Шкаф'} description='Выглядит так что можно сдвинуть' isActive={wardrobeActive} meshBeforeIteract='/src/models/wardrobe.glb' meshAfterIteract='/src/models/wardrobe.glb' activateItem={handleChangeWardrobePosition}/>
+      Ящик за шкафом
+      <BoxForItems position={[12.5,2,0.5]} scale={1} rotation={[0,-Math.PI,0]}/>
       <Pager 
         position={[15, 1, -10]} 
         cameraRef={camera} 
