@@ -3,6 +3,8 @@ import {useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import './AddableItem.css';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { useLoader } from '@react-three/fiber';
 
 const AddableItem = ({ 
   position = [0, 0, 0], 
@@ -11,6 +13,8 @@ const AddableItem = ({
   image, 
   addItemToInventory, 
   name,
+  mesh,
+  size = 2,
   description = 'Описание 123' }) => {
 
   const ref = useRef();
@@ -18,7 +22,7 @@ const AddableItem = ({
   const [keys, setKeys] = useState({KeyE : false});
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y:0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
-
+  const objectMesh = useLoader(GLTFLoader, mesh);
   useEffect(() => {
     const handleKeyDown = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: true }));
@@ -78,10 +82,13 @@ const AddableItem = ({
   return (
     <>
       {/* Mesh для предмета */}
-      <mesh ref={ref} position={position} receiveShadow castShadow>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="red" side={THREE.DoubleSide} />
-      </mesh>
+      <primitive
+          ref={ref}
+          object={objectMesh.scene}
+          position={position}
+          rotation={[0,0,0]}
+          scale={size}
+      />
 
       {/* Контекстное меню */}
       {contextMenu.visible && (

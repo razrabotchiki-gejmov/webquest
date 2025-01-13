@@ -33,10 +33,8 @@ const IteractableItem = ({
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
   const [isIteracted, setIsIteracted] = useState(false);
-  
-  const loader = meshBeforeIteract.endsWith('.glb') ? GLTFLoader : FBXLoader;
-  const initialMesh = useLoader(loader, meshBeforeIteract);
-  const afterMesh =  useLoader(loader, meshAfterIteract);
+  const initialMesh = useLoader(GLTFLoader, meshBeforeIteract);
+  const afterMesh =  useLoader(GLTFLoader, meshAfterIteract);
   
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -129,7 +127,7 @@ const IteractableItem = ({
       {!isIteracted ? (
         <primitive
           ref={ref}
-          object={meshBeforeIteract.endsWith('.glb') ? initialMesh.scene : initialMesh}
+          object={initialMesh.scene}
           position={position}
           rotation={rotation}
           scale={size}
@@ -137,7 +135,7 @@ const IteractableItem = ({
       ) : (
         <primitive
           ref={ref}
-          object={meshAfterIteract.endsWith('.glb') ? afterMesh.scene : afterMesh}
+          object={afterMesh.scene}
           position={position}
           rotation={rotation}
           scale={size}

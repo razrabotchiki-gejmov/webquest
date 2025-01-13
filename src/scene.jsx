@@ -542,7 +542,6 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       <Chair position={[10, 1, 12]} scale={2}/>
       <Desk position={[10, 1.5, 15]} scale={2}/>
-      <Bulb position={[0, 7, 0]} scale={0.05}/>
       Шкаф в маленькой комнате пустой
       <Nightstand position={[8, 1, 13]} scale={3}/>
       Шкаф в маленькой комнате c патронами
@@ -552,11 +551,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       Стол c лампой
       <Table position={[10, 1, 4]} scale={2}/>
       Подбираемая УФ лампа
-      <AddableItem position={[4, 3, 15]} cameraRef={camera} threshold={3} image={'/images/уф лампа.jpg'} addItemToInventory={addItemToInventory} name={'уф лампа'} />
+      <AddableItem position={[4, 3, 15]} cameraRef={camera} threshold={3} image={'/images/уф лампа.jpg'} mesh={'src/models/bulb.glb'} addItemToInventory={addItemToInventory} name={'уф лампа'} />
       Подсказка для УФ лампы
-      <AddableItem position={[10,2,4]} cameraRef={camera} threshold={3} image={'/images/Листок до подсказки.jpg'} addItemToInventory={addItemToInventory} name={'Листок с подсказкой'} />
+      <AddableItem position={[10,2,4]} cameraRef={camera} threshold={3} image={'/images/Листок до подсказки.jpg'} mesh={'src/models/arrow_hour.glb'} addItemToInventory={addItemToInventory} name={'Листок с подсказкой'} />
       Интерактивная лампа в которую вставляется УФ лампа
-      <IteractableItem position={[9,2,4]} cameraRef={camera} threshold={3} name={'Лампа'} itemInHand={itemInHand} description={'Лампа, проявляет скрытое'} removeItemFromInventory={removeItemFromInventory} addItemToInventory={addItemToInventory} activateItem={handleWardrobeActivate} meshBeforeIteract='/src/models/nightstand.glb' meshAfterIteract='/src/models/chair.glb'/>
+      <IteractableItem position={[9,2,4]} cameraRef={camera} threshold={3} name={'Лампа'} itemInHand={itemInHand} description={'Лампа, проявляет скрытое'} removeItemFromInventory={removeItemFromInventory} addItemToInventory={addItemToInventory} activateItem={handleWardrobeActivate} meshBeforeIteract='/src/models/lamp_empty.glb' meshAfterIteract='/src/models/lamp_wbulb.glb'/>
       Шкаф который можно сдвинуть после активции подсказки
       <IteractableItem position={changedWardrobePosition} size={2} cameraRef={camera} threshold={3} name={'Шкаф'} description='Выглядит так что можно сдвинуть' isActive={wardrobeActive} meshBeforeIteract='/src/models/wardrobe.glb' meshAfterIteract='/src/models/wardrobe.glb' activateItem={handleChangeWardrobePosition}/>
       Ящик за шкафом
