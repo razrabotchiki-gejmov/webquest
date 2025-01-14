@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -15,10 +15,11 @@ import { materialOpacity } from 'three/webgpu';
 import { mx_bilerp_1 } from 'three/src/nodes/materialx/lib/mx_noise.js';
 
 
+
 const size = 24;
 const color = 'pink'; // Цвет стен
 const floorColor = 'gray'; // Цвет пола
-const smallRoomSize = size/2;
+const smallRoomSize = size / 2;
 
 const Room = () => {
   //console.log('Room загружается');
@@ -447,75 +448,72 @@ const Locker = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   );
 };
 
-const Projectile = ({ startPosition, direction, speed = 10, onRemove }) => {
-  const sphereGeometry = new SphereGeometry(1, 32, 32);
-  const meshRef = useRef();
-  useFrame((_, delta) => {
-    if (meshRef.current) {
-      meshRef.current.position.addScaledVector(direction, speed * delta);
-      if (meshRef.current.position.length() > 100) {
-        onRemove();
+const Projectile = ({ position, direction }) => {
+  const ref = useRef();
+  const [hit, setHit] = useState(false);
+  const { scene } = useThree(); // Получаем доступ к сцене через useThree
+
+  useFrame(() => {
+    if (hit || !ref.current) return;
+    
+    // Движение шарика
+    ref.current.position.x += direction.x * 0.5;
+    ref.current.position.y += direction.y * 0.5;
+    ref.current.position.z += direction.z * 0.5;
+    
+    // Проверка столкновений
+    const raycaster = new THREE.Raycaster();
+    raycaster.set(ref.current.position, direction);
+    
+    const intersects = raycaster.intersectObjects(scene.children, true);
+    
+    if (intersects.length > 0 && intersects[0].distance < 1) {
+      const hitObject = intersects[0].object;
+      if (hitObject !== ref.current) {
+        console.log("Попадание в:", hitObject.name || "неизвестный объект");
+        setHit(true);
       }
     }
   });
 
-  return (
-    <mesh ref={meshRef} position={startPosition}>
-      <sphereGeometry args={[0.1, 16, 16]} />
+  return hit ? null : (
+    <mesh ref={ref} position={[position.x, position.y, position.z]}>
+      <sphereGeometry args={[0.2, 16, 16]} />
       <meshStandardMaterial color="yellow" />
     </mesh>
   );
 };
 
-const ShootingMechanic = () => {
-  const { camera, scene } = useThree();
+const ShootingMechanic = ({ camera }) => {
   const [projectiles, setProjectiles] = useState([]);
-  const [canShoot, setCanShoot] = useState(true);
-  const cooldown = 1000; // Cooldown in milliseconds
-
-  const shoot = () => {
-    if (!canShoot) return;
-
-    const raycaster = new Raycaster();
-    raycaster.setFromCamera({ x: 0, y: 0 }, camera); // Center of the screen
-    const direction = raycaster.ray.direction.clone();
-
-    const newProjectile = {
-      id: Date.now(),
-      startPosition: camera.position.clone(),
-      direction: direction.clone(),
-    };
-
-    setProjectiles((prev) => [...prev, newProjectile]);
-    setCanShoot(false);
-    setTimeout(() => setCanShoot(true), cooldown);
+  
+  const handleShoot = (event) => {
+    if (!camera.current) return;
+    
+    const direction = new THREE.Vector3();
+    camera.current.getWorldDirection(direction);
+    
+    setProjectiles(prev => [...prev, {
+      id: Math.random(),
+      position: camera.current.position.clone(),
+      direction: direction.normalize()
+    }]);
   };
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.code === 'Space') {
-        shoot();
-      }
-    };
+    window.addEventListener('click', handleShoot);
+    return () => window.removeEventListener('click', handleShoot);
+  }, [camera]);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [canShoot]);
-
-  return (
-    <>
-      {projectiles.map((proj) => (
-        <Projectile
-          key={proj.id}
-          startPosition={proj.startPosition}
-          direction={proj.direction}
-          onRemove={() => setProjectiles((prev) => prev.filter((p) => p.id !== proj.id))}
-        />
-      ))}
-    </>
-  );
+  return projectiles.map(proj => (
+    <Projectile
+      key={proj.id}
+      position={proj.position}
+      direction={proj.direction}
+    />
+  ));
 };
-  
+
 const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory}) => {
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -575,6 +573,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
         angle={Math.PI / 2.5}
         penumbra={0.5}
       />
+      
       <object3D ref={targetRef} position={[10, 10, 10]} />
       <Room />
 
@@ -645,7 +644,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
         camera={camera}
         isInventoryLocked={isInventoryLocked} 
       />
-      <ShootingMechanic />
+      <ShootingMechanic camera={camera} />
     </Canvas>
     {isModalOpen && <Modal onClose={handleModalClose} />}
     </>
