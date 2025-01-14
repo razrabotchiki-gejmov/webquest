@@ -7,7 +7,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
 import HoverableObject from './HoverableObject';
 import { FixedTimer } from 'three/examples/jsm/Addons.js';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 const IteractableItem = ({ 
   position = [0, 0, 0], 
@@ -92,7 +91,7 @@ const IteractableItem = ({
           if(removeItemFromInventory)
             removeItemFromInventory(itemInHand);
             setTimeout(() =>{
-              addItemToInventory({name: item.name, imageUrl: '/images/Листок для часов.jpg'});
+              addItemToInventory({name: item.name, imageUrl: '/images/Шкаф.jpg'});
               activateItem();
             },3000);
         }

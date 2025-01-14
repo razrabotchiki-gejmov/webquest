@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import './AddableItem.css';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
+import { rotate } from 'three/webgpu';
 
 const AddableItem = ({ 
   position = [0, 0, 0], 
@@ -15,6 +16,7 @@ const AddableItem = ({
   name,
   mesh,
   size = 2,
+  rotation = [0,Math.PI/2,0],
   description = 'Описание 123' }) => {
 
   const ref = useRef();
@@ -86,7 +88,7 @@ const AddableItem = ({
           ref={ref}
           object={objectMesh.scene}
           position={position}
-          rotation={[0,0,0]}
+          rotation={rotation}
           scale={size}
       />
 
