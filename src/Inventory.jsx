@@ -27,12 +27,12 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     setHotbar(grid.slice(0, 5));
   }, [grid]);
 
-  let firstEmptyIndex
+  
   // Функция для добавления предмета в инвентарь
   const addItemToInventory = (item) => {
     setGrid((prevGrid) => {
       const newGrid = [...prevGrid];
-      firstEmptyIndex = newGrid.findIndex((cell) => cell.item === null);
+      const firstEmptyIndex = newGrid.findIndex((cell) => cell.item === null);
       if (newGrid.some((cell) => cell.item === item)) return prevGrid;
       if (firstEmptyIndex !== -1) {
         newGrid[firstEmptyIndex].item = item;
@@ -51,19 +51,19 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     );
   };
 
-  const recheckItem = (firstEmptyIndex) =>
+  const recheckItem = (index) =>
   {
-    if(!grid[firstEmptyIndex]) return;
+    if(!grid[index]) return;
     //console.log("Item Rechecked")
     //console.log(firstEmptyIndex);
     //console.log(grid);
-    setItemInHand(grid[firstEmptyIndex].item);
-    //console.log(grid[firstEmptyIndex].item)
+    setItemInHand(grid[index].item);
+    //console.log(grid[index].item)
   }
 
   useEffect(() => {
     
-    setInterval(() => recheckItem(firstEmptyIndex),1000);
+    setInterval(() => recheckItem(activeIndex),1000);
     if (setAddItemToInventory) {
       setAddItemToInventory(() => addItemToInventory);
     }
@@ -71,13 +71,14 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       setRemoveItemFromInventory(() => removeItemFromInventory);
     }
 
+    let activeIndex
     const handleKeyDown = (event) => {
       if (event.code === 'KeyI') {
         toggleInventory();
       } else if (!isVisible && /^Digit[1-5]$/.test(event.code)) {
-        const index = parseInt(event.code.slice(-1)) - 1;
-        recheckItem(index);
-        setSelectedHotbarIndex(index);
+        activeIndex = parseInt(event.code.slice(-1)) - 1;
+        recheckItem(activeIndex);
+        setSelectedHotbarIndex(activeIndex);
       }
     };
 

@@ -266,7 +266,7 @@ const Locker = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
     }
   }, [gltf]);
   return (
-    <group
+    <primitive
       ref={ref}
       object={gltf.scene}
       position={position}
@@ -408,10 +408,32 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       <Room />
 
       Шкаф в маленькой комнате пустой
-      <Locker position={[8, 0, 13]} scale={1.5} rotation={[0,-Math.PI/2,0]}/>
+      <IteractableItem 
+      position={[8, 0, 13]} 
+      size={1.5} 
+      rotation={[0,-Math.PI/2,0]}
+      threshold={3}
+      cameraRef={camera}
+      name='Ящик'
+      descriptionBefore='Специализированное место для хранения различных предметов или инструментов.'
+      descriptionAfter='Специализированное место для хранения различных предметов или инструментов.'
+      meshBeforeIteract='src/models/locker.glb'
+      meshAfterIteract='src/models/locker_opened.glb'
+      keyEPressed={keys['KeyE']}/>
 
       Шкаф в маленькой комнате c патронами
-      <Locker position={[8, 0, 14]} scale={1.5} rotation={[0,-Math.PI/2,0]}/>
+      <IteractableItem 
+      position={[8, 0, 14]} 
+      size={1.5} 
+      rotation={[0,-Math.PI/2,0]}
+      threshold={3}
+      cameraRef={camera}
+      name='Ящик'
+      descriptionBefore='Специализированное место для хранения различных предметов или инструментов.'
+      descriptionAfter='Специализированное место для хранения различных предметов или инструментов.'
+      meshBeforeIteract='src/models/locker.glb'
+      meshAfterIteract='src/models/locker_opened.glb'
+      keyEPressed={keys['KeyE']}/>
 
       Ящик за плакатом
       <BoxForItems position={[6,2,18.5]} scale={1} rotation={[0,Math.PI/2,0]}/>
@@ -458,7 +480,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       cameraRef={camera} 
       threshold={3} 
       name='Шкаф' 
-      description='Место для хранения различных вещей. Почти всегда стоит на одном месте, хорошая причина спрятать за шкафом что-нибудь.' 
+      descriptionBefore ='Место для хранения различных вещей. Почти всегда стоит на одном месте, хорошая причина спрятать за шкафом что-нибудь.'
+      descriptionAfter='Больше нет смысла его пытаться двигать' 
       isActive={wardrobeActive} 
       meshBeforeIteract='src/models/wardrobe.glb' 
       meshAfterIteract='src/models/wardrobe.glb' 
@@ -476,18 +499,30 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       Холодильник
       <IteractableItem 
       position={[-11,0,11.5]} 
-      size={2} 
+      size={1.5} 
       rotation={[0,Math.PI,0]} 
       cameraRef={camera} 
       threshold={3} 
       name='Холодильник'
-      description='Хранилище для продуктов питания. Некоторую еду можно заморозить, тогда она будет оставаться свежей долгое время.' 
+      descriptionBefore='Хранилище для продуктов питания. Некоторую еду можно заморозить, тогда она будет оставаться свежей долгое время.' 
+      descriptionAfter='Хранилище для продуктов питания. Некоторую еду можно заморозить, тогда она будет оставаться свежей долгое время.'
       meshBeforeIteract='src/models/fridge.glb' 
-      meshAfterIteract='src/models/fridge.glb'
+      meshAfterIteract='src/models/fridge_opened.glb'
       keyEPressed={keys['KeyE']}/>
       
       Стол c ящиком с подсказой для УФ лампы и кружкой внутри которой стрелка
-      <Desk position={[-11.2, 0, 0]} scale={1.5} rotation={[0,Math.PI/2,0]}/>
+      <IteractableItem 
+      position={[-11.2, 0, 0]} 
+      size={1.5} 
+      rotation={[0,Math.PI/2,0]} 
+      cameraRef={camera} 
+      threshold={3} 
+      name='Стол с замком'
+      descriptionBefore='Для чего понадобилось запирать ящик на замок?' 
+      descriptionAfter='Для чего понадобилось запирать ящик на замок?'
+      meshBeforeIteract='src/models/desk_withlock.glb' 
+      meshAfterIteract='src/models/desk_opened.glb'
+      keyEPressed={keys['KeyE']}/>
 
       Подсказка для УФ лампы
       <AddableItem 
@@ -540,7 +575,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       cameraRef={camera} 
       threshold={3} 
       name='Часы' 
-      description='В современное время не часто можно увидеть такие громоздкие приспособления. Может они не только время показывать умеют. Прямо сейчас в часах нет стрелок, без них от устройства нет смысла.'
+      descriptionBefore='В современное время не часто можно увидеть такие громоздкие приспособления. Может они не только время показывать умеют. Прямо сейчас в часах нет стрелок, без них от устройства нет смысла.'
       meshBeforeIteract='src/models/clock_closed.glb' 
       meshAfterIteract='src/models/clock_opened.glb'
       keyEPressed={keys['KeyE']}/>
@@ -559,14 +594,27 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       size={2} rotation={[0,Math.PI,0]} 
       cameraRef={camera} 
       threshold={3} 
-      name='Ящик со стрелкой' 
-      description='Специализированное место для хранения различных предметов или инструментов.' 
+      name='Ящик' 
+      descriptionBefore='Специализированное место для хранения различных предметов или инструментов.'
+      descriptionAfter='Специализированное место для хранения различных предметов или инструментов.'  
       meshBeforeIteract='src/models/nightstand.glb' 
-      meshAfterIteract='src/models/nightstand.glb'
+      meshAfterIteract='src/models/nightstand_opened.glb'
       keyEPressed={keys['KeyE']}/>
       
       Шкаф у колонны с телефоном
-      <Locker position={[-1,0,0]} scale={1.5} rotation={[0,0,0]}/>
+      <IteractableItem 
+      position={[-1,0,0]} 
+      size={1.5} 
+      rotation={[0,0,0]}
+      threshold={3}
+      cameraRef={camera}
+      name='Ящик'
+      isActive={false}
+      descriptionBefore='Специализированное место для хранения различных предметов или инструментов.'
+      descriptionAfter='Специализированное место для хранения различных предметов или инструментов.'
+      meshBeforeIteract='src/models/locker.glb'
+      meshAfterIteract='src/models/locker_opened.glb'
+      keyEPressed={keys['KeyE']}/>
       
       <MovableCube 
         position={[0, 0.5, 0]} 

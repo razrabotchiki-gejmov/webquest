@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import {useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,6 +7,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
 import HoverableObject from './HoverableObject';
 import { FixedTimer } from 'three/examples/jsm/Addons.js';
+import ClockInteraction from './ClockInteraction';
 
 const IteractableItem = ({ 
   position = [0, 0, 0], 
@@ -33,10 +34,11 @@ const IteractableItem = ({
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
   const [isIteracted, setIsIteracted] = useState(false);
-  const initialMesh = useLoader(GLTFLoader, meshBeforeIteract);
-  const afterMesh =  useLoader(GLTFLoader, meshAfterIteract);
-  
-  
+  const initMesh = useLoader(GLTFLoader, meshBeforeIteract);
+  const aftMesh =  useLoader(GLTFLoader, meshAfterIteract);
+  const initialMesh = useMemo(() => initMesh.scene.clone(), [initMesh]);
+  const afterMesh = useMemo(() => aftMesh.scene.clone(), [aftMesh]);
+  const [clockActive, setClockActive] = useState(false);
   useFrame(() => {
     if (!cameraRef?.current || !ref.current || !isActive) return; 
       // Создаем луч из камеры в направлении ее взгляда
@@ -53,7 +55,7 @@ const IteractableItem = ({
           y: cameraRef.current.position.y + cameraRef.current.getWorldDirection(new THREE.Vector3()).y * 2,
           z: cameraRef.current.position.z + cameraRef.current.getWorldDirection(new THREE.Vector3()).z * 2,
         });
-        console.log(contextMenu.visible);
+        //console.log(contextMenu.x + ' ' + contextMenu.y + ' ' + contextMenu.z);
       }    
   });
  // Закрыть контекстное меню
@@ -77,12 +79,12 @@ const IteractableItem = ({
           if(removeItemFromInventory)
             removeItemFromInventory(itemInHand);
         }
-        if(name == 'Лампа' && itemInHand.name =='Листок с подсказкой' && isIteracted)
+        if(name == 'Лампа' && itemInHand.name =='Листок с изображением лампочки' && isIteracted)
         {
           if(removeItemFromInventory)
             removeItemFromInventory(itemInHand);
             setTimeout(() =>{
-              addItemToInventory({name: item.name, imageUrl: '/images/Шкаф.jpg'});
+              addItemToInventory({name: 'Листок с изображение шкафа', imageUrl: '/images/шкаф.jpg'});
               activateItem();
             },3000);
         }
@@ -94,7 +96,11 @@ const IteractableItem = ({
       }
       if(name == 'Часы')
       {
-        setIsIteracted(true);
+        setClockActive(true);
+      }
+      if(name == 'Ящик' || name == 'Холодильник')
+      {
+        setIsIteracted(!isIteracted);
       }
     }
       closeContextMenu();
@@ -112,6 +118,10 @@ const IteractableItem = ({
     setIsInspecting(false);
   };
 
+  const handleClockClose = () =>{
+    setClockActive(false);
+  }
+
   return (
     <>
     
@@ -121,7 +131,7 @@ const IteractableItem = ({
       {!isIteracted ? (
         <primitive
           ref={ref}
-          object={initialMesh.scene}
+          object={initialMesh}
           position={position}
           rotation={rotation}
           scale={size}
@@ -129,7 +139,7 @@ const IteractableItem = ({
       ) : (
         <primitive
           ref={ref}
-          object={afterMesh.scene}
+          object={afterMesh}
           position={position}
           rotation={rotation}
           scale={size}
@@ -179,6 +189,15 @@ const IteractableItem = ({
                 </div>
             </div>
         </Html>))
+      }
+      {clockActive && <ClockInteraction 
+      correctHour={8.5} 
+      position={[contextMenu.x, contextMenu.y, contextMenu.z]} 
+      onSuccess={() => {
+        setIsIteracted(true);
+        setClockActive(false);
+      }}
+      onClose={handleClockClose}/>
       }
     </>
   );
