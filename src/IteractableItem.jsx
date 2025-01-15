@@ -16,35 +16,26 @@ const IteractableItem = ({
   rotation = [0, -Math.PI/2, 0],
   name,
   itemInHand,
-  description = 'Описание 123',
+  descriptionBefore = 'Описание 123',
+  descriptionAfter = 'Описание после',
   meshBeforeIteract = '',
   meshAfterIteract = '',
   removeItemFromInventory,
   addItemToInventory,
   isActive = true,
-  activateItem
+  activateItem,
+  keyEPressed = false
 }) => {
   const handleHoverChange = (isHovered) => {
     console.log(isHovered ? "Hovered" : "Not Hovered");
   };
   const ref = useRef();
-  const [keys, setKeys] = useState({KeyE : false});
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
   const [isIteracted, setIsIteracted] = useState(false);
   const initialMesh = useLoader(GLTFLoader, meshBeforeIteract);
   const afterMesh =  useLoader(GLTFLoader, meshAfterIteract);
   
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      setKeys((prev) => ({ ...prev, [event.code]: true }));
-    };
-    const handleKeyUp = (event) => {
-      setKeys((prev) => ({ ...prev, [event.code]: false }));
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-  });
   
   useFrame(() => {
     if (!cameraRef?.current || !ref.current || !isActive) return; 
@@ -55,7 +46,7 @@ const IteractableItem = ({
       const intersects = raycaster.intersectObject(ref.current);
 
       // Меняем состояние видимости на основе расстояния
-      if (intersects.length > 0 && intersects[0].distance < threshold && keys['KeyE']) {      
+      if (intersects.length > 0 && intersects[0].distance < threshold && keyEPressed) {      
         setContextMenu({
           visible: true,
           x: cameraRef.current.position.x + cameraRef.current.getWorldDirection(new THREE.Vector3()).x * 2 , // Центр экрана
@@ -100,6 +91,10 @@ const IteractableItem = ({
       {
         setIsIteracted(true);
         activateItem();
+      }
+      if(name == 'Часы')
+      {
+        setIsIteracted(true);
       }
     }
       closeContextMenu();
@@ -161,7 +156,7 @@ const IteractableItem = ({
       )}
 
       {/* Описание предмета */}
-      {isInspecting && (
+      {isInspecting && ( !isIteracted ? (
         <Html 
         position={[contextMenu.x, contextMenu.y, contextMenu.z]}  
         center
@@ -169,11 +164,22 @@ const IteractableItem = ({
             <div className="item-description-modal" onClick={closeInspect}>
                 <div className="item-description-content">
                     <h2>{name}</h2>
-                    <p>{description}</p>
+                    <p>{descriptionBefore}</p>
                 </div>
             </div>
-        </Html>
-      )}
+        </Html>) : (
+        <Html 
+        position={[contextMenu.x, contextMenu.y, contextMenu.z]}  
+        center
+        >
+            <div className="item-description-modal" onClick={closeInspect}>
+                <div className="item-description-content">
+                    <h2>{name}</h2>
+                    <p>{descriptionAfter}</p>
+                </div>
+            </div>
+        </Html>))
+      }
     </>
   );
 };

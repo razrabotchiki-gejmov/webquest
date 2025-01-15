@@ -17,7 +17,8 @@ const AddableItem = ({
   mesh,
   size = 2,
   rotation = [0,Math.PI/2,0],
-  description = 'Описание 123' }) => {
+  description = 'Описание 123',
+  keyEPressed = false }) => {
 
   const ref = useRef();
   const [isDeleted, setIsDeleted] = useState(false);
@@ -25,16 +26,6 @@ const AddableItem = ({
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y:0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
   const objectMesh = useLoader(GLTFLoader, mesh);
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      setKeys((prev) => ({ ...prev, [event.code]: true }));
-    };
-    const handleKeyUp = (event) => {
-      setKeys((prev) => ({ ...prev, [event.code]: false }));
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-  });
   useFrame(() => {
     if (isDeleted || !cameraRef?.current || !ref.current) return; 
       // Создаем луч из камеры в направлении ее взгляда
@@ -43,7 +34,7 @@ const AddableItem = ({
       const intersects = raycaster.intersectObject(ref.current);
 
       // Меняем состояние видимости на основе расстояния
-      if (intersects.length > 0 && intersects[0].distance < threshold && keys['KeyE']) {  
+      if (intersects.length > 0 && intersects[0].distance < threshold && keyEPressed) {  
         console.log('Предмет добавлен')      
         setContextMenu({
           visible: true,
