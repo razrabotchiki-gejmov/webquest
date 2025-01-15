@@ -9,12 +9,6 @@ import './scene.css'
 import AddableItem from './AddableItem.jsx'
 import IteractableItem from './IteractableItem.jsx';
 import HoverableObject from './HoverableObject';
-import { Raycaster } from 'three';
-import { SphereGeometry  } from 'three';
-import { materialOpacity } from 'three/webgpu';
-import { mx_bilerp_1 } from 'three/src/nodes/materialx/lib/mx_noise.js';
-
-
 
 const size = 24;
 const color = 'pink'; // Цвет стен
@@ -30,78 +24,65 @@ const Room = () => {
         <planeGeometry args={[size*2, size*2]} />
         <meshStandardMaterial color={floorColor} side={THREE.DoubleSide} />
       </mesh>
-
       {/* Потолок */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, size / 4, 0]}>
         <planeGeometry args={[size*2, size*2]} />
         <meshStandardMaterial color="black" side={THREE.DoubleSide} />
       </mesh>
-
       {/* Передняя стена */}
       <mesh rotation={[0, 0, 0]} position={[0, 0, -size / 2]}>
         <planeGeometry args={[size, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
-
       {/* Правая стена (с отверстием для двери) */}
       {/* Левая часть */}
       <mesh rotation={[0, -Math.PI, 0]} position={[-size / 6, 0, size / 2]}>
         <planeGeometry args={[4.5 * size / 6, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
-
       {/* Правая часть*/}
       <mesh rotation={[0, -Math.PI, 0]} position={[size / 2, 0, size / 2]}>
         <planeGeometry args={[size /  2.5, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
-
       {/* Верхняя часть*/}
       <mesh rotation={[0, -Math.PI, 0]} position={[0, 11, size / 2]}>
         <planeGeometry args={[size, size/1.6]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
-
       {/* Задняя стена */}
       <mesh rotation={[0, Math.PI / 2, 0]} position={[-size / 2, 0, 0]}>
         <planeGeometry args={[size, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
-
       {/* Правая стена с потайным отверстием */}
       {/* Левая часть*/}
       <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, -size/4]}>
         <planeGeometry args={[size/2, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
-
       {/* Правая часть*/}
       <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, size/4+1]}>
         <planeGeometry args={[size/2, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
-
       {/* Нижняя часть*/}
       <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, 0]}>
         <planeGeometry args={[size, size/8]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
-
       {/* Верхняя часть*/}
       <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 5, 0]}>
         <planeGeometry args={[size, 1.05*size/5]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
 
-
       {/*Побочная комната*/}
-
       {/* Правая стена */}
       <mesh rotation={[0, Math.PI/2, 0]} position={[3, 0, 5*smallRoomSize/4]}>
         <planeGeometry args={[smallRoomSize/2, smallRoomSize]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
-
       {/* Левая стена */}
       <mesh rotation={[0, Math.PI/2, 0]} position={[9, 0, 5*smallRoomSize/4]}>
         <planeGeometry args={[smallRoomSize/2, smallRoomSize]} />
@@ -109,7 +90,6 @@ const Room = () => {
       </mesh>
 
       {/* Задняя стена */}
-
       {/* Левая часть */}
       <mesh rotation={[0, 0, 0]} position={[8, 0, 3*smallRoomSize/2]}>
         <planeGeometry args={[smallRoomSize/4, smallRoomSize]} />
@@ -156,101 +136,15 @@ const BoxForItems = ({position=[0,0,0], scale = 1, rotation =[0,0,0]}) => {
   );
 };
 
-const Modal = ({ onClose }) => {
-  useEffect(() => {
-    // Добавляем обработчик клика на документ
-    const handleOutsideClick = (event) => {
-      onClose(); // Закрыть модальное окно
-    };
-
-    document.addEventListener('mousedown', handleOutsideClick);
-
-    return () => {
-      // Удаляем обработчик при размонтировании компонента
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, [onClose]);
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        background: "white",
-        padding: "20px",
-        boxShadow: "0px 0px 10px rgba(0,0,0,0.25)",
-        zIndex: 1000,
-      }}
-    >
-      <p>1 + 1 = ?</p>
-      <p>Закрыть</p>
-    </div>
-  );
-};
-
-const Pager = ({ position = [0, 0, 0], cameraRef, threshold = 2, onActivate }) => {
-  const handleHoverChange = (isHovered) => {
-    console.log(isHovered ? "Hovered" : "Not Hovered");
-  };
-  const ref = useRef();
-  const [isVisible, setIsVisible] = useState(true);
-  const [keys, setKeys] = useState({ KeyE: false });
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      setKeys((prev) => ({ ...prev, [event.code]: true }));
-    };
-    const handleKeyUp = (event) => {
-      setKeys((prev) => ({ ...prev, [event.code]: false }));
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("keyup", handleKeyUp);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("keyup", handleKeyUp);
-    };
-  }, []);
-
-  useFrame(() => {
-    if (cameraRef?.current && ref.current) {
-      const cameraPos = new THREE.Vector3().setFromMatrixPosition(cameraRef.current.matrixWorld);
-      const itemPos = new THREE.Vector3(...position);
-      const distance = cameraPos.distanceTo(itemPos);
-
-      if (isVisible && distance < threshold && keys["KeyE"]) {
-        setIsVisible(false);
-        onActivate(); // Вызов callback для открытия окна
-      }
-    }
-  });
-
-  return (
-    <HoverableObject
-      cameraRef={cameraRef}
-      onHoverChange={handleHoverChange}
-      scaleOnHover={1}
-      colorOnHover="yellow"
-      baseColor="red"
-    >
-    <mesh ref={ref} position={position} visible={isVisible} receiveShadow castShadow>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
-    </mesh>
-    </HoverableObject>
-  );
-};
 
 const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventoryLocked }) => {
-  //console.log('Cube загружается');
   const ref = useRef();
-  const [yaw, setYaw] = useState(0); // Угол наклона по горизонтали
-  const [pitch, setPitch] = useState(0); // Угол наклона по вертикали
+  const [yaw, setYaw] = useState(0);
+  const [pitch, setPitch] = useState(0);
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false });
   useEffect(() => {
     if (isInventoryLocked) return;
+    const pressedKeys = new Set();
     const handleKeyDown = (event) => {
       setKeys((prev) => ({ ...prev, [event.code]: true }));
     };
@@ -258,7 +152,6 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
       setKeys((prev) => ({ ...prev, [event.code]: false }));
     };
     const handleMouseMove = (e) => {
-      //console.log('isInventoryLocked blocks rotation on inventory lock:', isInventoryLocked);
       if (isInventoryLocked || !document.pointerLockElement) return; 
         const delta = THREE.MathUtils.clamp(e.movementX, -50, 50);
         const deltaPitch = THREE.MathUtils.clamp(e.movementY, -50, 50);
@@ -271,18 +164,15 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
           return THREE.MathUtils.clamp(newPitch, -Math.PI / 3, Math.PI / 3); // Ограничение наклона (-30° до +30°)
         });
       }    
-    
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     document.addEventListener('mousemove', handleMouseMove);
-
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
       document.removeEventListener('mousemove', handleMouseMove);
     };
   }, [rotationSpeed, isInventoryLocked]);
-
   useFrame(() => {
     if (!ref.current) return;
     //console.log('isInventoryLocked block movement:', isInventoryLocked);
@@ -290,7 +180,6 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
     const forward = new THREE.Vector3(0, 0, -1);
     const right = new THREE.Vector3(1, 0, 0);
     ref.current.rotation.y = yaw;
-    
     if (keys["KeyW"]) 
       ref.current.translateOnAxis(forward, playerSpeed);
     if (keys["KeyS"]) 
@@ -301,54 +190,24 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
       ref.current.translateOnAxis(right, playerSpeed);
     const halfSize = size / 2 - 0.6;
     ref.current.position.x = Math.max(-halfSize, Math.min(halfSize, ref.current.position.x));
-    //ref.current.position.z = Math.max(-halfSize, Math.min(halfSize, ref.current.position.z));
     if (camera.current) {
-      const distance = 1; // Фиксированное расстояние камеры от куба
-      const height = 2; // Камера будет немного выше куба
-
+      const distance = 1; 
+      const height = 2; 
         camera.current.position.set(
           Math.sin(yaw) * distance + ref.current.position.x,
           Math.sin(pitch) * -distance + height,
           Math.cos(yaw) * distance + ref.current.position.z
         );
-
       // Камера всегда смотрит на куб
       camera.current.lookAt(ref.current.position.x, height, ref.current.position.z);
     }
   });
-
   return (
     <mesh ref={ref} position={position} castShadow>
       <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial color="green" transparent={true} opacity={0} />
     </mesh>
   );
-};
-  
-const Closet = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
-    const gltf = useLoader(GLTFLoader, 'src/models/wardrobe.glb');
-    
-    return (
-      <primitive
-        object={gltf.scene}
-        position={position}
-        rotation={[0,80,0]}
-        scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
-        />
-    );
-};
-  
-const Chair = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
-    const gltf = useLoader(GLTFLoader, 'src/models/chair.glb');
-  
-    return (
-      <primitive
-        object={gltf.scene}
-        position={position}
-        rotation={[0,80,0]}
-        scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
-      />
-    );
 };
   
 const Desk = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
@@ -365,27 +224,6 @@ const Desk = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
         object={gltf.scene}
         position={position}
         rotation={rotation}
-        scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
-      />
-    );
-};
-
-const Nightstand = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
-    const gltf = useLoader(GLTFLoader, 'src/models/nightstand.glb');
-    const ref = useRef();
-
-    useEffect(() => {
-      if (ref.current) {
-        ref.current.add(gltf.scene.clone());
-      }
-    }, [gltf]);
-  
-    return (
-      <group
-        ref={ref}
-        object={gltf.scene}
-        position={position}
-        rotation={[0,-Math.PI/2,0]}
         scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
       />
     );
@@ -456,12 +294,10 @@ const Projectile = ({ position, direction }) => {
   useFrame(() => {
     if (hit || !ref.current) return;
     
-    // Движение шарика
     ref.current.position.x += direction.x * 0.5;
     ref.current.position.y += direction.y * 0.5;
     ref.current.position.z += direction.z * 0.5;
     
-    // Проверка столкновений
     const raycaster = new THREE.Raycaster();
     raycaster.set(ref.current.position, direction);
     
@@ -486,13 +322,10 @@ const Projectile = ({ position, direction }) => {
 
 const ShootingMechanic = ({ camera }) => {
   const [projectiles, setProjectiles] = useState([]);
-  
   const handleShoot = (event) => {
     if (!camera.current) return;
-    
     const direction = new THREE.Vector3();
     camera.current.getWorldDirection(direction);
-    
     setProjectiles(prev => [...prev, {
       id: Math.random(),
       position: camera.current.position.clone(),
@@ -504,7 +337,6 @@ const ShootingMechanic = ({ camera }) => {
     window.addEventListener('click', handleShoot);
     return () => window.removeEventListener('click', handleShoot);
   }, [camera]);
-
   return projectiles.map(proj => (
     <Projectile
       key={proj.id}
@@ -552,8 +384,6 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
         return newPosition;})
       setTimeout(()=> {console.log('changedPosition: ' + changedWardrobePosition)},2000);
     }
-  // console.log('Scene загружается');
-  // console.log(typeof setIsInventoryLocked);
   return (
     <>
     <Canvas shadows>
@@ -573,10 +403,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
         angle={Math.PI / 2.5}
         penumbra={0.5}
       />
-      
       <object3D ref={targetRef} position={[10, 10, 10]} />
       <Room />
-
       Шкаф в маленькой комнате пустой
       <Locker position={[8, 0, 13]} scale={1.5} rotation={[0,-Math.PI/2,0]}/>
       Шкаф в маленькой комнате c патронами
@@ -612,7 +440,6 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       <AddableItem position={[-11.2,1.4,1]} cameraRef={camera} threshold={3} image={''} mesh={'src/models/arrow_hour.glb'} description='ДОПОЛНИТЬ' addItemToInventory={addItemToInventory} name={'Часовая стрелка'}/>
       Стол для аквариума
       <Table position={[-10.5, 0, -5]} scale={1.5} rotation={[0,Math.PI/2,0]}/>
-
       Стеллаж в рядом с часами
       <Shlef position={[-9,0,-11.5]} scale={1.8} rotation={[0,0,0]}/>
       Подсказка для часов
@@ -620,10 +447,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       Часы
       <IteractableItem position={[-6,3,-11.5]} size={2} rotation={[0,0,0]} cameraRef={camera} threshold={3} name={'Часы'} description='Не хватает стрелок' meshBeforeIteract='src/models/clock_closed.glb' meshAfterIteract='src/models/clock_opened.glb'/>
       Диван
-      
       Колонна
       <mesh position={[-1,0,-1]} rotation={[0,0,0]}>
-        
         <boxGeometry args={[1,20,1]}/>
         <meshStandardMaterial color="grey" transparent={true} />
       </mesh>
@@ -631,12 +456,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       <IteractableItem position={[-1,0,-2.1]} size={2} rotation={[0,Math.PI,0]} cameraRef={camera} threshold={3} name='Ящик со стрелкой' description='ДОПОЛНИТЬ' meshBeforeIteract='src/models/nightstand.glb' meshAfterIteract='src/models/nightstand.glb'/>
       Шкаф у колонны с телефоном
       <Locker position={[-1,0,0]} scale={1.5} rotation={[0,0,0]}/>
-      <Pager 
-        position={[15, 1, -10]} 
-        cameraRef={camera} 
-        threshold={3} 
-        onActivate={() => setIsModalOpen(true)}
-      />
+      
       <MovableCube 
         position={[0, 0.5, 0]} 
         rotationSpeed={0.005} 
@@ -646,9 +466,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       />
       <ShootingMechanic camera={camera} />
     </Canvas>
-    {isModalOpen && <Modal onClose={handleModalClose} />}
     </>
   );
 };
-
 export default Scene;
