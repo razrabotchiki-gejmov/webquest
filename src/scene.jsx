@@ -8,7 +8,9 @@ import { useLoader } from '@react-three/fiber';
 import './scene.css'
 import AddableItem from './AddableItem.jsx'
 import IteractableItem from './IteractableItem.jsx';
+import { ShootingMechanic } from './ShootingMechanic';
 import HoverableObject from './HoverableObject';
+import InteractiveCube from './InteractiveCube';
 
 const size = 24;
 const color = 'pink'; // Цвет стен
@@ -113,6 +115,7 @@ const Room = () => {
     </>
   );
 };
+
 const BoxForItems = ({position=[0,0,0], scale = 1, rotation =[0,0,0]}) => {
   const ref=useRef();
   const color='grey'
@@ -136,7 +139,6 @@ const BoxForItems = ({position=[0,0,0], scale = 1, rotation =[0,0,0]}) => {
     </mesh>
   );
 };
-
 
 const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventoryLocked, keys }) => {
   const ref = useRef();
@@ -276,66 +278,6 @@ const Locker = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   );
 };
 
-const Projectile = ({ position, direction }) => {
-  const ref = useRef();
-  const [hit, setHit] = useState(false);
-  const { scene } = useThree(); // Получаем доступ к сцене через useThree
-
-  useFrame(() => {
-    if (hit || !ref.current) return;
-    
-    ref.current.position.x += direction.x * 0.5;
-    ref.current.position.y += direction.y * 0.5;
-    ref.current.position.z += direction.z * 0.5;
-    
-    const raycaster = new THREE.Raycaster();
-    raycaster.set(ref.current.position, direction);
-    
-    const intersects = raycaster.intersectObjects(scene.children, true);
-    
-    if (intersects.length > 0 && intersects[0].distance < 1) {
-      const hitObject = intersects[0].object;
-      if (hitObject !== ref.current) {
-        console.log("Попадание в:", hitObject.name || "неизвестный объект");
-        setHit(true);
-      }
-    }
-  });
-
-  return hit ? null : (
-    <mesh ref={ref} position={[position.x, position.y, position.z]}>
-      <sphereGeometry args={[0.2, 16, 16]} />
-      <meshStandardMaterial color="yellow" />
-    </mesh>
-  );
-};
-
-const ShootingMechanic = ({ camera }) => {
-  const [projectiles, setProjectiles] = useState([]);
-  const handleShoot = (event) => {
-    if (!camera.current) return;
-    const direction = new THREE.Vector3();
-    camera.current.getWorldDirection(direction);
-    setProjectiles(prev => [...prev, {
-      id: Math.random(),
-      position: camera.current.position.clone(),
-      direction: direction.normalize()
-    }]);
-  };
-
-  useEffect(() => {
-    window.addEventListener('click', handleShoot);
-    return () => window.removeEventListener('click', handleShoot);
-  }, [camera]);
-  return projectiles.map(proj => (
-    <Projectile
-      key={proj.id}
-      position={proj.position}
-      direction={proj.direction}
-    />
-  ));
-};
-
 const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory}) => {
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -389,7 +331,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
     <>
     <Canvas shadows>
       <PerspectiveCamera ref={camera} makeDefault position={[0, 1, 10]} />
-
+      <ShootingMechanic camera={camera} />
       <ambientLight intensity={0.5} />
       <spotLight 
         position={[0, 2, 0]} 
@@ -524,6 +466,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshAfterIteract='src/models/desk_opened.glb'
       keyEPressed={keys['KeyE']}/>
 
+      <InteractiveCube position={[10, 0.5, -5]} />
+
       Подсказка для УФ лампы
       <AddableItem 
       position={[-11.2, 1.43,-0.7]} 
@@ -624,7 +568,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
         isInventoryLocked={isInventoryLocked} 
         keys={keys}
       />
-      <ShootingMechanic camera={camera} />
+      
     </Canvas>
     </>
   );
