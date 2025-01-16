@@ -89,7 +89,7 @@ const IteractableItem = ({
               activateItem();
             },3000);
         }
-        if(name == 'Часы' && (itemInHand.name == 'Часовая стрелка' || itemInHand.name == 'Минутная стрелка'))
+        if(name == 'Часы' && (itemInHand.name === 'Часовая стрелка' || itemInHand.name === 'Минутная стрелка'))
           {
             removeItemFromInventory(itemInHand)
             setArrowsCount((prev) => prev + 1)
@@ -106,6 +106,7 @@ const IteractableItem = ({
       }
       if(name == 'Ящик' || name == 'Холодильник')
       {
+        console.log('Ящик со стрелкой открыт?'+ isIteracted);
         setIsIteracted((prev) => !prev);
         if(activateItem)
           activateItem();

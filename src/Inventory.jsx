@@ -37,6 +37,8 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       if (firstEmptyIndex !== -1) {
         newGrid[firstEmptyIndex].item = item;
       }
+      setItemInHand(newGrid[firstEmptyIndex].item);
+      setSelectedHotbarIndex(firstEmptyIndex)
       return newGrid;
     });
   };
@@ -45,7 +47,8 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     setGrid((prevGrid) => {
       const newGrid = [...prevGrid];
       const index = newGrid.findIndex((cell) => cell.item === itemName);
-      newGrid[index].item = null;
+      if (index !== -1)
+        newGrid[index].item = null;
       return newGrid;
       }
     );
@@ -55,7 +58,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
   {
     if(!grid[index]) return;
     setItemInHand(grid[index].item);
-    //console.log(grid[index].item)
+    console.log(grid[index].item)
   }
 
   useEffect(() => {
