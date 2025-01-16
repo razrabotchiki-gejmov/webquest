@@ -17,7 +17,6 @@ const ClockInteraction = ({ correctHour = 8.5, onSuccess, onFailure, position, o
       onSuccess();
       onClose();
     } else {
-      onFailure();
       setCurrentHour(0);
       setCurrentMinute(0);
     }
