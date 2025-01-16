@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import ClockUI from './ClockUI';
 
-const ClockInteraction = ({ correctHour = 8.5, onSuccess, onFailure, position, onClose }) => {
-  const [isInteracting, setIsInteracting] = useState(false); // Показывать ли интерфейс
+const ClockInteraction = ({ correctHour = 8.5, onSuccess, position, onClose }) => {
   const [currentHour, setCurrentHour] = useState(0); // Часовая стрелка
   const [currentMinute, setCurrentMinute] = useState(0); // Минутная стрелка
   const handleApply = () => {

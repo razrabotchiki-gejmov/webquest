@@ -28,14 +28,26 @@ const ClockUI = ({
     <Html position={[position]}>
         <div className="clock-ui">
             <div className="clock-face">
-                <div
-                className="hour-hand"
-                style={{ transform: `rotate(${hourStep * currentHour}deg)` }}
-                ></div>
-                <div
-                className="minute-hand"
-                style={{ transform: `rotate(${minuteStep * currentMinute}deg)` }}
-                ></div>
+              <div className="clock-number number-1">1</div>
+              <div className="clock-number number-2">2</div>
+              <div className="clock-number number-3">3</div>
+              <div className="clock-number number-4">4</div>
+              <div className="clock-number number-5">5</div>
+              <div className="clock-number number-6">6</div>
+              <div className="clock-number number-7">7</div>
+              <div className="clock-number number-8">8</div>
+              <div className="clock-number number-9">9</div>
+              <div className="clock-number number-10">10</div>
+              <div className="clock-number number-11">11</div>
+              <div className="clock-number number-12">12</div>
+              <div
+              className="hour-hand"
+              style={{ transform: `rotate(${hourStep * currentHour}deg)` }}
+              ></div>
+              <div
+              className="minute-hand"
+              style={{ transform: `rotate(${minuteStep * currentMinute}deg)` }}
+              ></div>
         </div>
         <div className="controls">
             <div>
