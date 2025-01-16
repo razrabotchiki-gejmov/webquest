@@ -54,9 +54,6 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
   const recheckItem = (index) =>
   {
     if(!grid[index]) return;
-    //console.log("Item Rechecked")
-    //console.log(firstEmptyIndex);
-    //console.log(grid);
     setItemInHand(grid[index].item);
     //console.log(grid[index].item)
   }

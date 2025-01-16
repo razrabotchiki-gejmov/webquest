@@ -39,6 +39,7 @@ const IteractableItem = ({
   const initialMesh = useMemo(() => initMesh.scene.clone(), [initMesh]);
   const afterMesh = useMemo(() => aftMesh.scene.clone(), [aftMesh]);
   const [clockActive, setClockActive] = useState(false);
+  const [arrowsCount,setArrowsCount] = useState(0);
   useFrame(() => {
     if (!cameraRef?.current || !ref.current || !isActive) return; 
       // Создаем луч из камеры в направлении ее взгляда
@@ -56,7 +57,9 @@ const IteractableItem = ({
           z: cameraRef.current.position.z + cameraRef.current.getWorldDirection(new THREE.Vector3()).z * 2,
         });
         //console.log(contextMenu.x + ' ' + contextMenu.y + ' ' + contextMenu.z);
-      }    
+      }
+      if(arrowsCount==2)
+        activateItem();   
   });
  // Закрыть контекстное меню
   const closeContextMenu = () => {
@@ -71,36 +74,41 @@ const IteractableItem = ({
     const item = itemInHand;
     if(isActive)
     {
-      if(itemInHand) 
+      if(itemInHand && removeItemFromInventory) 
       { 
         if(name == 'Лампа' && itemInHand.name =='уф лампа')
         {
           setIsIteracted(true);
-          if(removeItemFromInventory)
             removeItemFromInventory(itemInHand);
         }
         if(name == 'Лампа' && itemInHand.name =='Листок с изображением лампочки' && isIteracted)
         {
-          if(removeItemFromInventory)
             removeItemFromInventory(itemInHand);
             setTimeout(() =>{
               addItemToInventory({name: 'Листок с изображение шкафа', imageUrl: '/images/шкаф.jpg'});
               activateItem();
             },3000);
         }
+        if(name == 'Часы' && (itemInHand.name == 'Часовая стрелка' || itemInHand.name == 'Минутная стрелка'))
+          {
+            removeItemFromInventory(itemInHand)
+            setArrowsCount((prev) => prev + 1)
+          }
       }
       if(name == 'Шкаф' && !isIteracted)
       {
         setIsIteracted(true);
         activateItem();
       }
-      if(name == 'Часы')
+      if(name == 'Часы' && arrowsCount==2)
       {
         setClockActive(true);
       }
       if(name == 'Ящик' || name == 'Холодильник')
       {
-        setIsIteracted(!isIteracted);
+        setIsIteracted((prev) => !prev);
+        if(activateItem)
+          activateItem();
       }
     }
       closeContextMenu();

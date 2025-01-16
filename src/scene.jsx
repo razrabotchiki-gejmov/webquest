@@ -11,6 +11,7 @@ import IteractableItem from './IteractableItem.jsx';
 import { ShootingMechanic } from './ShootingMechanic';
 import HoverableObject from './HoverableObject';
 import InteractiveCube from './InteractiveCube';
+import { threshold } from 'three/webgpu';
 
 const size = 24;
 const color = 'pink'; // Цвет стен
@@ -259,8 +260,46 @@ const Shlef = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   );
 };
 
-const Locker = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
-  const gltf = useLoader(GLTFLoader, 'src/models/locker.glb');
+const Couch = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/couch.glb');
+  const ref = useRef();
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.add(gltf.scene.clone());
+    }
+  }, [gltf]);
+  return (
+    <primitive
+      ref={ref}
+      object={gltf.scene}
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const Cup = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/cup.glb');
+  const ref = useRef();
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.add(gltf.scene.clone());
+    }
+  }, [gltf]);
+  return (
+    <primitive
+      ref={ref}
+      object={gltf.scene}
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const Pillow = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/pillow.glb');
   const ref = useRef();
   useEffect(() => {
     if (ref.current) {
@@ -284,6 +323,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
   const [wardrobeActive, setWardrobeActive] = useState(false);
   const [changedWardrobePosition, setChangeWardrobePosition] = useState([11.3,0,0])
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false, KeyE: false });
+  const [minuteArrowSpawn, setMinuteArrowSpawn] = useState(false);
+  const [clockModel, setClockModel] = useState('src/models/clock_closed.glb')
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
@@ -317,7 +358,6 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
     const handleWardrobeActivate = () =>
     {
       setWardrobeActive(true);
-      setTimeout(()=> {console.log('wardrobeActive: ' + wardrobeActive)},2000);
     }
     
     const handleChangeWardrobePosition = () =>
@@ -327,12 +367,20 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
         return newPosition;})
       setTimeout(()=> {console.log('changedPosition: ' + changedWardrobePosition)},2000);
     }
+    const handleMinuteArrowSpawn = () =>
+    {
+      setMinuteArrowSpawn((prev) => !prev);
+    }
+    const handleClockModelChange = () =>
+    {
+      setClockModel('src/models/clock_closed_witharrows.glb');
+    }
   return (
     <>
     <Canvas shadows>
       <PerspectiveCamera ref={camera} makeDefault position={[0, 1, 10]} />
       <ShootingMechanic camera={camera} />
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.6} />
       <spotLight 
         position={[0, 2, 0]} 
         intensity={5} 
@@ -341,9 +389,9 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       <spotLight 
         ref={lightRef}
         position={[-10, 7, 10]} 
-        intensity={80} 
+        intensity={100} 
         castShadow
-        angle={Math.PI / 2.5}
+        angle={Math.PI}
         penumbra={0.5}
       />
       <object3D ref={targetRef} position={[10, 10, 10]} />
@@ -435,8 +483,17 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Стол c микроволновкой
       <Table position={[-7, 0, 10]} scale={1.8} rotation={[0,0,0]}/>
-      Микроволоновка
-      positiion=-6,1,9
+      Микроволоновка ДОБАВИТЬ МОДЕЛЬКУ
+      <IteractableItem 
+      position={[-6,1,9]}
+      size={1.5}
+      rotation={[0,Math.PI/2,0]}
+      cameraRef={camera}
+      threshold={3}
+      name='Микроволновка'
+      descriptionBefore=''
+      meshBeforeIteract='src/models/cup.glb'
+      meshAfterIteract='src/models/cup.glb'/>
 
       Холодильник
       <IteractableItem 
@@ -480,6 +537,9 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       name='Листок с изображением лампочки' 
       keyEPressed={keys['KeyE']}/>
       
+      Кружка
+      <Cup position={[-11.2,1.4,1]} scale={1} rotation={[0,Math.PI/2,0]}/>
+      
       Стрелка часовая
       <AddableItem 
       position={[-11.2,1.4,1]} 
@@ -494,7 +554,20 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       
       Стол для аквариума
       <Table position={[-10.5, 0, -5]} scale={1.5} rotation={[0,Math.PI/2,0]}/>
-      
+
+      Аквариум
+      <IteractableItem 
+      position={[-10.5, 1.3, -5]} 
+      cameraRef={camera} 
+      threshold={3}
+      size={2} 
+      meshBeforeIteract='src/models/aquarium.glb'
+      meshAfterIteract='src/models/aquarium.glb'
+      descriptionBefore='Тут могут жить различные морские обитатели. Прямо сейчас аквариум занят опасной пираньей. Руки здесь лучше не мыть.'
+      descriptionAfter='Тут могут жить различные морские обитатели. Прямо сейчас аквариум занят опасной пираньей. Руки здесь лучше не мыть.'
+      name='Аквариум' 
+      keyEPressed={keys['KeyE']}/>
+
       Стеллаж в рядом с часами
       <Shlef position={[-9,0,-11.5]} scale={1.8} rotation={[0,0,0]}/>
       
@@ -513,19 +586,27 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       
       Часы
       <IteractableItem 
-      position={[-6,3,-11.5]} 
+      position={[-6,3,-11.8]} 
       size={2} 
       rotation={[0,0,0]} 
       cameraRef={camera} 
       threshold={3} 
       name='Часы' 
       descriptionBefore='В современное время не часто можно увидеть такие громоздкие приспособления. Может они не только время показывать умеют. Прямо сейчас в часах нет стрелок, без них от устройства нет смысла.'
-      meshBeforeIteract='src/models/clock_closed.glb' 
-      meshAfterIteract='src/models/clock_opened.glb'
-      keyEPressed={keys['KeyE']}/>
+      descriptionAfter='В современное время не часто можно увидеть такие громоздкие приспособления. Может они не только время показывать умеют.'
+      meshBeforeIteract={clockModel} 
+      meshAfterIteract='src/models/clock_opened_solved.glb'
+      keyEPressed={keys['KeyE']}
+      removeItemFromInventory={removeItemFromInventory}
+      itemInHand={itemInHand}
+      activateItem={handleClockModelChange}/>
       
       Диван
-      
+      <Couch position={[-2,0,-11]} scale={1.3} rotation={[0,0,0]} />
+      Подушка
+      <Pillow position={[-3.2,1,-10.8]} scale={1.2} rotation={[0,0,0]} />
+
+
       Колонна
       <mesh position={[-1,0,-1]} rotation={[0,0,0]}>
         <boxGeometry args={[1,20,1]}/>
@@ -543,7 +624,21 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='Специализированное место для хранения различных предметов или инструментов.'  
       meshBeforeIteract='src/models/nightstand.glb' 
       meshAfterIteract='src/models/nightstand_opened.glb'
-      keyEPressed={keys['KeyE']}/>
+      keyEPressed={keys['KeyE']}
+      activateItem={handleMinuteArrowSpawn}/>
+
+      {minuteArrowSpawn && <AddableItem 
+      position={[-1,1.4,-3]}
+      size={2}
+      rotation={[Math.PI/2,0,Math.PI/2]}
+      cameraRef={camera}
+      threshold={3}
+      name='Минутная стрелка'
+      image=''
+      addItemToInventory={addItemToInventory}
+      mesh={'src/models/arrow_minute.glb'}
+      description='Одна из двух потерянных стрелок. Определяет какая сейчас минута.'
+      keyEPressed={keys['KeyE']}/>}
       
       Шкаф у колонны с телефоном
       <IteractableItem 
