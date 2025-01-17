@@ -282,11 +282,6 @@ const Couch = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
 const Cup = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   const gltf = useLoader(GLTFLoader, 'src/models/cup.glb');
   const ref = useRef();
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.add(gltf.scene.clone());
-    }
-  }, [gltf]);
   return (
     <primitive
       ref={ref}
@@ -325,6 +320,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false, KeyE: false });
   const [minuteArrowSpawn, setMinuteArrowSpawn] = useState(false);
   const [clockModel, setClockModel] = useState('src/models/clock_closed.glb')
+  const [gunInHand,setGunInHand] = useState(false);
+  const [haveBullets,setHaveBullets] = useState(false);
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
@@ -375,11 +372,24 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
     {
       setClockModel('src/models/clock_closed_witharrows.glb');
     }
+    if(itemInHand){ 
+      if(itemInHand.name=='Пистолет')
+      {
+        if(!gunInHand)
+          setGunInHand(true);
+      }
+      else if (gunInHand) setGunInHand(false);
+      if(itemInHand.name=='Патроны для пистолета')
+        if(!haveBullets)
+          setHaveBullets(true);
+    }
+    else if (gunInHand) setGunInHand(false);
+
   return (
     <>
     <Canvas shadows>
       <PerspectiveCamera ref={camera} makeDefault position={[0, 1, 10]} />
-      <ShootingMechanic camera={camera} />
+      {gunInHand && haveBullets && <ShootingMechanic camera={camera} />}
       <ambientLight intensity={0.6} />
       <spotLight 
         position={[0, 2, 0]} 
@@ -424,6 +434,19 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshBeforeIteract='src/models/locker.glb'
       meshAfterIteract='src/models/locker_opened.glb'
       keyEPressed={keys['KeyE']}/>
+
+      <AddableItem 
+      position={[8, 1.97, 14]} 
+      size={1}
+      rotation={[0,0,0]}
+      name='Патроны для пистолета'
+      description='Мягкие и безопасные для человека. Можно зарядить в игрушечный пистолет.'
+      mesh='src/models/toygun_bulletbox.glb'
+      image=''
+      keyEPressed={keys['KeyE']}
+      threshold={3}
+      cameraRef={camera}
+      addItemToInventory={addItemToInventory}/>
 
       Ящик за плакатом
       <BoxForItems position={[6,2,18.5]} scale={1} rotation={[0,Math.PI/2,0]}/>
@@ -482,18 +505,20 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       <BoxForItems position={[12.5,2,0.5]} scale={1} rotation={[0,-Math.PI,0]}/>
 
       Стол c микроволновкой
-      <Table position={[-7, 0, 10]} scale={1.8} rotation={[0,0,0]}/>
-      Микроволоновка ДОБАВИТЬ МОДЕЛЬКУ
+      <Table position={[-7, 0, 10]} scale={1.6} rotation={[0,0,0]}/>
+      Микроволоновка
       <IteractableItem 
-      position={[-6,1,9]}
+      position={[-6.5,1.4,10]}
       size={1.5}
-      rotation={[0,Math.PI/2,0]}
+      rotation={[0,Math.PI,0]}
       cameraRef={camera}
       threshold={3}
       name='Микроволновка'
-      descriptionBefore=''
-      meshBeforeIteract='src/models/cup.glb'
-      meshAfterIteract='src/models/cup.glb'/>
+      descriptionBefore='Поможет быстро разогреть любой продукт. Не стоит пробовать разогревать несъедобные предметы.'
+      descriptionAfter='Поможет быстро разогреть любой продукт. Не стоит пробовать разогревать несъедобные предметы.'
+      meshBeforeIteract='src/models/microwave.glb'
+      meshAfterIteract='src/models/microwave_enabled.glb'
+      keyEPressed={keys['KeyE']}/>
 
       Холодильник
       <IteractableItem 
@@ -606,6 +631,19 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       Подушка
       <Pillow position={[-3.2,1,-10.8]} scale={1.2} rotation={[0,0,0]} />
 
+      Пистолет
+      <AddableItem 
+      position={[-2.7,0.9,-10.6]}
+      size={1}
+      rotation={[Math.PI/2,0,0]}
+      cameraRef={camera}
+      threshold={3}
+      name='Пистолет'
+      image='images/пистолет.jpg'
+      description='С этой игрушкой можно чувствовать себе увереннее. Отлично подходит для сбивания пустых банок или бутылок. Не работает без патронов.'
+      mesh='src/models/toygun.glb'
+      addItemToInventory={addItemToInventory}
+      keyEPressed={keys['KeyE']}/>
 
       Колонна
       <mesh position={[-1,0,-1]} rotation={[0,0,0]}>
