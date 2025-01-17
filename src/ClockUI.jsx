@@ -1,5 +1,5 @@
 import React from 'react';
-import { Html } from '@react-three/drei';
+import { Center, Html } from '@react-three/drei';
 import './ClockUI.css';
 
 const ClockUI = ({
@@ -25,7 +25,7 @@ const ClockUI = ({
   };
 
   return (
-    <Html position={[position]}>
+    <Html position={position} center>
         <div className="clock-ui">
             <div className="clock-face">
               <div className="clock-number number-1">1</div>
@@ -56,7 +56,7 @@ const ClockUI = ({
             </div>
             <div>
             <button onClick={() => rotateMinute(1)}>Минуты +</button>
-            <button onClick={() => rotateMinute(-1)}>Минты -</button>
+            <button onClick={() => rotateMinute(-1)}>Минуты -</button>
             </div>
         </div>
             <div>

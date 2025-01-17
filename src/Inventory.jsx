@@ -58,7 +58,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
   {
     if(!grid[index]) return;
     setItemInHand(grid[index].item);
-    console.log(grid[index].item)
+    //console.log(grid[index].item)
   }
 
   useEffect(() => {

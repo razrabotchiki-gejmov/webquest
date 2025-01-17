@@ -58,7 +58,7 @@ const IteractableItem = ({
         });
         //console.log(contextMenu.x + ' ' + contextMenu.y + ' ' + contextMenu.z);
       }
-      if(arrowsCount==2)
+      if(arrowsCount==2 && meshBeforeIteract != 'src/models/clock_closed_witharrows.glb')
         activateItem();   
   });
  // Закрыть контекстное меню
@@ -204,7 +204,7 @@ const IteractableItem = ({
       position={[contextMenu.x, contextMenu.y, contextMenu.z]} 
       onSuccess={() => {
         setIsIteracted(true);
-        setClockActive(false);
+        handleClockClose();
       }}
       onClose={handleClockClose}/>
       }

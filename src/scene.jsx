@@ -666,7 +666,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       activateItem={handleMinuteArrowSpawn}/>
 
       {minuteArrowSpawn && <AddableItem 
-      position={[-1,1.4,-3]}
+      position={[-1,1.45,-3]}
       size={2}
       rotation={[Math.PI/2,0,Math.PI/2]}
       cameraRef={camera}
