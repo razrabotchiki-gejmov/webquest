@@ -9,6 +9,8 @@ import HoverableObject from './HoverableObject';
 import { FixedTimer } from 'three/examples/jsm/Addons.js';
 import ClockInteraction from './ClockInteraction';
 import { add } from 'three/webgpu';
+import LockUI3 from './LockUI3';
+import LockUI4 from './LockUI4';
 
 const IteractableItem = ({ 
   position = [0, 0, 0], 
@@ -41,6 +43,7 @@ const IteractableItem = ({
   const afterMesh = useMemo(() => aftMesh.scene.clone(), [aftMesh]);
   const [clockActive, setClockActive] = useState(false);
   const [arrowsCount,setArrowsCount] = useState(0);
+  const [lock5Active, setLock5Active] = useState(false);
   useFrame(() => {
     if (!cameraRef?.current || !ref.current) return; 
       // Создаем луч из камеры в направлении ее взгляда
@@ -122,6 +125,10 @@ const IteractableItem = ({
       {
         setClockActive(true);
       }
+      if(name == 'Стол с замком' && !isIteracted)
+      {
+        setLock5Active(true);
+      }
       if(name == 'Ящик' || name == 'Холодильник')
       {
         console.log('Ящик со стрелкой открыт?'+ isIteracted);
@@ -153,6 +160,10 @@ const IteractableItem = ({
     setClockActive(false);
   }
 
+  const handleLockClose =() =>
+  {
+    setLock5Active(false);
+  }
   return (
     <>
     
@@ -229,6 +240,17 @@ const IteractableItem = ({
         handleClockClose();
       }}
       onClose={handleClockClose}/>
+      }
+
+      {lock5Active && <LockUI3
+      position={[contextMenu.x,contextMenu.y,contextMenu.z]}
+      onUnlock={() =>
+      {
+        setIsIteracted(true);
+        handleLockClose();
+      }
+      }
+      onClose={handleLockClose}/>
       }
     </>
   );
