@@ -312,6 +312,33 @@ const Pillow = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   );
 };
 
+const Piranha = ({startPosition = [0, 0, 0], movementSpeed = 0.01, goDown}) => {
+  const ref = useRef();
+  const [direction, setDirection] = useState(1); // 1 - вправо, -1 - влево
+
+  const model = useLoader(GLTFLoader, 'src/models/piranha.glb');
+  let rotation = [0,direction*Math.PI/2,0]
+  useFrame(() => {
+    if (!ref.current) return;
+      const position = ref.current.position;
+
+      if (!goDown) {
+        position.z += direction * movementSpeed;
+        if (position.z > startPosition[2] + 0.5 || position.z < startPosition[2]-0.5) {
+          setDirection((prev) => -prev);
+        }
+    } else {
+      position.y -= movementSpeed;
+
+      if (position.y <= 1.55) {
+        ref.current.position.y = 1.55;
+      }
+    }
+  });
+
+  return <primitive ref={ref} object={model.scene} position={startPosition} rotation={rotation}/>;
+};
+
 const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory}) => {
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -322,6 +349,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
   const [clockModel, setClockModel] = useState('src/models/clock_closed.glb')
   const [gunInHand,setGunInHand] = useState(false);
   const [haveBullets,setHaveBullets] = useState(false);
+  const [aquariumActive,setAquariumActive] = useState(false);
+  const [piranhaFollowMeat, setPiranhaFollowMeat] = useState(false);
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
@@ -371,6 +400,14 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
     const handleClockModelChange = () =>
     {
       setClockModel('src/models/clock_closed_witharrows.glb');
+    }
+    const handleAquariumActive = () =>
+    {
+      setAquariumActive(true);
+    }
+    const handlePiranhaEatMeat = () =>
+    {
+      setPiranhaFollowMeat(true);
     }
     if(itemInHand){ 
       if(itemInHand.name=='Пистолет')
@@ -518,7 +555,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='Поможет быстро разогреть любой продукт. Не стоит пробовать разогревать несъедобные предметы.'
       meshBeforeIteract='src/models/microwave.glb'
       meshAfterIteract='src/models/microwave_enabled.glb'
-      keyEPressed={keys['KeyE']}/>
+      removeItemFromInventory={removeItemFromInventory}
+      addItemToInventory={addItemToInventory}
+      keyEPressed={keys['KeyE']}
+      activateItem={handleAquariumActive}
+      itemInHand={itemInHand}/>
 
       Холодильник
       <IteractableItem 
@@ -533,7 +574,22 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshBeforeIteract='src/models/fridge.glb' 
       meshAfterIteract='src/models/fridge_opened.glb'
       keyEPressed={keys['KeyE']}/>
-      
+
+      Мясо
+      <AddableItem 
+      position={[-11,2.35,11.5]}
+      size={1}
+      rotation={[0,Math.PI/2,Math.PI/2]}
+      cameraRef={camera}
+      threshold={3}
+      image=''
+      addItemToInventory={addItemToInventory}
+      name='Мясо замороженное'
+      description='Промерз основательно. Чтобы сделать его пригодным в пищу  сначала необходимо разогреть.'
+      mesh={'src/models/meat_frozen.glb'}
+      keyEPressed={keys['KeyE']}
+      />
+
       Стол c ящиком с подсказой для УФ лампы и кружкой внутри которой стрелка
       <IteractableItem 
       position={[-11.2, 0, 0]} 
@@ -590,8 +646,19 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshAfterIteract='src/models/aquarium.glb'
       descriptionBefore='Тут могут жить различные морские обитатели. Прямо сейчас аквариум занят опасной пираньей. Руки здесь лучше не мыть.'
       descriptionAfter='Тут могут жить различные морские обитатели. Прямо сейчас аквариум занят опасной пираньей. Руки здесь лучше не мыть.'
-      name='Аквариум' 
-      keyEPressed={keys['KeyE']}/>
+      name='Аквариум'
+      isActive={aquariumActive} 
+      keyEPressed={keys['KeyE']}
+      itemInHand={itemInHand}
+      removeItemFromInventory={removeItemFromInventory}
+      addItemToInventory={addItemToInventory}
+      activateItem={handlePiranhaEatMeat}/>
+
+      Пиранья
+      <Piranha 
+      startPosition={[-10.5, 2, -5]}
+      goDown={piranhaFollowMeat}
+      />
 
       Стеллаж в рядом с часами
       <Shlef position={[-9,0,-11.5]} scale={1.8} rotation={[0,0,0]}/>
@@ -701,7 +768,6 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
         isInventoryLocked={isInventoryLocked} 
         keys={keys}
       />
-      
     </Canvas>
     </>
   );

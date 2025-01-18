@@ -8,6 +8,7 @@ import { useLoader } from '@react-three/fiber';
 import HoverableObject from './HoverableObject';
 import { FixedTimer } from 'three/examples/jsm/Addons.js';
 import ClockInteraction from './ClockInteraction';
+import { add } from 'three/webgpu';
 
 const IteractableItem = ({ 
   position = [0, 0, 0], 
@@ -41,7 +42,7 @@ const IteractableItem = ({
   const [clockActive, setClockActive] = useState(false);
   const [arrowsCount,setArrowsCount] = useState(0);
   useFrame(() => {
-    if (!cameraRef?.current || !ref.current || !isActive) return; 
+    if (!cameraRef?.current || !ref.current) return; 
       // Создаем луч из камеры в направлении ее взгляда
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera({ x: 0, y: 0 }, cameraRef.current); // Центр экрана (x=0, y=0)
@@ -71,6 +72,7 @@ const IteractableItem = ({
     console.log(!itemInHand)
     console.log(itemInHand);
     console.log(isActive);
+    console.log(name)
     const item = itemInHand;
     if(isActive)
     {
@@ -87,13 +89,29 @@ const IteractableItem = ({
             setTimeout(() =>{
               addItemToInventory({name: 'Листок с изображение шкафа', imageUrl: '/images/шкаф.jpg'});
               activateItem();
-            },3000);
+            },3 * 1000);
         }
         if(name == 'Часы' && (itemInHand.name === 'Часовая стрелка' || itemInHand.name === 'Минутная стрелка'))
           {
             removeItemFromInventory(itemInHand)
             setArrowsCount((prev) => prev + 1)
           }
+        if(name == 'Микроволновка' && itemInHand.name=='Мясо замороженное')
+        {
+          removeItemFromInventory(itemInHand)
+          setIsIteracted(true);
+          setTimeout(() =>{
+            addItemToInventory({name: 'Мясо', imageUrl: ''})
+            setIsIteracted(false);
+            activateItem();
+          },25 * 1000)
+        }
+        if(name=='Аквариум' && itemInHand.name == 'Мясо')
+          {
+            removeItemFromInventory(itemInHand);
+            setIsIteracted(true);
+            activateItem();
+          }         
       }
       if(name == 'Шкаф' && !isIteracted)
       {
@@ -110,6 +128,10 @@ const IteractableItem = ({
         setIsIteracted((prev) => !prev);
         if(activateItem)
           activateItem();
+      }
+      if(name=='Аквариум' && isIteracted)
+      {
+
       }
     }
       closeContextMenu();
@@ -164,9 +186,9 @@ const IteractableItem = ({
             <div
             className="context-menu"
             >
-                <div className="context-menu-item" onClick={handleUse}>
+                {isActive && (<div className="context-menu-item" onClick={handleUse}>
                     Взаимодействие
-                </div>
+                </div>)}
                 <div className="context-menu-item" onClick={handleInspect}>
                     Описание
                 </div>
