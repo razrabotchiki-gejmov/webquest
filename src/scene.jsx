@@ -30,7 +30,7 @@ const Room = () => {
       {/* Потолок */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, size / 4, 0]}>
         <planeGeometry args={[size*2, size*2]} />
-        <meshStandardMaterial color="black" side={THREE.DoubleSide} />
+        <meshStandardMaterial color="grey" side={THREE.DoubleSide} />
       </mesh>
       {/* Передняя стена */}
       <mesh rotation={[0, 0, 0]} position={[0, 0, -size / 2]}>
@@ -344,11 +344,74 @@ const Piranha = ({startPosition = [0, 0, 0], movementSpeed = 0.01, goDown}) => {
   return <primitive ref={ref} object={model.scene} position={startPosition} rotation={rotation}/>;
 };
 
+const HintBlue = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/s_blue_book.glb');
+  //if(color=='red')
+  //  gltf = useLoader(GLTFLoader, 'src/models/s_red_bell.glb');
+ // if(color=='yellow')
+ //   gltf = useLoader(GLTFLoader, 'src/models/s_yellow_diplom.glb');
+  const ref = useRef();
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.add(gltf.scene.clone());
+    }
+  }, [gltf]);
+  return (
+    <primitive
+      ref={ref}
+      object={gltf.scene}
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const HintRed = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/s_red_bell.glb');
+ // if(color=='yellow')
+ //   gltf = useLoader(GLTFLoader, 'src/models/s_yellow_diplom.glb');
+  const ref = useRef();
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.add(gltf.scene.clone());
+    }
+  }, [gltf]);
+  return (
+    <primitive
+      ref={ref}
+      object={gltf.scene}
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const HintYellow = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/s_yellow_diplom.glb');
+  const ref = useRef();
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.add(gltf.scene.clone());
+    }
+  }, [gltf]);
+  return (
+    <primitive
+      ref={ref}
+      object={gltf.scene}
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
 const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory}) => {
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [wardrobeActive, setWardrobeActive] = useState(false);
-  const [changedWardrobePosition, setChangeWardrobePosition] = useState([11.3,0,0])
+  const [changedWardrobePosition, setChangeWardrobePosition] = useState([11.7,0,0])
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false, KeyE: false });
   const [minuteArrowSpawn, setMinuteArrowSpawn] = useState(false);
   const [clockModel, setClockModel] = useState('src/models/clock_closed.glb')
@@ -492,16 +555,21 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Ящик за плакатом
       <BoxForItems position={[6,2,18.5]} scale={1} rotation={[0,Math.PI/2,0]}/>
+
       Пирамида в потайном ящике
       <IteractableItem 
       position={[6,1.5,18.3]} 
-      size={1} 
+      size={1.1} 
       rotation={[0,0,0]} 
       cameraRef={camera} 
       threshold={3} 
       name='Пирамида'
       meshBeforeIteract='src/models/can_pyramid.glb' 
       meshAfterIteract='src/models/can_pyramid_fallen.glb'/>
+
+      <HintBlue position={[6,1.9,18.7]}
+      scale={0.8}
+      rotation={[0,0,0]}/>
 
       Стеллаж в маленькой комнате
       <Shlef position={[3.5,0,15]} scale={1.8} rotation={[0,Math.PI/2,0]}/>
@@ -520,11 +588,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       keyEPressed={keys['KeyE']}/>
 
       Стол c лампой
-      <Table position={[10, 0, 4]} scale={1.8} rotation={[0, -Math.PI/2,0]}/>
+      <Table position={[10.5, 0, 4]} scale={1.5} rotation={[0, -Math.PI/2,0]}/>
 
       Интерактивная лампа в которую вставляется УФ лампа
       <IteractableItem 
-      position={[10,1.6,5]} 
+      position={[10,1.3,5]} 
       cameraRef={camera} 
       threshold={3} 
       name='Лампа'
@@ -541,7 +609,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       Шкаф который можно сдвинуть после активции подсказки
       <IteractableItem 
       position={changedWardrobePosition} 
-      size={2} 
+      size={1.5} 
       cameraRef={camera} 
       threshold={3} 
       name='Шкаф' 
@@ -566,6 +634,10 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       name='Пирамида'
       meshBeforeIteract='src/models/can_pyramid.glb' 
       meshAfterIteract='src/models/can_pyramid_fallen.glb'/>
+
+      <HintYellow position={[11.6,5,11.6]}
+      scale={1}
+      rotation={[0,Math.PI/4,0]}/>
 
       Стол c микроволновкой
       <Table position={[-7, 0, 10]} scale={1.6} rotation={[0,0,0]}/>
@@ -694,13 +766,17 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       Пирамида на стеллаже
       <IteractableItem 
       position={[-10, 4, -11.5]} 
-      size={1} 
+      size={1.1} 
       rotation={[0,Math.PI/6,0]} 
       cameraRef={camera} 
       threshold={3} 
       name='Пирамида'
       meshBeforeIteract='src/models/can_pyramid.glb' 
       meshAfterIteract='src/models/can_pyramid_fallen.glb'/>
+
+      <HintRed position={[-10.1, 4.3, -11.6]}
+      scale={0.7}
+      rotation={[0,Math.PI/6,0]}/>
 
       Подсказка для часов
       <AddableItem 

@@ -7,6 +7,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     Array(20).fill(null).map((_, index) => ({
       id: index + 1,
       item: null,
+      description: '',
     }))
   );
 
@@ -29,13 +30,14 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
 
   
   // Функция для добавления предмета в инвентарь
-  const addItemToInventory = (item) => {
+  const addItemToInventory = (item, description) => {
     setGrid((prevGrid) => {
       const newGrid = [...prevGrid];
       const firstEmptyIndex = newGrid.findIndex((cell) => cell.item === null);
       if (newGrid.some((cell) => cell.item === item)) return prevGrid;
       if (firstEmptyIndex !== -1) {
         newGrid[firstEmptyIndex].item = item;
+        newGrid[firstEmptyIndex].description = description;
       }
       setItemInHand(newGrid[firstEmptyIndex].item);
       setSelectedHotbarIndex(firstEmptyIndex)
@@ -140,23 +142,25 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       {/* Инвентарь */}
       {isVisible && (
         <div className="inventory-window">
-          <h1>Инвентарь</h1>
           <div className="inventory-items">
             {grid.map((cell, index) => (
-              <div
-                key={cell.id}
-                className="inventory-item"
-                onMouseDown={() => handleMouseDown(index)}
-                onMouseUp={() => handleMouseUp(index)}
-                onContextMenu={(e) => cell.item && handleContextMenu(e, cell.item)}
-              >
-                {cell.item && (
-                  <>
-                    <img src={cell.item.imageUrl} alt={cell.item.name} />
-                    <p>{cell.item.name}</p>
-                  </>
-                )}
-              </div>
+              <>
+                {/* Добавляем разделительную черту после первой строки */}
+                {index === 5 && <div key="divider" className="divider"></div>}
+                <div
+                  key={cell.id}
+                  className="inventory-item"
+                  onMouseDown={() => handleMouseDown(index)}
+                  onMouseUp={() => handleMouseUp(index)}
+                  onContextMenu={(e) => cell.item && handleContextMenu(e, cell.item)}
+                >
+                  {cell.item && (
+                    <>
+                      <img src={cell.item.imageUrl} alt={cell.item.name} />
+                    </>
+                  )}
+                </div>
+              </>
             ))}
           </div>
         </div>
