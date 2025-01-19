@@ -5,7 +5,6 @@ import * as THREE from 'three';
 import './IteractableItem.css';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
-import HoverableObject from './HoverableObject';
 import { FixedTimer } from 'three/examples/jsm/Addons.js';
 import ClockInteraction from './ClockInteraction';
 import { add } from 'three/webgpu';
