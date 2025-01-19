@@ -24,13 +24,12 @@ const Projectile = ({position, direction, onHit}) => {
       const hitObject = intersects[0].object;
       if (hitObject !== ref.current) {
         console.log(name + " попал в:", hitObject.name || "Никуда");
-        setHit(true);
         console.log(hitObject.parent.parent)
-        console.log(hitObject.parent.parent.userData)
         if(hitObject.parent.parent.name.includes('ирамида'))
         {
           if(hitObject.parent.parent.userData)
             hitObject.parent.parent.userData();
+          setHit(true);
         }
       }
     }
