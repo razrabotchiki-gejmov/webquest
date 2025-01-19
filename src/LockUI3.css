@@ -1,85 +1,77 @@
 .lock-ui {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    background: #f8f8f8;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    width: 300px;
-  }
-  
-  .lock-dials {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .lock-dial {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-  }
-  
-  .dial-value {
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background: #fff;
-  }
-  
-  button {
-    cursor: pointer;
-    padding: 5px 10px;
-    font-size: 16px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    transition: background 0.3s;
-  }
-  
-  button:hover {
-    background: #0056b3;
-  }
-  
-  .submit-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 18px;
-    font-weight: bold;
-    background: #28a745;
-    border-radius: 5px;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: #f8f8f8;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  width: 300px;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-  .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 25px;
-    height: 25px;
-    background: #ff4d4d;
-    border: none;
-    border-radius: 50%;
-    font-size: 16px;
-    color: rgb(255, 0, 0);
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .close-button:hover {
-    background: #cc0000;
-  }
-  
-  .submit-button:hover {
-    background: #218838;
-  }
-  
+/* Барабаны замка */
+.lock-dials {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+.lock-dial {
+  width: 80px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #333;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.lock-dial .dial-value img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+button {
+  cursor: pointer;
+  padding: 5px 10px;
+  font-size: 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+/* Кнопка закрытия */
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 25px;
+  height: 25px;
+  background: #ff4d4d;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.close-button:hover {
+  background: #cc0000;
+}

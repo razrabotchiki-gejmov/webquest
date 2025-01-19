@@ -28,7 +28,7 @@ const IteractableItem = ({
   addItemToInventory,
   isActive = true,
   activateItem,
-  keyEPressed = false
+  keyEPressed = false,
 }) => {
   const handleHoverChange = (isHovered) => {
     console.log(isHovered ? "Hovered" : "Not Hovered");
@@ -44,6 +44,7 @@ const IteractableItem = ({
   const [clockActive, setClockActive] = useState(false);
   const [arrowsCount,setArrowsCount] = useState(0);
   const [lock5Active, setLock5Active] = useState(false);
+  const [lock10Active, setLock10Active] = useState(false);
   useFrame(() => {
     if (!cameraRef?.current || !ref.current) return; 
       // Создаем луч из камеры в направлении ее взгляда
@@ -63,7 +64,7 @@ const IteractableItem = ({
         //console.log(contextMenu.x + ' ' + contextMenu.y + ' ' + contextMenu.z);
       }
       if(arrowsCount==2 && meshBeforeIteract != 'src/models/clock_closed_witharrows.glb')
-        activateItem();   
+        activateItem();  
   });
  // Закрыть контекстное меню
   const closeContextMenu = () => {
@@ -136,6 +137,10 @@ const IteractableItem = ({
         if(activateItem)
           activateItem();
       }
+      if(name == 'Ящик c кодовым замком' && !isIteracted)
+      {
+        setLock10Active(true)
+      }
       if(name=='Аквариум' && isIteracted)
       {
 
@@ -160,9 +165,19 @@ const IteractableItem = ({
     setClockActive(false);
   }
 
-  const handleLockClose =() =>
+  const handleLock5Close =() =>
   {
     setLock5Active(false);
+  }
+
+  const handleLock10Close =() =>
+  {
+    setLock10Active(false);
+  }
+
+  const destroyPyramid =() =>
+  {
+    setIsIteracted(true);
   }
   return (
     <>
@@ -177,6 +192,8 @@ const IteractableItem = ({
           position={position}
           rotation={rotation}
           scale={size}
+          name={name}
+          userData={destroyPyramid}
         />
       ) : (
         <primitive
@@ -185,6 +202,7 @@ const IteractableItem = ({
           position={position}
           rotation={rotation}
           scale={size}
+          name={name}
         />
       )}
 
@@ -247,10 +265,21 @@ const IteractableItem = ({
       onUnlock={() =>
       {
         setIsIteracted(true);
-        handleLockClose();
+        handleLock5Close();
       }
       }
-      onClose={handleLockClose}/>
+      onClose={handleLock5Close}/>
+      }
+
+      {lock10Active && <LockUI4
+      position={[contextMenu.x,contextMenu.y,contextMenu.z]}
+      onUnlock={() =>
+      {
+        setIsIteracted(true);
+        handleLock10Close();
+      }
+      }
+      onClose={handleLock10Close}/>
       }
     </>
   );

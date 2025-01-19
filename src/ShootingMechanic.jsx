@@ -2,10 +2,11 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const Projectile = ({ position, direction }) => {
+const Projectile = ({position, direction, onHit}) => {
   const ref = useRef();
   const [hit, setHit] = useState(false);
   const { scene } = useThree();
+  const name = 'Ğ¨Ğ°Ñ€'
 
   useFrame(() => {
     if (hit || !ref.current) return;
@@ -22,8 +23,15 @@ const Projectile = ({ position, direction }) => {
     if (intersects.length > 0 && intersects[0].distance < 1) {
       const hitObject = intersects[0].object;
       if (hitObject !== ref.current) {
-        console.log("Ïîïàäàíèå â:", hitObject.name || "íåèçâåñòíûé îáúåêò");
+        console.log(name + " Ğ¿Ğ¾Ğ¿Ğ°Ğ» Ğ²:", hitObject.name || "ĞĞ¸ĞºÑƒĞ´Ğ°");
         setHit(true);
+        console.log(hitObject.parent.parent)
+        console.log(hitObject.parent.parent.userData)
+        if(hitObject.parent.parent.name.includes('Ğ¸Ñ€Ğ°Ğ¼Ğ¸Ğ´Ğ°'))
+        {
+          if(hitObject.parent.parent.userData)
+            hitObject.parent.parent.userData();
+        }
       }
     }
   });

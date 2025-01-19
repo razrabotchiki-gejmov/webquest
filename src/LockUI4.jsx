@@ -3,14 +3,14 @@ import './LockUI4.css';
 import { Html } from '@react-three/drei';
 
 const LockUI4 = ({ onUnlock, position, onClose, }) => {
-  const [combination, setCombination] = useState([1, 1, 1, 1]); // Текущее состояние барабанов
-  const correctCombination = [3, 2, 5, 1]; // Верный пароль
+  const [combination, setCombination] = useState([0, 0, 0, 0]); // Текущее состояние барабанов
+  const correctCombination = [3, 5, 2, 8]; // Верный пароль
 
   // Обновление значения барабана
   const updateCombination = (index, delta) => {
     setCombination((prev) => {
       const newCombination = [...prev];
-      newCombination[index] = ((newCombination[index] - 1 + delta + 9) % 9) + 1; // Циклическое обновление
+      newCombination[index] = ((newCombination[index] + delta + 10) % 10); // Циклическое обновление
       return newCombination;
     });
   };
@@ -20,7 +20,7 @@ const LockUI4 = ({ onUnlock, position, onClose, }) => {
     if (JSON.stringify(combination) === JSON.stringify(correctCombination)) {
       onUnlock(); // Вызываем функцию разблокировки
     } else {
-      setCombination([1, 1, 1, 1]); // Сбрасываем комбинацию
+      setCombination([0, 0, 0, 0]); // Сбрасываем комбинацию
     }
   };
 

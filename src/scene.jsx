@@ -58,6 +58,11 @@ const Room = () => {
         <planeGeometry args={[size, size]} />
         <meshStandardMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
+      {/* Полка на углу для пирамидки */}
+      <mesh rotation={[Math.PI/2, 0, 0]} position={[11, 4, 11]}>
+        <planeGeometry args={[2, 2]} />
+        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+      </mesh>
       {/* Правая стена с потайным отверстием */}
       {/* Левая часть*/}
       <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, -size/4]}>
@@ -487,6 +492,16 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Ящик за плакатом
       <BoxForItems position={[6,2,18.5]} scale={1} rotation={[0,Math.PI/2,0]}/>
+      Пирамида в потайном ящике
+      <IteractableItem 
+      position={[6,1.5,18.3]} 
+      size={1} 
+      rotation={[0,0,0]} 
+      cameraRef={camera} 
+      threshold={3} 
+      name='Пирамида'
+      meshBeforeIteract='src/models/can_pyramid.glb' 
+      meshAfterIteract='src/models/can_pyramid_fallen.glb'/>
 
       Стеллаж в маленькой комнате
       <Shlef position={[3.5,0,15]} scale={1.8} rotation={[0,Math.PI/2,0]}/>
@@ -540,6 +555,17 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Ящик за шкафом
       <BoxForItems position={[12.5,2,0.5]} scale={1} rotation={[0,-Math.PI,0]}/>
+
+      Пирамида на полке
+      <IteractableItem 
+      position={[11.4, 4.1, 11.4]} 
+      size={1.3} 
+      rotation={[0,Math.PI/4,0]} 
+      cameraRef={camera} 
+      threshold={3} 
+      name='Пирамида'
+      meshBeforeIteract='src/models/can_pyramid.glb' 
+      meshAfterIteract='src/models/can_pyramid_fallen.glb'/>
 
       Стол c микроволновкой
       <Table position={[-7, 0, 10]} scale={1.6} rotation={[0,0,0]}/>
@@ -604,6 +630,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshAfterIteract='src/models/desk_opened.glb'
       keyEPressed={keys['KeyE']}/>
 
+
       <InteractiveCube position={[10, 0.5, -5]} />
 
       Подсказка для УФ лампы
@@ -663,6 +690,17 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       Стеллаж в рядом с часами
       <Shlef position={[-9,0,-11.5]} scale={1.8} rotation={[0,0,0]}/>
       
+      Пирамида на стеллаже
+      <IteractableItem 
+      position={[-10, 4, -11.5]} 
+      size={1} 
+      rotation={[0,Math.PI/6,0]} 
+      cameraRef={camera} 
+      threshold={3} 
+      name='Пирамида'
+      meshBeforeIteract='src/models/can_pyramid.glb' 
+      meshAfterIteract='src/models/can_pyramid_fallen.glb'/>
+
       Подсказка для часов
       <AddableItem 
       position={[-9,1.8,-11.5]} 
@@ -752,11 +790,10 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       rotation={[0,0,0]}
       threshold={3}
       cameraRef={camera}
-      name='Ящик'
-      isActive={false}
+      name='Ящик c кодовым замком'
       descriptionBefore='Специализированное место для хранения различных предметов или инструментов.'
       descriptionAfter='Специализированное место для хранения различных предметов или инструментов.'
-      meshBeforeIteract='src/models/locker.glb'
+      meshBeforeIteract='src/models/locker_withlock.glb'
       meshAfterIteract='src/models/locker_opened.glb'
       keyEPressed={keys['KeyE']}/>
       
