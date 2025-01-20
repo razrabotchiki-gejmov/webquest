@@ -54,7 +54,7 @@ const AddableItem = ({
   // Подобрать предмет
   const handlePickup = () => {
     if (addItemToInventory) {
-      addItemToInventory({ name: name, imageUrl: image });
+      addItemToInventory({ name: name, imageUrl: image, description: description });
       setIsDeleted(true);
       closeContextMenu();
     }

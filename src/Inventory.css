@@ -1,11 +1,11 @@
 /* Окно инвентаря */
 .inventory-window {
     position: fixed;
-    top: 50%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 50vw;
-    height: 40vw;
+    width: 40vw;
+    height: 30vw;
     background-color: #E6F0F0;
     color: white;
     border: 2px solid #fff;
@@ -25,6 +25,7 @@
     gap: 40px;
     width: 90%;
     height: 95%;
+    z-index: 1001;
   }
   
   /* Ячейка инвентаря */
@@ -48,11 +49,13 @@
   }
       
   .divider {
-    grid-column: 1 / -1; /* Растянуть на всю ширину */
+    position: absolute;
+    top: 22.5%;
     height: 2px;
     background-color: #000000;
     color: #000;
     width: 100%;
+    z-index: 1;
   }
 
 
@@ -132,3 +135,41 @@
     max-height: 400px;
     object-fit: contain;
   }
+
+  .description-window {
+    position: fixed;
+    top: 85%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40vw;
+    background-color: #E6F0F0;
+    color: white;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Выровнять контент по левому краю */
+    justify-content: flex-start; /* Контент выравнивается сверху */
+    z-index: 999;
+    padding: 10px;
+    gap: 10px; /* Добавляет отступы между элементами */
+}
+
+.description-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000; /* Чёрный цвет для читаемости */
+    margin: 0;
+}
+
+.description-divider {
+    width: 100%;
+    height: 1px;
+    background-color: #000; /* Чёрная линия-разделитель */
+}
+
+.description-text {
+    font-size: 14px;
+    color: #333; /* Тёмно-серый цвет для текста */
+    margin: 0;
+}

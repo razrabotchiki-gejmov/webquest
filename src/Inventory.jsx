@@ -142,11 +142,10 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       {/* Инвентарь */}
       {isVisible && (
         <div className="inventory-window">
+          <div key="divider" className="divider"></div>
           <div className="inventory-items">
             {grid.map((cell, index) => (
               <>
-                {/* Добавляем разделительную черту после первой строки */}
-                {index === 5 && <div key="divider" className="divider"></div>}
                 <div
                   key={cell.id}
                   className="inventory-item"
@@ -190,6 +189,17 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
           <div className="context-menu-item" onClick={handleInspectItem}>
             Осмотреть
           </div>
+        </div>
+      )}
+
+      {/* Описание предмета */}
+      {contextMenu.visible && (
+        <div
+          className="description-window"
+        >
+          <div class="description-title">{contextMenu.item.name}</div>
+          <div class="description-divider"></div>
+          <div class="description-text">{contextMenu.item.description}</div>
         </div>
       )}
 
