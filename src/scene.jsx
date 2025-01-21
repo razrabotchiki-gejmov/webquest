@@ -205,9 +205,9 @@ const ShlefCorner = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => 
 const Piranha = ({startPosition = [0, 0, 0], movementSpeed = 0.005, goDown}) => {
   const ref = useRef();
   const [direction, setDirection] = useState(1); // 1 - вправо, -1 - влево
-
+  const [stopMove, setStopMove] = useState(false);
   const model = useLoader(GLTFLoader, 'src/models/piranha.glb');
-  let rotation = [0,direction*Math.PI/2,0]
+  let rotation = [0,direction*Math.PI/2,stopMove*Math.PI/2]
   useFrame(() => {
     if (!ref.current) return;
       const position = ref.current.position;
@@ -218,14 +218,41 @@ const Piranha = ({startPosition = [0, 0, 0], movementSpeed = 0.005, goDown}) => 
           setDirection((prev) => -prev);
         }
     } else {
-      position.y -= movementSpeed;
+      position.y -= movementSpeed/5;
+      if (position.y <= 1.22) {
+        ref.current.position.y = 1.22;
+      }
+      if(!stopMove)
+      {
+        if (position.z > -2 || position.z < -2)
+          setDirection((prev) => -prev)
+        position.z += direction * movementSpeed
+        if (position.z >= 2- 1e03 || position.z <= 2 + 1e03) {
+          setStopMove(true)
+        }
+      }
+    }
+  });
 
+  return <primitive ref={ref} object={model.scene} position={startPosition} rotation={rotation}/>;
+};
+
+const Meat = ({startPosition = [0, 0, 0], movementSpeed = 0.005, isActive}) => {
+  const ref = useRef();
+  const [direction, setDirection] = useState(1); // 1 - вправо, -1 - влево
+
+  const model = useLoader(GLTFLoader, 'src/models/meat.glb');
+  const rotation = [0,Math.PI/2,0]
+  useFrame(() => {
+    if (!ref.current) return;
+      const position = ref.current.position;
+    if (isActive) {
+      position.y -= movementSpeed;
       if (position.y <= 1.1) {
         ref.current.position.y = 1.1;
       }
     }
   });
-
   return <primitive ref={ref} object={model.scene} position={startPosition} rotation={rotation}/>;
 };
 
@@ -691,6 +718,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       goDown={piranhaFollowMeat}
       />
 
+      Мясо
+      {piranhaFollowMeat && (<Meat
+      startPosition={[-4.9, 1.4, -2]}
+      isActive={piranhaFollowMeat}/>)}
+
       Стеллаж в рядом с часами
       <Shlef position={[-4.5, 0, -5.68]} scale={1} rotation={[0,0,0]}/>
       
@@ -749,7 +781,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       cameraRef={camera} 
       threshold={3} 
       image=''
-      mesh='src/models/phone_2_empty.glb'
+      mesh='src/models/phone_3_empty.glb'
       description='Специальное устройство, на которое записан учебный вопрос. На задней стороне есть номер – 4.'
       descriptionAddedPhone='Специальное устройство, на которое записан учебный вопрос. 
       На задней стороне есть номер – 4.
@@ -829,7 +861,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       cameraRef={camera} 
       threshold={1.5} 
       image=''
-      mesh='src/models/phone_2_empty.glb'
+      mesh='src/models/phone_5_empty.glb'
       description='Специальное устройство, на которое записан учебный вопрос.'
       descriptionAddedPhone='Специальное устройство, на которое записан учебный вопрос. 
       На экране выводится надпись – “Дверь открыта”.' 
