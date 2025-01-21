@@ -27,7 +27,7 @@ const IteractableItem = ({
   addItemToInventory,
   isActive = true,
   activateItem,
-  keyEPressed = false,
+  keys,
 }) => {
   const handleHoverChange = (isHovered) => {
     console.log(isHovered ? "Hovered" : "Not Hovered");
@@ -53,7 +53,7 @@ const IteractableItem = ({
       const intersects = raycaster.intersectObject(ref.current);
 
       // Меняем состояние видимости на основе расстояния
-      if (intersects.length > 0 && intersects[0].distance < threshold && keyEPressed) {      
+      if (intersects.length > 0 && intersects[0].distance < threshold && keys['KeyE']) {      
         setContextMenu({
           visible: true,
           x: cameraRef.current.position.x + cameraRef.current.getWorldDirection(new THREE.Vector3()).x * 2 , // Центр экрана
@@ -61,6 +61,11 @@ const IteractableItem = ({
           z: cameraRef.current.position.z + cameraRef.current.getWorldDirection(new THREE.Vector3()).z * 2,
         });
         //console.log(contextMenu.x + ' ' + contextMenu.y + ' ' + contextMenu.z);
+      }
+      if((contextMenu.visible || isInspecting) && keys['Escape'])
+      {
+        closeContextMenu();
+        closeInspect();
       }
       if(arrowsCount==2 && meshBeforeIteract != 'src/models/clock_closed_witharrows.glb')
         activateItem();  

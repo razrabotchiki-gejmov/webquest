@@ -12,139 +12,25 @@ import { ShootingMechanic } from './ShootingMechanic';
 import InteractiveCube from './InteractiveCube';
 import { threshold } from 'three/webgpu';
 import IntCube2 from './IntCube2';
+import { mx_bilerp_0 } from 'three/src/nodes/materialx/lib/mx_noise.js';
 
 const size = 24;
 const color = 'pink'; // Цвет стен
 const floorColor = 'gray'; // Цвет пола
 const smallRoomSize = size / 2;
 
-const Room = () => {
-  //console.log('Room загружается');
+const Room = ({scale = 1}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/room.glb');
   return (
-    <>
-      {/* Пол */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-        <planeGeometry args={[size*2, size*2]} />
-        <meshStandardMaterial color={floorColor} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Потолок */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, size / 4, 0]}>
-        <planeGeometry args={[size*2, size*2]} />
-        <meshStandardMaterial color="grey" side={THREE.DoubleSide} />
-      </mesh>
-      {/* Передняя стена */}
-      <mesh rotation={[0, 0, 0]} position={[0, 0, -size / 2]}>
-        <planeGeometry args={[size, size]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Правая стена (с отверстием для двери) */}
-      {/* Левая часть */}
-      <mesh rotation={[0, -Math.PI, 0]} position={[-size / 6, 0, size / 2]}>
-        <planeGeometry args={[4.5 * size / 6, size]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Правая часть*/}
-      <mesh rotation={[0, -Math.PI, 0]} position={[size / 2, 0, size / 2]}>
-        <planeGeometry args={[size /  2.5, size]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Верхняя часть*/}
-      <mesh rotation={[0, -Math.PI, 0]} position={[0, 11, size / 2]}>
-        <planeGeometry args={[size, size/1.6]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Задняя стена */}
-      <mesh rotation={[0, Math.PI / 2, 0]} position={[-size / 2, 0, 0]}>
-        <planeGeometry args={[size, size]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Полка на углу для пирамидки */}
-      <mesh rotation={[Math.PI/2, 0, 0]} position={[11, 4, 11]}>
-        <planeGeometry args={[2, 2]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Правая стена с потайным отверстием */}
-      {/* Левая часть*/}
-      <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, -size/4]}>
-        <planeGeometry args={[size/2, size]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Правая часть*/}
-      <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, size/4+1]}>
-        <planeGeometry args={[size/2, size]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Нижняя часть*/}
-      <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 0, 0]}>
-        <planeGeometry args={[size, size/8]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Верхняя часть*/}
-      <mesh rotation={[0, -Math.PI / 2, 0]} position={[size / 2, 5, 0]}>
-        <planeGeometry args={[size, 1.05*size/5]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-
-      {/*Побочная комната*/}
-      {/* Правая стена */}
-      <mesh rotation={[0, Math.PI/2, 0]} position={[3, 0, 5*smallRoomSize/4]}>
-        <planeGeometry args={[smallRoomSize/2, smallRoomSize]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Левая стена */}
-      <mesh rotation={[0, Math.PI/2, 0]} position={[9, 0, 5*smallRoomSize/4]}>
-        <planeGeometry args={[smallRoomSize/2, smallRoomSize]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-
-      {/* Задняя стена */}
-      {/* Левая часть */}
-      <mesh rotation={[0, 0, 0]} position={[8, 0, 3*smallRoomSize/2]}>
-        <planeGeometry args={[smallRoomSize/4, smallRoomSize]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Правая часть */}
-      <mesh rotation={[0, 0, 0]} position={[4, 0, 3*smallRoomSize/2]}>
-        <planeGeometry args={[smallRoomSize/4, smallRoomSize]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Нижняя часть */}
-      <mesh rotation={[0, 0, 0]} position={[6, 0, 3*smallRoomSize/2]}>
-        <planeGeometry args={[smallRoomSize, smallRoomSize/4]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-      {/* Верхняя часть */}
-      <mesh rotation={[0, 0, 0]} position={[6, 5.5, 3*smallRoomSize/2]}>
-        <planeGeometry args={[smallRoomSize, smallRoomSize/2]} />
-        <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-      </mesh>
-    </>
+    <primitive
+      object={gltf.scene}
+      position={[-5,0,0]}
+      rotation={[0,Math.PI/2,0]}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
   );
 };
 
-const BoxForItems = ({position=[0,0,0], scale = 1, rotation =[0,0,0]}) => {
-  const ref=useRef();
-  const color='grey'
-  return (
-    <mesh ref={ref} position={position} rotation={rotation}>
-      {/* Геометрия коробки */}
-      <boxGeometry args={[scale,scale,scale]}/>
-      {/* Материалы для каждой стороны */}
-      <meshStandardMaterial
-        attach="material-0" // Передняя сторона (индекс 0)
-        color="red"
-        transparent={true}
-        opacity={0} // Прозрачность
-        depthWrite={false}
-      />
-      <meshStandardMaterial attach="material-1" color={color} side={THREE.DoubleSide}/> {/* Задняя сторона */}
-      <meshStandardMaterial attach="material-2" color={color} side={THREE.DoubleSide}/> {/* Верхняя сторона */}
-      <meshStandardMaterial attach="material-3" color={color} side={THREE.DoubleSide}/> {/* Нижняя сторона */}
-      <meshStandardMaterial attach="material-4" color={color} side={THREE.DoubleSide}/> {/* Левая сторона */}
-      <meshStandardMaterial attach="material-5" color={color} side={THREE.DoubleSide}/> {/* Правая сторона */}
-    </mesh>
-  );
-};
 
 const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventoryLocked, keys }) => {
   const ref = useRef();
@@ -152,7 +38,6 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
   const [pitch, setPitch] = useState(0);
   useEffect(() => {
     if (isInventoryLocked) return;
-    const pressedKeys = new Set();
     const handleMouseMove = (e) => {
       if (isInventoryLocked || !document.pointerLockElement) return; 
         const delta = THREE.MathUtils.clamp(e.movementX, -50, 50);
@@ -187,10 +72,10 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
     if (keys["KeyD"]) 
       ref.current.translateOnAxis(right, playerSpeed);
     const halfSize = size / 2 - 0.6;
-    ref.current.position.x = Math.max(-halfSize, Math.min(halfSize, ref.current.position.x));
+    //console.log(ref.current.position);
     if (camera.current) {
       const distance = 1; 
-      const height = 2; 
+      const height = 1.5; 
         camera.current.position.set(
           Math.sin(yaw) * distance + ref.current.position.x,
           Math.sin(pitch) * -distance + height,
@@ -268,11 +153,6 @@ const Shlef = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
 const Couch = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   const gltf = useLoader(GLTFLoader, 'src/models/couch.glb');
   const ref = useRef();
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.add(gltf.scene.clone());
-    }
-  }, [gltf]);
   return (
     <primitive
       ref={ref}
@@ -301,11 +181,6 @@ const Cup = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
 const Pillow = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   const gltf = useLoader(GLTFLoader, 'src/models/pillow.glb');
   const ref = useRef();
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.add(gltf.scene.clone());
-    }
-  }, [gltf]);
   return (
     <primitive
       ref={ref}
@@ -317,7 +192,21 @@ const Pillow = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   );
 };
 
-const Piranha = ({startPosition = [0, 0, 0], movementSpeed = 0.01, goDown}) => {
+const ShlefCorner = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/shelf_corner.glb');
+  const ref = useRef();
+  return (
+    <primitive
+      ref={ref}
+      object={gltf.scene}
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const Piranha = ({startPosition = [0, 0, 0], movementSpeed = 0.005, goDown}) => {
   const ref = useRef();
   const [direction, setDirection] = useState(1); // 1 - вправо, -1 - влево
 
@@ -329,14 +218,14 @@ const Piranha = ({startPosition = [0, 0, 0], movementSpeed = 0.01, goDown}) => {
 
       if (!goDown) {
         position.z += direction * movementSpeed;
-        if (position.z > startPosition[2] + 0.5 || position.z < startPosition[2]-0.5) {
+        if (position.z > startPosition[2] + 0.3 || position.z < startPosition[2]-0.3) {
           setDirection((prev) => -prev);
         }
     } else {
       position.y -= movementSpeed;
 
-      if (position.y <= 1.55) {
-        ref.current.position.y = 1.55;
+      if (position.y <= 1.1) {
+        ref.current.position.y = 1.1;
       }
     }
   });
@@ -346,16 +235,7 @@ const Piranha = ({startPosition = [0, 0, 0], movementSpeed = 0.01, goDown}) => {
 
 const HintBlue = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   const gltf = useLoader(GLTFLoader, 'src/models/s_blue_book.glb');
-  //if(color=='red')
-  //  gltf = useLoader(GLTFLoader, 'src/models/s_red_bell.glb');
- // if(color=='yellow')
- //   gltf = useLoader(GLTFLoader, 'src/models/s_yellow_diplom.glb');
   const ref = useRef();
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.add(gltf.scene.clone());
-    }
-  }, [gltf]);
   return (
     <primitive
       ref={ref}
@@ -369,14 +249,7 @@ const HintBlue = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
 
 const HintRed = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   const gltf = useLoader(GLTFLoader, 'src/models/s_red_bell.glb');
- // if(color=='yellow')
- //   gltf = useLoader(GLTFLoader, 'src/models/s_yellow_diplom.glb');
   const ref = useRef();
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.add(gltf.scene.clone());
-    }
-  }, [gltf]);
   return (
     <primitive
       ref={ref}
@@ -391,11 +264,6 @@ const HintRed = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
 const HintYellow = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   const gltf = useLoader(GLTFLoader, 'src/models/s_yellow_diplom.glb');
   const ref = useRef();
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.add(gltf.scene.clone());
-    }
-  }, [gltf]);
   return (
     <primitive
       ref={ref}
@@ -411,8 +279,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [wardrobeActive, setWardrobeActive] = useState(false);
-  const [changedWardrobePosition, setChangeWardrobePosition] = useState([11.7,0,0])
-  const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false, KeyE: false });
+  const [changedWardrobePosition, setChangeWardrobePosition] = useState([4.3,0,-3.5])
+  const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false, KeyE: false, Escape: false });
   const [minuteArrowSpawn, setMinuteArrowSpawn] = useState(false);
   const [clockModel, setClockModel] = useState('src/models/clock_closed.glb')
   const [gunInHand,setGunInHand] = useState(false);
@@ -457,7 +325,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
     const handleChangeWardrobePosition = () =>
     {
       setChangeWardrobePosition(prev => {const newPosition = [...prev];
-        newPosition[2] -= 3;
+        newPosition[2] -= 1.1;
         return newPosition;})
       setTimeout(()=> {console.log('changedPosition: ' + changedWardrobePosition)},2000);
     }
@@ -514,8 +382,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Шкаф в маленькой комнате пустой
       <IteractableItem 
-      position={[8, 0, 13]} 
-      size={1.5} 
+      position={[3.5, 0, 7]} 
+      size={1} 
       rotation={[0,-Math.PI/2,0]}
       threshold={3}
       cameraRef={camera}
@@ -524,12 +392,12 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='Специализированное место для хранения различных предметов или инструментов.'
       meshBeforeIteract='src/models/locker.glb'
       meshAfterIteract='src/models/locker_opened.glb'
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
 
       Шкаф в маленькой комнате c патронами
       <IteractableItem 
-      position={[8, 0, 14]} 
-      size={1.5} 
+      position={[3.5, 0, 8]} 
+      size={1} 
       rotation={[0,-Math.PI/2,0]}
       threshold={3}
       cameraRef={camera}
@@ -538,10 +406,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='Специализированное место для хранения различных предметов или инструментов.'
       meshBeforeIteract='src/models/locker.glb'
       meshAfterIteract='src/models/locker_opened.glb'
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
 
+      Патроны для пистолета
       <AddableItem 
-      position={[8, 1.97, 14]} 
+      position={[3.5, 1.32, 8]} 
       size={1}
       rotation={[0,0,0]}
       name='Патроны для пистолета'
@@ -553,12 +422,9 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       cameraRef={camera}
       addItemToInventory={addItemToInventory}/>
 
-      Ящик за плакатом
-      <BoxForItems position={[6,2,18.5]} scale={1} rotation={[0,Math.PI/2,0]}/>
-
       Пирамида в потайном ящике
       <IteractableItem 
-      position={[6,1.5,18.3]} 
+      position={[2, 1.2, 11]} 
       size={1.1} 
       rotation={[0,0,0]} 
       cameraRef={camera} 
@@ -567,16 +433,18 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshBeforeIteract='src/models/can_pyramid.glb' 
       meshAfterIteract='src/models/can_pyramid_fallen.glb'/>
 
-      <HintBlue position={[6,1.9,18.7]}
-      scale={0.8}
+      Подсказка
+      <HintBlue position={[2, 1.5, 11.2]}
+      scale={0.6}
       rotation={[0,0,0]}/>
 
       Стеллаж в маленькой комнате
-      <Shlef position={[3.5,0,15]} scale={1.8} rotation={[0,Math.PI/2,0]}/>
+      <Shlef position={[0.4, 0, 8]} scale={1} rotation={[0,Math.PI/2,0]}/>
 
       Подбираемая УФ лампочка
       <AddableItem 
-      position={[3.5, 1.9, 15]} 
+      position={[0.4, 1.48, 8]} 
+      size={1}
       cameraRef={camera} 
       rotation={[Math.PI/2,0,0]} 
       threshold={3} 
@@ -588,11 +456,12 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       keyEPressed={keys['KeyE']}/>
 
       Стол c лампой
-      <Table position={[10.5, 0, 4]} scale={1.5} rotation={[0, -Math.PI/2,0]}/>
+      <Table position={[3.5, 0, 0.4]} scale={1} rotation={[0, -Math.PI/2,0]}/>
 
       Интерактивная лампа в которую вставляется УФ лампа
       <IteractableItem 
-      position={[10,1.3,5]} 
+      position={[3, 0.9, 1]} 
+      size={1}
       cameraRef={camera} 
       threshold={3} 
       name='Лампа'
@@ -604,12 +473,12 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       activateItem={handleWardrobeActivate} 
       meshBeforeIteract='src/models/lamp_empty.glb' 
       meshAfterIteract='src/models/lamp_wbulb.glb'
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
 
       Шкаф который можно сдвинуть после активции подсказки
       <IteractableItem 
       position={changedWardrobePosition} 
-      size={1.5} 
+      size={1} 
       cameraRef={camera} 
       threshold={3} 
       name='Шкаф' 
@@ -619,15 +488,17 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshBeforeIteract='src/models/wardrobe.glb' 
       meshAfterIteract='src/models/wardrobe.glb' 
       activateItem={handleChangeWardrobePosition}
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
 
-      Ящик за шкафом
-      <BoxForItems position={[12.5,2,0.5]} scale={1} rotation={[0,-Math.PI,0]}/>
+      Полка для пирамидки
+      <ShlefCorner 
+      position={[-5.04, -0.2, -0.04]}
+      rotation={[0,Math.PI/2,0]}/>
 
       Пирамида на полке
       <IteractableItem 
-      position={[11.4, 4.1, 11.4]} 
-      size={1.3} 
+      position={[4.2, 2.4, 5.6]} 
+      size={1} 
       rotation={[0,Math.PI/4,0]} 
       cameraRef={camera} 
       threshold={3} 
@@ -635,16 +506,18 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshBeforeIteract='src/models/can_pyramid.glb' 
       meshAfterIteract='src/models/can_pyramid_fallen.glb'/>
 
-      <HintYellow position={[11.6,5,11.6]}
-      scale={1}
+      Подсказка желтая
+      <HintYellow position={[4.3, 2.8, 5.7]}
+      scale={0.6}
       rotation={[0,Math.PI/4,0]}/>
 
       Стол c микроволновкой
-      <Table position={[-7, 0, 10]} scale={1.6} rotation={[0,0,0]}/>
+      <Table position={[-3, 0, 5]} scale={1} rotation={[0,0,0]}/>
+
       Микроволоновка
       <IteractableItem 
-      position={[-6.5,1.4,10]}
-      size={1.5}
+      position={[-3.4, 0.9, 5]}
+      size={1}
       rotation={[0,Math.PI,0]}
       cameraRef={camera}
       threshold={3}
@@ -655,14 +528,14 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshAfterIteract='src/models/microwave_enabled.glb'
       removeItemFromInventory={removeItemFromInventory}
       addItemToInventory={addItemToInventory}
-      keyEPressed={keys['KeyE']}
+      keys={keys}
       activateItem={handleAquariumActive}
       itemInHand={itemInHand}/>
 
       Холодильник
       <IteractableItem 
-      position={[-11,0,11.5]} 
-      size={1.5} 
+      position={[-5, 0, 5.6]} 
+      size={1} 
       rotation={[0,Math.PI,0]} 
       cameraRef={camera} 
       threshold={3} 
@@ -671,12 +544,12 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='Хранилище для продуктов питания. Некоторую еду можно заморозить, тогда она будет оставаться свежей долгое время.'
       meshBeforeIteract='src/models/fridge.glb' 
       meshAfterIteract='src/models/fridge_opened.glb'
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
 
       Мясо
       <AddableItem 
-      position={[-11,2.35,11.5]}
-      size={1}
+      position={[-5, 1.6, 5.6]}
+      size={0.8}
       rotation={[0,Math.PI/2,Math.PI/2]}
       cameraRef={camera}
       threshold={3}
@@ -690,8 +563,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Стол c ящиком с подсказой для УФ лампы и кружкой внутри которой стрелка
       <IteractableItem 
-      position={[-11.2, 0, 0]} 
-      size={1.5} 
+      position={[-4.99, 0, 1.7]} 
+      size={1} 
       rotation={[0,Math.PI/2,0]} 
       cameraRef={camera} 
       threshold={3} 
@@ -700,7 +573,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='Для чего понадобилось запирать ящик на замок?'
       meshBeforeIteract='src/models/desk_withlock.glb' 
       meshAfterIteract='src/models/desk_opened.glb'
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
 
 
       <InteractiveCube position={[0, 0.5, 0]} />
@@ -708,7 +581,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Подсказка для УФ лампы
       <AddableItem 
-      position={[-11.2, 1.43,-0.7]} 
+      position={[-4.75, 1, 1.2]} 
+      size={1.3}
       cameraRef={camera} 
       threshold={3} 
       image='/images/Листок до подсказки.jpg'
@@ -719,11 +593,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       keyEPressed={keys['KeyE']}/>
       
       Кружка
-      <Cup position={[-11.2,1.4,1]} scale={1} rotation={[0,Math.PI/2,0]}/>
+      <Cup position={[-4.8, 1, 2.3]} scale={1} rotation={[0,Math.PI/2,0]}/>
       
       Стрелка часовая
       <AddableItem 
-      position={[-11.2,1.4,1]} 
+      position={[-4.8, 1, 2.3]} 
       cameraRef={camera} 
       threshold={3} 
       image={''}
@@ -734,21 +608,21 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       keyEPressed={keys['KeyE']}/>
       
       Стол для аквариума
-      <Table position={[-10.5, 0, -5]} scale={1.5} rotation={[0,Math.PI/2,0]}/>
+      <Table position={[-4.6, 0, -2]} scale={1} rotation={[0,Math.PI/2,0]}/>
 
       Аквариум
       <IteractableItem 
-      position={[-10.5, 1.3, -5]} 
+      position={[-4.6, 0.9, -2]} 
       cameraRef={camera} 
       threshold={3}
-      size={2} 
+      size={1.4} 
       meshBeforeIteract='src/models/aquarium.glb'
       meshAfterIteract='src/models/aquarium.glb'
       descriptionBefore='Тут могут жить различные морские обитатели. Прямо сейчас аквариум занят опасной пираньей. Руки здесь лучше не мыть.'
       descriptionAfter='Тут могут жить различные морские обитатели. Прямо сейчас аквариум занят опасной пираньей. Руки здесь лучше не мыть.'
       name='Аквариум'
       isActive={aquariumActive} 
-      keyEPressed={keys['KeyE']}
+      keys={keys}
       itemInHand={itemInHand}
       removeItemFromInventory={removeItemFromInventory}
       addItemToInventory={addItemToInventory}
@@ -756,17 +630,17 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Пиранья
       <Piranha 
-      startPosition={[-10.5, 2, -5]}
+      startPosition={[-4.6, 1.4, -2]}
       goDown={piranhaFollowMeat}
       />
 
       Стеллаж в рядом с часами
-      <Shlef position={[-9,0,-11.5]} scale={1.8} rotation={[0,0,0]}/>
+      <Shlef position={[-4.5, 0, -5.7]} scale={1} rotation={[0,0,0]}/>
       
       Пирамида на стеллаже
       <IteractableItem 
-      position={[-10, 4, -11.5]} 
-      size={1.1} 
+      position={[-5, 2.25, -5.7]} 
+      size={1} 
       rotation={[0,Math.PI/6,0]} 
       cameraRef={camera} 
       threshold={3} 
@@ -774,13 +648,14 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshBeforeIteract='src/models/can_pyramid.glb' 
       meshAfterIteract='src/models/can_pyramid_fallen.glb'/>
 
-      <HintRed position={[-10.1, 4.3, -11.6]}
-      scale={0.7}
+      <HintRed position={[-5, 2.6, -5.7]}
+      scale={0.4}
       rotation={[0,Math.PI/6,0]}/>
 
       Подсказка для часов
       <AddableItem 
-      position={[-9,1.8,-11.5]} 
+      position={[-4, 1, -5.7]} 
+      size={1.1}
       rotation={[0,0,0]} 
       cameraRef={camera} 
       threshold={3} 
@@ -793,8 +668,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       
       Часы
       <IteractableItem 
-      position={[-6,3,-11.8]} 
-      size={2} 
+      position={[-2.5, 2, -5.7]} 
+      size={1} 
       rotation={[0,0,0]} 
       cameraRef={camera} 
       threshold={3} 
@@ -803,19 +678,19 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='В современное время не часто можно увидеть такие громоздкие приспособления. Может они не только время показывать умеют.'
       meshBeforeIteract={clockModel} 
       meshAfterIteract='src/models/clock_opened_solved.glb'
-      keyEPressed={keys['KeyE']}
+      keys={keys}
       removeItemFromInventory={removeItemFromInventory}
       itemInHand={itemInHand}
       activateItem={handleClockModelChange}/>
       
       Диван
-      <Couch position={[-2,0,-11]} scale={1.3} rotation={[0,0,0]} />
+      <Couch position={[0, 0,-5.3]} scale={1} rotation={[0,0,0]} />
       Подушка
-      <Pillow position={[-3.2,1,-10.8]} scale={1.2} rotation={[0,0,0]} />
+      <Pillow position={[-0.8, 0.73, -5]} scale={1} rotation={[0,0,Math.PI/36]} />
 
       Пистолет
       <AddableItem 
-      position={[-2.7,0.9,-10.6]}
+      position={[-0.3, 0.68, -5]}
       size={1}
       rotation={[Math.PI/2,0,0]}
       cameraRef={camera}
@@ -826,17 +701,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       mesh='src/models/toygun.glb'
       addItemToInventory={addItemToInventory}
       keyEPressed={keys['KeyE']}/>
-
-      Колонна
-      <mesh position={[-1,0,-1]} rotation={[0,0,0]}>
-        <boxGeometry args={[1,20,1]}/>
-        <meshStandardMaterial color="grey" transparent={true} />
-      </mesh>
       
       Ящик со стрелкой
       <IteractableItem 
-      position={[-1,0,-2.1]} 
-      size={2} rotation={[0,Math.PI,0]} 
+      position={[-1,0,-1.4]} 
+      size={1.3} rotation={[0,Math.PI,0]} 
       cameraRef={camera} 
       threshold={3} 
       name='Ящик' 
@@ -844,11 +713,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='Специализированное место для хранения различных предметов или инструментов.'  
       meshBeforeIteract='src/models/nightstand.glb' 
       meshAfterIteract='src/models/nightstand_opened.glb'
-      keyEPressed={keys['KeyE']}
+      keys={keys}
       activateItem={handleMinuteArrowSpawn}/>
 
       {minuteArrowSpawn && <AddableItem 
-      position={[-1,1.45,-3]}
+      position={[-1,0.9,-2]}
       size={2}
       rotation={[Math.PI/2,0,Math.PI/2]}
       cameraRef={camera}
@@ -862,8 +731,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       
       Шкаф у колонны с телефоном
       <IteractableItem 
-      position={[-1,0,0]} 
-      size={1.5} 
+      position={[-1,0,0.1]} 
+      size={1} 
       rotation={[0,0,0]}
       threshold={3}
       cameraRef={camera}
@@ -872,7 +741,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='Специализированное место для хранения различных предметов или инструментов.'
       meshBeforeIteract='src/models/locker_withlock.glb'
       meshAfterIteract='src/models/locker_opened.glb'
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
       
       <MovableCube 
         position={[0, 0.5, 0]} 
