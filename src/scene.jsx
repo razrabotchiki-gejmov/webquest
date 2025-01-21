@@ -11,7 +11,6 @@ import IteractableItem from './IteractableItem.jsx';
 import { ShootingMechanic } from './ShootingMechanic';
 import InteractiveCube from './InteractiveCube';
 import { threshold } from 'three/webgpu';
-import IntCube2 from './IntCube2';
 
 const size = 24;
 const color = 'pink'; // Цвет стен
@@ -703,8 +702,9 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       keyEPressed={keys['KeyE']}/>
 
 
-      <InteractiveCube position={[0, 0.5, 0]} />
-      <IntCube2 position={[4, 0.5, 0]} />
+      <InteractiveCube position={[0, 0.5, 0]} questionType="text" />
+      <InteractiveCube position={[2, 0.5, 0]} questionType="radio" />
+      <InteractiveCube position={[4, 0.5, 0]} questionType="checkbox" />
 
       Подсказка для УФ лампы
       <AddableItem 
