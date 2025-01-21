@@ -1,175 +1,287 @@
 /* Окно инвентаря */
 .inventory-window {
-    position: fixed;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 40vw;
-    height: 30vw;
-    background-color: #E6F0F0;
-    color: white;
-    border: 2px solid #fff;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 999;
-    padding: 10px;
-  }
-  
-  /* Сетка для ячеек */
-  .inventory-items {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    gap: 40px;
-    width: 90%;
-    height: 95%;
-    z-index: 1001;
-  }
-  
-  /* Ячейка инвентаря */
-  .inventory-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 1px #ccc;
-    border-radius: 5px;
-    background-color: #006666;
-    cursor: grab;
-    height: 100%;
-  }
-  
-  .inventory-item img {
-    width: 80%;
-    height: 80%;
-    object-fit: contain;
-    pointer-events: none;
-  }
-      
-  .divider {
-    position: absolute;
-    top: 22.5%;
-    height: 2px;
-    background-color: #000000;
-    color: #000;
-    width: 100%;
-    z-index: 1;
-  }
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40vw;
+  height: 30vw;
+  background-color: #E6F0F0;
+  color: white;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 999;
+  padding: 10px;
+}
 
+/* Сетка для ячеек */
+.inventory-items {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 40px;
+  width: 90%;
+  height: 95%;
+  z-index: 1001;
+}
 
-  .hotbar {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-  }
-  
-  .hotbar-slot {
-    width: 60px;
-    height: 60px;
-    background-color: rgba(0, 0, 0, 0.8);
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .hotbar-slot.selected {
-    border-color: yellow;
-  }
-  
-  .hotbar-slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
+/* Ячейка инвентаря */
+.inventory-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px #ccc;
+  border-radius: 5px;
+  background-color: #006666;
+  cursor: grab;
+  height: 100%;
+}
 
-  .context-menu {
-    position: absolute;
-    background-color: rgba(50, 50, 50, 0.9);
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    z-index: 1000;
-  }
-  
-  .context-menu-item {
-    padding: 5px 10px;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .context-menu-item:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
+.inventory-item img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  pointer-events: none;
+}
 
-  .inspection-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-  }
-  
-  .inspection-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .inspection-content img {
-    max-width: 400px;
-    max-height: 400px;
-    object-fit: contain;
-  }
+.divider {
+  position: absolute;
+  top: 22.5%;
+  height: 2px;
+  background-color: #000000;
+  color: #000;
+  width: 100%;
+  z-index: 1;
+}
 
-  .description-window {
-    position: fixed;
-    top: 85%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 40vw;
-    background-color: #E6F0F0;
-    color: white;
-    border: 2px solid #fff;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Выровнять контент по левому краю */
-    justify-content: flex-start; /* Контент выравнивается сверху */
-    z-index: 999;
-    padding: 10px;
-    gap: 10px; /* Добавляет отступы между элементами */
+.hotbar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  background-color: #E6F0F080;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1000;
+}
+
+.hotbar-slot {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  background-color: #006666; /* Цвет фона, близкий к картинке */
+  border: 2px solid #006666; /* Цвет границы, близкий к картинке */
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hotbar-slot.selected {
+  border-color: rgb(0, 0, 0);
+}
+
+.hotbar-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hotbar-slot .slot-number {
+  position: absolute;
+  top: -10px; /* Сдвигаем цифру немного вверх */
+  left: 0%;
+  transform: translateX(-50%);
+  background-color: #ffffff; /* Фон для цифры */
+  color: rgb(0, 0, 0); /* Цвет текста */
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.left-panel {
+  position: fixed;
+  bottom: 20px; /* Перемещаем вниз */
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.movement-block, .interaction-block {
+  background-color: #E6F0F080;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.movement-block .movement-label, .interaction-block .interaction-label {
+  font-weight: bold;
+  text-align: center;
+}
+
+.movement-block .movement-text, .interaction-block .interaction-text {
+  background-color: #006666; /* Цвет фона, близкий к картинке */
+  border-radius: 10px;
+  text-align: center;
+  color: white; /* Белый текст */
+  margin: 0 auto;
+}
+
+/* Изменения для блока передвижения */
+.movement-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.wasd-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.asd-block {
+  display: flex;
+  gap: 15px;
+}
+
+.wasd-block .movement-text {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* Изменения для блока взаимодействия */
+.interaction-block {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: flex-start; /* Выравнивание по левому краю */
+}
+
+.interaction-label-row {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+
+.interaction-text-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Выравнивание по левому краю */
+}
+
+.interaction-block .interaction-text {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.interaction-description {
+  text-align: left;
+  font-size: 18px;
+}
+
+.context-menu {
+  position: absolute;
+  background-color: rgba(50, 50, 50, 0.9);
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.context-menu-item {
+  padding: 5px 10px;
+  color: white;
+  cursor: pointer;
+}
+
+.context-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.inspection-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.inspection-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inspection-content img {
+  max-width: 400px;
+  max-height: 400px;
+  object-fit: contain;
+}
+
+.description-window {
+  position: fixed;
+  top: 85%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40vw;
+  background-color: #E6F0F0;
+  color: white;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Выровнять контент по левому краю */
+  justify-content: flex-start; /* Контент выравнивается сверху */
+  z-index: 999;
+  padding: 10px;
+  gap: 10px; /* Добавляет отступы между элементами */
 }
 
 .description-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #000; /* Чёрный цвет для читаемости */
-    margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #000; /* Черный цвет для читаемости */
+  margin: 0;
 }
 
 .description-divider {
-    width: 100%;
-    height: 1px;
-    background-color: #000; /* Чёрная линия-разделитель */
+  width: 100%;
+  height: 1px;
+  background-color: #000; /* Черная линия-разделитель */
 }
 
 .description-text {
-    font-size: 14px;
-    color: #333; /* Тёмно-серый цвет для текста */
-    margin: 0;
+  font-size: 14px;
+  color: #333; /* Темно-серый цвет для текста */
+  margin: 0;
 }

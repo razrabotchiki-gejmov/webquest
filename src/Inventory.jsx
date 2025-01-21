@@ -28,7 +28,6 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     setHotbar(grid.slice(0, 5));
   }, [grid]);
 
-  
   // Функция для добавления предмета в инвентарь
   const addItemToInventory = (item, description) => {
     setGrid((prevGrid) => {
@@ -44,6 +43,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       return newGrid;
     });
   };
+
   // Функция для удаления предмета из инвентаря
   const removeItemFromInventory = (itemName) => {
     setGrid((prevGrid) => {
@@ -136,9 +136,36 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     setInspectedItem(null); // Закрыть окно осмотра
   };
 
-  
   return (
     <>
+      {/* Левая часть интерфейса */}
+      <div className="left-panel">
+        <div className="movement-block">
+          <div className="movement-label">Передвижение</div>
+          <div className="wasd-block">
+            <div className="movement-text">W</div>
+            <div className="asd-block">
+              <div className="movement-text">A</div>
+              <div className="movement-text">S</div>
+              <div className="movement-text">D</div>
+            </div>
+          </div>
+        </div>
+        <div className="interaction-block">
+          <div className="interaction-label-row">
+            <div className="interaction-text">E</div>
+            <div className="interaction-description">Взаимодействие</div>
+          </div>
+          <div className="interaction-label-row">
+            <div className="interaction-text">F</div>
+            <div className="interaction-description">Прочитать описание</div>
+          </div>
+          <div className="interaction-label-row">
+            <div className="interaction-text">I</div>
+            <div className="interaction-description">Открыть инвентарь</div>
+          </div>
+        </div>
+      </div>
       {/* Инвентарь */}
       {isVisible && (
         <div className="inventory-window">
@@ -169,12 +196,10 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       {!isVisible && (
         <div className="hotbar">
           {hotbar.map((cell, index) => (
-            <div
-            key={index}
-            className={`hotbar-slot ${index === selectedHotbarIndex ? 'selected' : ''}`}
-          >
-            {cell?.item && <img src={cell?.item.imageUrl} alt="" />}
-          </div>
+            <div key={index} className={`hotbar-slot ${index === selectedHotbarIndex ? 'selected' : ''}`}>
+              <div className="slot-number">{index + 1}</div>
+              {cell?.item && <img src={cell?.item.imageUrl} alt="" />}
+            </div>
           ))}
         </div>
       )}
