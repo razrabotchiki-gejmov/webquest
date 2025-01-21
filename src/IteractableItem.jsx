@@ -114,7 +114,7 @@ const IteractableItem = ({
             activateItem();
           },25 * 1000)
         }
-        if(name=='Аквариум' && itemInHand.name == 'Мясо')
+        if(name=='Аквариум' && itemInHand.name == 'Мясо' && !isIteracted)
           {
             removeItemFromInventory(itemInHand);
             setIsIteracted(true);
@@ -126,13 +126,15 @@ const IteractableItem = ({
         setIsIteracted(true);
         activateItem();
       }
-      if(name == 'Часы' && arrowsCount==2)
+      if(name == 'Часы' && arrowsCount==2 && !isIteracted)
       {
         setClockActive(true);
       }
       if(name == 'Стол с замком' && !isIteracted)
       {
         setLock5Active(true);
+        if(activateItem)
+          activateItem();
       }
       if(name == 'Ящик' || name == 'Холодильник')
       {
@@ -147,7 +149,7 @@ const IteractableItem = ({
       }
       if(name=='Аквариум' && isIteracted)
       {
-
+          activateItem();
       }
     }
       closeContextMenu();
@@ -260,6 +262,7 @@ const IteractableItem = ({
       onSuccess={() => {
         setIsIteracted(true);
         handleClockClose();
+        activateItem();
       }}
       onClose={handleClockClose}/>
       }

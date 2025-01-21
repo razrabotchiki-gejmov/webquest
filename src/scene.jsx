@@ -109,7 +109,7 @@ const Desk = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
 };
   
 const Table = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
-    const gltf = useLoader(GLTFLoader, 'src/models/table.glb');
+    const gltf = useLoader(GLTFLoader, 'src/models/table_thin.glb');
     const ref = useRef();
     useEffect(() => {
       if (ref.current) {
@@ -205,9 +205,9 @@ const ShlefCorner = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => 
 const Piranha = ({startPosition = [0, 0, 0], movementSpeed = 0.005, goDown}) => {
   const ref = useRef();
   const [direction, setDirection] = useState(1); // 1 - вправо, -1 - влево
-
+  const [stopMove, setStopMove] = useState(false);
   const model = useLoader(GLTFLoader, 'src/models/piranha.glb');
-  let rotation = [0,direction*Math.PI/2,0]
+  let rotation = [0,direction*Math.PI/2,stopMove*Math.PI/2]
   useFrame(() => {
     if (!ref.current) return;
       const position = ref.current.position;
@@ -218,14 +218,41 @@ const Piranha = ({startPosition = [0, 0, 0], movementSpeed = 0.005, goDown}) => 
           setDirection((prev) => -prev);
         }
     } else {
-      position.y -= movementSpeed;
+      position.y -= movementSpeed/5;
+      if (position.y <= 1.22) {
+        ref.current.position.y = 1.22;
+      }
+      if(!stopMove)
+      {
+        if (position.z > -2 || position.z < -2)
+          setDirection((prev) => -prev)
+        position.z += direction * movementSpeed
+        if (position.z >= 2- 1e03 || position.z <= 2 + 1e03) {
+          setStopMove(true)
+        }
+      }
+    }
+  });
 
+  return <primitive ref={ref} object={model.scene} position={startPosition} rotation={rotation}/>;
+};
+
+const Meat = ({startPosition = [0, 0, 0], movementSpeed = 0.005, isActive}) => {
+  const ref = useRef();
+  const [direction, setDirection] = useState(1); // 1 - вправо, -1 - влево
+
+  const model = useLoader(GLTFLoader, 'src/models/meat.glb');
+  const rotation = [0,Math.PI/2,0]
+  useFrame(() => {
+    if (!ref.current) return;
+      const position = ref.current.position;
+    if (isActive) {
+      position.y -= movementSpeed;
       if (position.y <= 1.1) {
         ref.current.position.y = 1.1;
       }
     }
   });
-
   return <primitive ref={ref} object={model.scene} position={startPosition} rotation={rotation}/>;
 };
 
@@ -275,7 +302,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [wardrobeActive, setWardrobeActive] = useState(false);
-  const [changedWardrobePosition, setChangeWardrobePosition] = useState([4.3,0,-3.5])
+  const [changedWardrobePosition, setChangeWardrobePosition] = useState([4.27,0,-3.5])
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false, KeyE: false, Escape: false });
   const [minuteArrowSpawn, setMinuteArrowSpawn] = useState(false);
   const [clockModel, setClockModel] = useState('src/models/clock_closed.glb')
@@ -283,6 +310,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
   const [haveBullets,setHaveBullets] = useState(false);
   const [aquariumActive,setAquariumActive] = useState(false);
   const [piranhaFollowMeat, setPiranhaFollowMeat] = useState(false);
+  const [spawn2Telephone, setSpawn2Telephone] = useState(false);
+  const [spawn4Telephone, setSpawn4Telephone] = useState(false);
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
@@ -329,18 +358,40 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
     {
       setMinuteArrowSpawn((prev) => !prev);
     }
-    const handleClockModelChange = () =>
+    const handleClockAction = () =>
     {
-      setClockModel('src/models/clock_closed_witharrows.glb');
+      if(clockModel!='src/models/clock_closed_witharrows.glb')
+        setClockModel('src/models/clock_closed_witharrows.glb');
+      else
+        handle4TelephoneSpawn();
     }
     const handleAquariumActive = () =>
     {
       setAquariumActive(true);
     }
-    const handlePiranhaEatMeat = () =>
+    const handleAquariumAction = () =>
     {
-      setPiranhaFollowMeat(true);
+      if(!piranhaFollowMeat)
+        setPiranhaFollowMeat(true);
+      else
+      {
+        if (addItemToInventory) {
+          addItemToInventory({ name: 'Телефон', imageUrl: '', description: 'Специальное устройство, на которое записан учебный вопрос. На задней стороне есть номер – 3. На экране выводится значение – 2.'});
+          console.log('Ответ появляется')
+          setActiveQuestion(true);
+          setQuestionType('checkbox')
+        }
+      }
     }
+    const handle2TelephoneSpawn = () =>
+    {
+      setSpawn2Telephone(true);
+    }
+    const handle4TelephoneSpawn = () =>
+    {
+      setSpawn4Telephone(true);
+    }
+
     if(itemInHand){ 
       if(itemInHand.name=='Пистолет')
       {
@@ -413,7 +464,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       description='Мягкие и безопасные для человека. Можно зарядить в игрушечный пистолет.'
       mesh='src/models/toygun_bulletbox.glb'
       image=''
-      keyEPressed={keys['KeyE']}
+      keys={keys}
       threshold={3}
       cameraRef={camera}
       addItemToInventory={addItemToInventory}/>
@@ -449,14 +500,14 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       description='Лампочка, способная излучать ультрафиолетовое свечение.' 
       addItemToInventory={addItemToInventory} 
       name={'уф лампа'} 
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
 
       Стол c лампой
-      <Table position={[3.5, 0, 0.4]} scale={1} rotation={[0, -Math.PI/2,0]}/>
+      <Table position={[3.9, 0, 0.4]} scale={1} rotation={[0, -Math.PI/2,0]}/>
 
       Интерактивная лампа в которую вставляется УФ лампа
       <IteractableItem 
-      position={[3, 0.9, 1]} 
+      position={[3.7, 0.9, 1]} 
       size={1}
       cameraRef={camera} 
       threshold={3} 
@@ -486,7 +537,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       activateItem={handleChangeWardrobePosition}
       keys={keys}/>
 
-      Телефон
+      Телефон 1
       <AddableItem 
       position={[4.7,1.5,-3.5]}
       rotation={[0,Math.PI/2,0]} 
@@ -495,10 +546,13 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       threshold={3} 
       image=''
       mesh='src/models/phone_1_empty.glb'
-      description='Телефон 1 и еще описание потом будет' 
+      description='Специальное устройство, на которое записан учебный вопрос. На задней стороне есть номер – 1.'
+      descriptionAddedPhone='Специальное устройство, на которое записан учебный вопрос. 
+      На задней стороне есть номер – 1.
+      На экране выводится значение – 3.' 
       addItemToInventory={addItemToInventory} 
-      name='Телефон1' 
-      keyEPressed={keys['KeyE']}
+      name='Телефон' 
+      keys={keys}
       questionType={'text'}
       setActiveQuestion={setActiveQuestion}
       setQuestionType={setQuestionType}/>
@@ -525,11 +579,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       rotation={[0,Math.PI/4,0]}/>
 
       Стол c микроволновкой
-      <Table position={[-3, 0, 5]} scale={1} rotation={[0,0,0]}/>
+      <Table position={[-3, 0, 5.4]} scale={1} rotation={[0,0,0]}/>
 
       Микроволоновка
       <IteractableItem 
-      position={[-3.4, 0.9, 5]}
+      position={[-3.4, 0.9, 5.3]}
       size={1}
       rotation={[0,Math.PI,0]}
       cameraRef={camera}
@@ -547,7 +601,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Холодильник
       <IteractableItem 
-      position={[-5, 0, 5.6]} 
+      position={[-5, 0, 5.55]} 
       size={1} 
       rotation={[0,Math.PI,0]} 
       cameraRef={camera} 
@@ -571,12 +625,12 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       name='Мясо замороженное'
       description='Промерз основательно. Чтобы сделать его пригодным в пищу  сначала необходимо разогреть.'
       mesh={'src/models/meat_frozen.glb'}
-      keyEPressed={keys['KeyE']}
+      keys={keys}
       />
 
       Стол c ящиком с подсказой для УФ лампы и кружкой внутри которой стрелка
       <IteractableItem 
-      position={[-4.99, 0, 1.7]} 
+      position={[-4.9, 0, 1.7]} 
       size={1} 
       rotation={[0,Math.PI/2,0]} 
       cameraRef={camera} 
@@ -586,7 +640,28 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='Для чего понадобилось запирать ящик на замок?'
       meshBeforeIteract='src/models/desk_withlock.glb' 
       meshAfterIteract='src/models/desk_opened.glb'
-      keys={keys}/>
+      keys={keys}
+      activateItem={handle2TelephoneSpawn}/>
+
+      Телефон 2
+      {spawn2Telephone && (<AddableItem 
+      position={[-4.3, 0.8, 1.7]}
+      rotation={[0,Math.PI/2,0]} 
+      size={1}
+      cameraRef={camera} 
+      threshold={3} 
+      image=''
+      mesh='src/models/phone_2_empty.glb'
+      description='Специальное устройство, на которое записан учебный вопрос. На задней стороне есть номер – 2.'
+      descriptionAddedPhone='Специальное устройство, на которое записан учебный вопрос. 
+      На задней стороне есть номер – 2.
+      На экране выводится значение – 5.' 
+      addItemToInventory={addItemToInventory} 
+      name='Телефон' 
+      keys={keys}
+      questionType={'radio'}
+      setActiveQuestion={setActiveQuestion}
+      setQuestionType={setQuestionType}/>)}
 
       Подсказка для УФ лампы
       <AddableItem 
@@ -599,7 +674,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       description='Листок с изображением лампочки, возможно это намек чтобы воспользоваться чем то в комнате.' 
       addItemToInventory={addItemToInventory} 
       name='Листок с изображением лампочки' 
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
       
       Кружка
       <Cup position={[-4.8, 0.95, 2.3]} scale={1} rotation={[0,Math.PI/2,0]}/>
@@ -614,17 +689,17 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       description='Одна из двух потерянных стрелок. Определяет какой сейчас час.' 
       addItemToInventory={addItemToInventory} 
       name='Часовая стрелка'
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
       
       Стол для аквариума
-      <Table position={[-4.6, 0, -2]} scale={1} rotation={[0,Math.PI/2,0]}/>
+      <Table position={[-4.9, 0, -2]} scale={1} rotation={[0,Math.PI/2,0]}/>
 
       Аквариум
       <IteractableItem 
-      position={[-4.6, 0.9, -2]} 
+      position={[-4.9, 0.9, -2]} 
       cameraRef={camera} 
       threshold={3}
-      size={1.4} 
+      size={1.5} 
       meshBeforeIteract='src/models/aquarium.glb'
       meshAfterIteract='src/models/aquarium.glb'
       descriptionBefore='Тут могут жить различные морские обитатели. Прямо сейчас аквариум занят опасной пираньей. Руки здесь лучше не мыть.'
@@ -635,16 +710,21 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       itemInHand={itemInHand}
       removeItemFromInventory={removeItemFromInventory}
       addItemToInventory={addItemToInventory}
-      activateItem={handlePiranhaEatMeat}/>
+      activateItem={handleAquariumAction}/>
 
       Пиранья
       <Piranha 
-      startPosition={[-4.6, 1.4, -2]}
+      startPosition={[-4.9, 1.4, -2]}
       goDown={piranhaFollowMeat}
       />
 
+      Мясо
+      {piranhaFollowMeat && (<Meat
+      startPosition={[-4.9, 1.4, -2]}
+      isActive={piranhaFollowMeat}/>)}
+
       Стеллаж в рядом с часами
-      <Shlef position={[-4.5, 0, -5.7]} scale={1} rotation={[0,0,0]}/>
+      <Shlef position={[-4.5, 0, -5.68]} scale={1} rotation={[0,0,0]}/>
       
       Пирамида на стеллаже
       <IteractableItem 
@@ -657,6 +737,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshBeforeIteract='src/models/can_pyramid.glb' 
       meshAfterIteract='src/models/can_pyramid_fallen.glb'/>
 
+      Подсказка красная
       <HintRed position={[-5, 2.6, -5.7]}
       scale={0.4}
       rotation={[0,Math.PI/6,0]}/>
@@ -673,12 +754,12 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       description='Листок с запиской. Содержание: Если кто найдет стрелки, установите время в часах на полдевятого – начало моего рабочего дня. Заведующий кабинетом' 
       addItemToInventory={addItemToInventory}
       name='Листок с неким текстом'
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
       
       Часы
       <IteractableItem 
-      position={[-2.5, 2, -5.7]} 
-      size={1} 
+      position={[-2.5, 2, -5.85]} 
+      size={1.5} 
       rotation={[0,0,0]} 
       cameraRef={camera} 
       threshold={3} 
@@ -690,10 +771,30 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       keys={keys}
       removeItemFromInventory={removeItemFromInventory}
       itemInHand={itemInHand}
-      activateItem={handleClockModelChange}/>
+      activateItem={handleClockAction}/>
+
+      Телефон 4
+      {spawn4Telephone && (<AddableItem 
+      position={[-2.5, 1.08, -5.9]}
+      rotation={[0,0,0]} 
+      size={0.6}
+      cameraRef={camera} 
+      threshold={3} 
+      image=''
+      mesh='src/models/phone_3_empty.glb'
+      description='Специальное устройство, на которое записан учебный вопрос. На задней стороне есть номер – 4.'
+      descriptionAddedPhone='Специальное устройство, на которое записан учебный вопрос. 
+      На задней стороне есть номер – 4.
+      На экране выводится значение – 8.' 
+      addItemToInventory={addItemToInventory} 
+      name='Телефон' 
+      keys={keys}
+      questionType={'text'}
+      setActiveQuestion={setActiveQuestion}
+      setQuestionType={setQuestionType}/>)}
       
       Диван
-      <Couch position={[0, 0,-5.3]} scale={1} rotation={[0,0,0]} />
+      <Couch position={[0, 0,-5.24]} scale={1} rotation={[0,0,0]} />
       Подушка
       <Pillow position={[-0.8, 0.73, -5]} scale={1} rotation={[0,0,Math.PI/36]} />
 
@@ -709,11 +810,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       description='С этой игрушкой можно чувствовать себе увереннее. Отлично подходит для сбивания пустых банок или бутылок. Не работает без патронов.'
       mesh='src/models/toygun.glb'
       addItemToInventory={addItemToInventory}
-      keyEPressed={keys['KeyE']}/>
+      keys={keys}/>
       
       Ящик со стрелкой
       <IteractableItem 
-      position={[-1,0,-1.4]} 
+      position={[-1,0,-1.5]} 
       size={1.3} rotation={[0,Math.PI,0]} 
       cameraRef={camera} 
       threshold={3} 
@@ -736,11 +837,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       addItemToInventory={addItemToInventory}
       mesh={'src/models/arrow_minute.glb'}
       description='Одна из двух потерянных стрелок. Определяет какая сейчас минута.'
-      keyEPressed={keys['KeyE']}/>}
+      keys={keys}/>}
       
       Шкаф у колонны с телефоном
       <IteractableItem 
-      position={[-1,0,0.1]} 
+      position={[-1,0,0.2]} 
       size={1} 
       rotation={[0,0,0]}
       threshold={3}
@@ -751,6 +852,25 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshBeforeIteract='src/models/locker_withlock.glb'
       meshAfterIteract='src/models/locker_opened.glb'
       keys={keys}/>
+
+      Телефон Финал
+      <AddableItem 
+      position={[-1,1.37,0.2]}
+      rotation={[0,0,0]} 
+      size={1}
+      cameraRef={camera} 
+      threshold={1.5} 
+      image=''
+      mesh='src/models/phone_5_empty.glb'
+      description='Специальное устройство, на которое записан учебный вопрос.'
+      descriptionAddedPhone='Специальное устройство, на которое записан учебный вопрос. 
+      На экране выводится надпись – “Дверь открыта”.' 
+      addItemToInventory={addItemToInventory} 
+      name='Телефон' 
+      keys={keys}
+      questionType={'text'}
+      setActiveQuestion={setActiveQuestion}
+      setQuestionType={setQuestionType}/>
       
       <MovableCube 
         position={[0, 0.5, 0]} 

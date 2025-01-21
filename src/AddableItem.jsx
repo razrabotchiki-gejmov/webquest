@@ -18,14 +18,14 @@ const AddableItem = ({
   size = 2,
   rotation = [0,Math.PI/2,0],
   description = 'Описание 123',
-  keyEPressed = false,
+  descriptionAddedPhone,
+  keys,
   questionType,
   setQuestionType,
   setActiveQuestion, }) => {
 
   const ref = useRef();
   const [isDeleted, setIsDeleted] = useState(false);
-  const [keys, setKeys] = useState({KeyE : false});
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y:0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
   const objectMesh = useLoader(GLTFLoader, mesh);
@@ -37,7 +37,7 @@ const AddableItem = ({
       const intersects = raycaster.intersectObject(ref.current);
 
       // Меняем состояние видимости на основе расстояния
-      if (intersects.length > 0 && intersects[0].distance < threshold && keyEPressed) {  
+      if (intersects.length > 0 && intersects[0].distance < threshold && keys['KeyE']) {  
         console.log('Предмет добавлен')      
         setContextMenu({
           visible: true,
@@ -47,7 +47,12 @@ const AddableItem = ({
         });
         console.log(contextMenu.visible);
         console.log('Position:', contextMenu.x + ' ' + contextMenu.z);
-      }    
+      }
+      if((contextMenu.visible || isInspecting) && keys['Escape'])
+        {
+          closeContextMenu();
+          closeInspect();
+        }    
   });
  // Закрыть контекстное меню
   const closeContextMenu = () => {
@@ -57,7 +62,7 @@ const AddableItem = ({
   // Подобрать предмет
   const handlePickup = () => {
     if (addItemToInventory) {
-      addItemToInventory({ name: name, imageUrl: image, description: description });
+      addItemToInventory({ name: name, imageUrl: image, description: name.includes('Телефон') ? descriptionAddedPhone : description });
       if(name.includes('Телефон'))
         {
           console.log('Ответ появляется')
