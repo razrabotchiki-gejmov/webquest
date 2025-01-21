@@ -1,10 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { Html } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
 
 // Основной компонент куба с различными типами вопросов
-const InteractiveCube = ({ position, questionType }) => {
-  const ref = useRef();
+const CallingQuestion = ({ questionType }) => {
   const [isInteracting, setIsInteracting] = useState(false);
   const [answer, setAnswer] = useState('');
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -47,12 +45,8 @@ const InteractiveCube = ({ position, questionType }) => {
 
   return (
     <>
-      <mesh ref={ref} position={position} castShadow onClick={handleInteraction}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="red" />
-      </mesh>
       {isInteracting && (
-        <Html position={[position[0], position[1] + 1.5, position[2]]} center>
+        <Html center>
           <div className="interaction-window" style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             {questionType === 'text' && (
               <>
@@ -152,4 +146,4 @@ const InteractiveCube = ({ position, questionType }) => {
   );
 };
 
-export default InteractiveCube;
+export default CallingQuestion;

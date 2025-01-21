@@ -9,7 +9,7 @@ import './scene.css'
 import AddableItem from './AddableItem.jsx'
 import IteractableItem from './IteractableItem.jsx';
 import { ShootingMechanic } from './ShootingMechanic';
-import InteractiveCube from './InteractiveCube';
+import CallingQuestion from './CallingQuestion.jsx';
 import { threshold } from 'three/webgpu';
 
 const size = 24;
@@ -702,9 +702,9 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       keyEPressed={keys['KeyE']}/>
 
 
-      <InteractiveCube position={[0, 0.5, 0]} questionType="text" />
-      <InteractiveCube position={[2, 0.5, 0]} questionType="radio" />
-      <InteractiveCube position={[4, 0.5, 0]} questionType="checkbox" />
+      <CallingQuestion questionType="text" />
+      <CallingQuestion questionType="radio" />
+      <CallingQuestion questionType="checkbox" />
 
       Подсказка для УФ лампы
       <AddableItem 
