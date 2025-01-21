@@ -1,18 +1,14 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
-import { Box, Plane, PerspectiveCamera } from '@react-three/drei';
+import React, { useRef, useState, useEffect } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { useLoader } from '@react-three/fiber';
 import './scene.css'
 import AddableItem from './AddableItem.jsx'
 import IteractableItem from './IteractableItem.jsx';
 import { ShootingMechanic } from './ShootingMechanic';
 import CallingQuestion from './CallingQuestion.jsx';
-import { threshold } from 'three/webgpu';
-import IntCube2 from './IntCube2';
-import { mx_bilerp_0 } from 'three/src/nodes/materialx/lib/mx_noise.js';
 
 const size = 24;
 const color = 'pink'; // Цвет стен
@@ -275,7 +271,7 @@ const HintYellow = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   );
 };
 
-const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory}) => {
+const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory, setActiveQuestion, activeQuestion, setQuestionType}) => {
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [wardrobeActive, setWardrobeActive] = useState(false);
@@ -297,7 +293,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
     if (lightRef.current && targetRef.current) {
       lightRef.current.target = targetRef.current;
     }
-    if(isInventoryLocked) return;
+    if(isInventoryLocked || activeQuestion) return;
     const handleClick = () => {
       document.body.requestPointerLock();
     };
@@ -315,7 +311,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       document.removeEventListener('keyup', handleKeyUp);
       document.body.removeEventListener("click", handleClick);
     };
-  }, [isInventoryLocked]);
+  }, [isInventoryLocked, activeQuestion]);
 
     const handleWardrobeActivate = () =>
     {
@@ -490,6 +486,23 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       activateItem={handleChangeWardrobePosition}
       keys={keys}/>
 
+      Телефон
+      <AddableItem 
+      position={[4.7,1.5,-3.5]}
+      rotation={[0,Math.PI/2,0]} 
+      size={1}
+      cameraRef={camera} 
+      threshold={3} 
+      image=''
+      mesh='src/models/phone_1_empty.glb'
+      description='Телефон 1 и еще описание потом будет' 
+      addItemToInventory={addItemToInventory} 
+      name='Телефон1' 
+      keyEPressed={keys['KeyE']}
+      questionType={'text'}
+      setActiveQuestion={setActiveQuestion}
+      setQuestionType={setQuestionType}/>
+
       Полка для пирамидки
       <ShlefCorner 
       position={[-5.04, -0.2, -0.04]}
@@ -575,11 +588,6 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshAfterIteract='src/models/desk_opened.glb'
       keys={keys}/>
 
-
-      <CallingQuestion questionType="text" />
-      <CallingQuestion questionType="radio" />
-      <CallingQuestion questionType="checkbox" />
-
       Подсказка для УФ лампы
       <AddableItem 
       position={[-4.75, 1, 1.2]} 
@@ -594,11 +602,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       keyEPressed={keys['KeyE']}/>
       
       Кружка
-      <Cup position={[-4.8, 1, 2.3]} scale={1} rotation={[0,Math.PI/2,0]}/>
+      <Cup position={[-4.8, 0.95, 2.3]} scale={1} rotation={[0,Math.PI/2,0]}/>
       
       Стрелка часовая
       <AddableItem 
-      position={[-4.8, 1, 2.3]} 
+      position={[-4.8, 0.95, 2.3]} 
       cameraRef={camera} 
       threshold={3} 
       image={''}

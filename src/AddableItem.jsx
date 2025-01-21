@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import './AddableItem.css';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
-import { rotate } from 'three/webgpu';
+import CallingQuestion from './CallingQuestion';
 
 const AddableItem = ({ 
   position = [0, 0, 0], 
@@ -18,7 +18,10 @@ const AddableItem = ({
   size = 2,
   rotation = [0,Math.PI/2,0],
   description = 'Описание 123',
-  keyEPressed = false }) => {
+  keyEPressed = false,
+  questionType,
+  setQuestionType,
+  setActiveQuestion, }) => {
 
   const ref = useRef();
   const [isDeleted, setIsDeleted] = useState(false);
@@ -55,6 +58,12 @@ const AddableItem = ({
   const handlePickup = () => {
     if (addItemToInventory) {
       addItemToInventory({ name: name, imageUrl: image, description: description });
+      if(name.includes('Телефон'))
+        {
+          console.log('Ответ появляется')
+          setActiveQuestion(true);
+          setQuestionType(questionType)
+        }
       setIsDeleted(true);
       closeContextMenu();
     }
@@ -71,17 +80,22 @@ const AddableItem = ({
     setIsInspecting(false);
   };
 
-  if (isDeleted) return null;
+  const closeQuestion = () =>
+  {
+    setActiveQuestion(false);
+  }
+
+
   return (
     <>
       {/* Mesh для предмета */}
-      <primitive
+      {!isDeleted && (<primitive
           ref={ref}
           object={objectMesh.scene}
           position={position}
           rotation={rotation}
           scale={size}
-      />
+      />)}
 
       {/* Контекстное меню */}
       {contextMenu.visible && (

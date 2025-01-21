@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Inventory.css';
 
-function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand, setRemoveItemFromInventory }) {
+function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand, setRemoveItemFromInventory, activeQuestion }) {
   const [isVisible, setIsVisible] = useState(false);
   const [grid, setGrid] = useState(
     Array(20).fill(null).map((_, index) => ({
@@ -64,7 +64,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
   }
 
   useEffect(() => {
-    
+    if (activeQuestion) return;
     setInterval(() => recheckItem(activeIndex),1000);
     if (setAddItemToInventory) {
       setAddItemToInventory(() => addItemToInventory);
@@ -89,7 +89,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [setAddItemToInventory, setIsInventoryLocked, setRemoveItemFromInventory, setItemInHand, isVisible]);
+  }, [setAddItemToInventory, setIsInventoryLocked, setRemoveItemFromInventory, setItemInHand, isVisible, activeQuestion]);
 
   // Обработчики перетаскивания
   const [draggedItem, setDraggedItem] = useState(null);
