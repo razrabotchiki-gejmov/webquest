@@ -50,7 +50,7 @@ const ShootingMechanic = ({ camera }) => {
   const handleShoot = (event) => {
     const currentTime = Date.now();
     if (!camera.current || currentTime - lastShotTime < 1000) return;
-
+    console.log('shoot');
     const direction = new THREE.Vector3();
     camera.current.getWorldDirection(direction);
     setProjectiles(prev => [...prev, {

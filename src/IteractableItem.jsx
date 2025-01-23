@@ -5,9 +5,7 @@ import * as THREE from 'three';
 import './IteractableItem.css';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
-import { FixedTimer } from 'three/examples/jsm/Addons.js';
 import ClockInteraction from './ClockInteraction';
-import { add } from 'three/webgpu';
 import LockUI3 from './LockUI3';
 import LockUI4 from './LockUI4';
 
@@ -45,7 +43,7 @@ const IteractableItem = ({
   const [lock5Active, setLock5Active] = useState(false);
   const [lock10Active, setLock10Active] = useState(false);
   useFrame(() => {
-    if (!cameraRef?.current || !ref.current) return; 
+    if (!cameraRef?.current || !ref.current || !keys) return; 
       // Создаем луч из камеры в направлении ее взгляда
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera({ x: 0, y: 0 }, cameraRef.current); // Центр экрана (x=0, y=0)
@@ -95,7 +93,7 @@ const IteractableItem = ({
         {
             removeItemFromInventory(itemInHand);
             setTimeout(() =>{
-              addItemToInventory({name: 'Листок с изображение шкафа', imageUrl: '/images/шкаф.jpg'});
+              addItemToInventory({name: 'Листок с изображение шкафа', imageUrl: 'images/Подсказка.png'});
               activateItem();
             },3 * 1000);
         }
@@ -109,7 +107,7 @@ const IteractableItem = ({
           removeItemFromInventory(itemInHand)
           setIsIteracted(true);
           setTimeout(() =>{
-            addItemToInventory({name: 'Мясо', imageUrl: ''})
+            addItemToInventory({name: 'Мясо', imageUrl: 'images/Кусок мяса.png'})
             setIsIteracted(false);
             activateItem();
           },25 * 1000)
@@ -133,8 +131,6 @@ const IteractableItem = ({
       if(name == 'Стол с замком' && !isIteracted)
       {
         setLock5Active(true);
-        if(activateItem)
-          activateItem();
       }
       if(name == 'Ящик' || name == 'Холодильник')
       {
@@ -150,6 +146,10 @@ const IteractableItem = ({
       if(name=='Аквариум' && isIteracted)
       {
           activateItem();
+      }
+      if(name=='Карта' && !isIteracted)
+      {
+        setIsIteracted(true);
       }
     }
       closeContextMenu();
@@ -273,6 +273,8 @@ const IteractableItem = ({
       {
         setIsIteracted(true);
         handleLock5Close();
+        if(activateItem)
+          activateItem();
       }
       }
       onClose={handleLock5Close}/>

@@ -8,7 +8,6 @@ import './scene.css'
 import AddableItem from './AddableItem.jsx'
 import IteractableItem from './IteractableItem.jsx';
 import { ShootingMechanic } from './ShootingMechanic';
-import CallingQuestion from './CallingQuestion.jsx';
 
 const size = 24;
 const color = 'pink'; // Цвет стен
@@ -89,17 +88,10 @@ const MovableCube = ({ position, rotationSpeed, playerSpeed, camera, isInventory
   );
 };
   
-const Desk = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
-    const gltf = useLoader(GLTFLoader, 'src/models/desk.glb');
-    const ref = useRef();
-    useEffect(() => {
-      if (ref.current) {
-        ref.current.add(gltf.scene.clone());
-      }
-    }, [gltf]);
+const Phone = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+    const gltf = useLoader(GLTFLoader, 'src/models/phone_3_empty.glb');
     return (
-      <group
-        ref={ref}
+      <primitive
         object={gltf.scene}
         position={position}
         rotation={rotation}
@@ -311,6 +303,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
   const [aquariumActive,setAquariumActive] = useState(false);
   const [piranhaFollowMeat, setPiranhaFollowMeat] = useState(false);
   const [spawn2Telephone, setSpawn2Telephone] = useState(false);
+  const [spawn3Telephone, setSpawn3Telephone] = useState(true);
   const [spawn4Telephone, setSpawn4Telephone] = useState(false);
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -376,7 +369,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       else
       {
         if (addItemToInventory) {
-          addItemToInventory({ name: 'Телефон', imageUrl: '', description: 'Специальное устройство, на которое записан учебный вопрос. На задней стороне есть номер – 3. На экране выводится значение – 2.'});
+          setSpawn3Telephone(false);
+          addItemToInventory({ name: 'Телефон', imageUrl: 'images/Телефон 3.png', description: 'Специальное устройство, на которое записан учебный вопрос. На задней стороне есть номер – 3. На экране выводится значение – 2.'});
           console.log('Ответ появляется')
           setActiveQuestion(true);
           setQuestionType('checkbox')
@@ -463,11 +457,24 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       name='Патроны для пистолета'
       description='Мягкие и безопасные для человека. Можно зарядить в игрушечный пистолет.'
       mesh='src/models/toygun_bulletbox.glb'
-      image=''
+      image='images/Патроны.png'
       keys={keys}
       threshold={3}
       cameraRef={camera}
       addItemToInventory={addItemToInventory}/>
+
+      Карта
+      <IteractableItem 
+      position={[2, 1.7, 10.33]}
+      size={1.3}
+      rotation={[0,Math.PI/2,0]}
+      cameraRef={camera}
+      threshold={2}
+      name='Карта'
+      descriptionBefore='Обычная карта мира, но зачем ее вешать в подсобке?'
+      meshBeforeIteract='src/models/map.glb'
+      meshAfterIteract='src/models/dot.glb'
+      keys={keys}/>
 
       Пирамида в потайном ящике
       <IteractableItem 
@@ -495,7 +502,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       cameraRef={camera} 
       rotation={[Math.PI/2,0,0]} 
       threshold={3} 
-      image={'/images/уф лампа.jpg'} 
+      image={'images/Лампочка.png'} 
       mesh={'src/models/bulb.glb'} 
       description='Лампочка, способная излучать ультрафиолетовое свечение.' 
       addItemToInventory={addItemToInventory} 
@@ -539,12 +546,12 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Телефон 1
       <AddableItem 
-      position={[4.7,1.5,-3.5]}
+      position={[4.7,1.4,-3.5]}
       rotation={[0,Math.PI/2,0]} 
       size={1}
       cameraRef={camera} 
       threshold={3} 
-      image=''
+      image='images/Телефон 1.png'
       mesh='src/models/phone_1_empty.glb'
       description='Специальное устройство, на которое записан учебный вопрос. На задней стороне есть номер – 1.'
       descriptionAddedPhone='Специальное устройство, на которое записан учебный вопрос. 
@@ -620,7 +627,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       rotation={[0,Math.PI/2,Math.PI/2]}
       cameraRef={camera}
       threshold={3}
-      image=''
+      image='images/Кусок мяса замороженный.png'
       addItemToInventory={addItemToInventory}
       name='Мясо замороженное'
       description='Промерз основательно. Чтобы сделать его пригодным в пищу  сначала необходимо разогреть.'
@@ -650,7 +657,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       size={1}
       cameraRef={camera} 
       threshold={3} 
-      image=''
+      image='images/Телефон 2.png'
       mesh='src/models/phone_2_empty.glb'
       description='Специальное устройство, на которое записан учебный вопрос. На задней стороне есть номер – 2.'
       descriptionAddedPhone='Специальное устройство, на которое записан учебный вопрос. 
@@ -669,7 +676,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       size={1.3}
       cameraRef={camera} 
       threshold={3} 
-      image='/images/Листок до подсказки.jpg'
+      image='images/Подсказка.png'
       mesh='src/models/paper1_notext.glb'
       description='Листок с изображением лампочки, возможно это намек чтобы воспользоваться чем то в комнате.' 
       addItemToInventory={addItemToInventory} 
@@ -684,7 +691,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       position={[-4.8, 0.95, 2.3]} 
       cameraRef={camera} 
       threshold={3} 
-      image={''}
+      image={'images/Часовая стрелка.png'}
       mesh='src/models/arrow_hour.glb' 
       description='Одна из двух потерянных стрелок. Определяет какой сейчас час.' 
       addItemToInventory={addItemToInventory} 
@@ -712,6 +719,11 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       addItemToInventory={addItemToInventory}
       activateItem={handleAquariumAction}/>
 
+      {spawn3Telephone && (
+        <Phone 
+        position={[-5, 1.07, -1.6]}
+        rotation={[0,Math.PI,0]}
+        scale={1}/>)}
       Пиранья
       <Piranha 
       startPosition={[-4.9, 1.4, -2]}
@@ -749,7 +761,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       rotation={[0,0,0]} 
       cameraRef={camera} 
       threshold={3} 
-      image='/images/Листок для часов.jpg'
+      image='images/Подсказка.png'
       mesh='src/models/paper2.glb'
       description='Листок с запиской. Содержание: Если кто найдет стрелки, установите время в часах на полдевятого – начало моего рабочего дня. Заведующий кабинетом' 
       addItemToInventory={addItemToInventory}
@@ -780,7 +792,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       size={0.6}
       cameraRef={camera} 
       threshold={3} 
-      image=''
+      image='images/Телефон 4.png'
       mesh='src/models/phone_3_empty.glb'
       description='Специальное устройство, на которое записан учебный вопрос. На задней стороне есть номер – 4.'
       descriptionAddedPhone='Специальное устройство, на которое записан учебный вопрос. 
@@ -806,7 +818,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       cameraRef={camera}
       threshold={3}
       name='Пистолет'
-      image='images/пистолет.jpg'
+      image='images/Пистолет.png'
       description='С этой игрушкой можно чувствовать себе увереннее. Отлично подходит для сбивания пустых банок или бутылок. Не работает без патронов.'
       mesh='src/models/toygun.glb'
       addItemToInventory={addItemToInventory}
@@ -833,7 +845,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       cameraRef={camera}
       threshold={3}
       name='Минутная стрелка'
-      image=''
+      image='images/Минутная стрелка.png'
       addItemToInventory={addItemToInventory}
       mesh={'src/models/arrow_minute.glb'}
       description='Одна из двух потерянных стрелок. Определяет какая сейчас минута.'
@@ -860,7 +872,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       size={1}
       cameraRef={camera} 
       threshold={1.5} 
-      image=''
+      image='images/Телефон 5.png'
       mesh='src/models/phone_5_empty.glb'
       description='Специальное устройство, на которое записан учебный вопрос.'
       descriptionAddedPhone='Специальное устройство, на которое записан учебный вопрос. 

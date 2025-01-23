@@ -5,7 +5,6 @@ import * as THREE from 'three';
 import './AddableItem.css';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useLoader } from '@react-three/fiber';
-import CallingQuestion from './CallingQuestion';
 
 const AddableItem = ({ 
   position = [0, 0, 0], 
