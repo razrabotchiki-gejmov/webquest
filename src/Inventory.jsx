@@ -138,7 +138,8 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
 
   return (
     <>
-      {/* Левая часть интерфейса */}
+    {/* Левая часть интерфейса */}
+      {!isVisible && (
       <div className="left-panel">
         <div className="movement-block">
           <div className="movement-label">Передвижение</div>
@@ -166,6 +167,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
           </div>
         </div>
       </div>
+      )}
       {/* Инвентарь */}
       {isVisible && (
         <div className="inventory-window">
