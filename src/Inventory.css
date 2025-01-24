@@ -1,4 +1,128 @@
-/* Окно инвентаря */
+/* Левая часть интерфейса */
+.left-panel {
+  position: fixed;
+  bottom: 20px; /* Перемещаем вниз */
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.movement-block, .interaction-block {
+  background-color: #E6F0F080;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.movement-block .movement-label, .interaction-block .interaction-label {
+  font-weight: bold;
+  text-align: center;
+}
+
+.movement-block .movement-text, .interaction-block .interaction-text {
+  background-color: #006666; /* Цвет фона, близкий к картинке */
+  border-radius: 10px;
+  text-align: center;
+  color: white; /* Белый текст */
+  margin: 0 auto;
+}
+.centre-panel {
+  transform: translateX(-50%);
+  position: fixed;
+  bottom: 20%; 
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+
+}
+/* Изменения для блока передвижения */
+.movement-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.wasd-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.asd-block {
+  display: flex;
+  gap: 15px;
+}
+
+.wasd-block .movement-text {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* Изменения для блока взаимодействия */
+.interaction-block {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: flex-start; /* Выравнивание по левому краю */
+}
+
+.interaction-label-row {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+
+.interaction-text-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Выравнивание по левому краю */
+}
+
+.interaction-block .interaction-text {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.interaction-description {
+  text-align: left;
+  font-size: 18px;
+}
+
+.context-menu {
+  position: absolute;
+  background-color: rgba(50, 50, 50, 0.9);
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.context-menu-item {
+  margin: 5px 0;
+  cursor: pointer;
+}
+
+.context-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Инвентарь */
 .inventory-window {
   position: fixed;
   top: 40%;
@@ -107,68 +231,7 @@
   font-weight: bold;
 }
 
-.left-panel {
-  position: fixed;
-  bottom: 20px; /* Перемещаем вниз */
-  left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 1000;
-}
-
-.movement-block, .interaction-block {
-  background-color: #E6F0F080;
-  border-radius: 10px;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.movement-block .movement-label, .interaction-block .interaction-label {
-  font-weight: bold;
-  text-align: center;
-}
-
-.movement-block .movement-text, .interaction-block .interaction-text {
-  background-color: #006666; /* Цвет фона, близкий к картинке */
-  border-radius: 10px;
-  text-align: center;
-  color: white; /* Белый текст */
-  margin: 0 auto;
-}
-
-/* Изменения для блока передвижения */
-.movement-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-.wasd-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-}
-
-.asd-block {
-  display: flex;
-  gap: 15px;
-}
-
-.wasd-block .movement-text {
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-}
-
-/* Изменения для блока взаимодействия */
+/* Interaction Message */
 .interaction-block {
   display: flex;
   flex-direction: column;
@@ -202,105 +265,23 @@
   font-size: 18px;
 }
 
-.context-menu {
-  position: absolute;
-  background-color: rgba(50, 50, 50, 0.9);
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  z-index: 1000;
-}
-
-.context-menu-item {
-  padding: 5px 10px;
-  color: white;
-  cursor: pointer;
-}
-
-.context-menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.inspection-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-
-.inspection-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.inspection-content img {
-  max-width: 400px;
-  max-height: 400px;
-  object-fit: contain;
-}
-
-.description-window {
-  position: fixed;
-  top: 85%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 40vw;
-  background-color: #E6F0F0;
-  color: white;
-  border: 2px solid #fff;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Выровнять контент по левому краю */
-  justify-content: flex-start; /* Контент выравнивается сверху */
-  z-index: 999;
-  padding: 10px;
-  gap: 10px; /* Добавляет отступы между элементами */
-}
-
-.description-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #000; /* Черный цвет для читаемости */
-  margin: 0;
-}
-
-.description-divider {
-  width: 100%;
-  height: 1px;
-  background-color: #000; /* Черная линия-разделитель */
-}
-
-.description-text {
-  font-size: 14px;
-  color: #333; /* Темно-серый цвет для текста */
-  margin: 0;
-}
-
-/* Interaction Message */
 .interaction-message {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
+  background-color: #E6F0F080;
+  color: rgb(0, 0, 0);
   padding: 20px;
   border-radius: 10px;
   z-index: 3000;
   font-size: 24px;
   font-weight: bold;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .interaction-item-name {
@@ -327,8 +308,8 @@
   top: 50%;
   right: 20px;
   transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
+  background-color: #E6F0F080;
+  color: rgb(0, 0, 0);
   padding: 20px;
   border-radius: 10px;
   z-index: 3000;
@@ -343,6 +324,6 @@
 
 .description-panel-content p {
   margin: 0;
-  color: #ddd;
+  color: #000000;
 }
 

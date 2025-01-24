@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Inventory.css';
 
-function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand, setRemoveItemFromInventory, activeQuestion, interactionMessage, interactionItemName, interactionItemDescription, setInteractionMessage }) {
+function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand, setRemoveItemFromInventory, activeQuestion, interactionMessage, interactionItemName, interactionItemDescription, interactionItemImage, setInteractionMessage }) {
   const [isVisible, setIsVisible] = useState(false);
   const [grid, setGrid] = useState(
     Array(20).fill(null).map((_, index) => ({
@@ -30,7 +30,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
   }, [grid]);
 
   // Функция для добавления предмета в инвентарь
-  const addItemToInventory = (item, description) => {
+  const addItemToInventory = (item, description, image) => {
     setGrid((prevGrid) => {
       const newGrid = [...prevGrid];
       const firstEmptyIndex = newGrid.findIndex((cell) => cell.item === null);
@@ -38,6 +38,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       if (firstEmptyIndex !== -1) {
         newGrid[firstEmptyIndex].item = item;
         newGrid[firstEmptyIndex].description = description;
+        newGrid[firstEmptyIndex].imageUrl = image;
       }
       setItemInHand(newGrid[firstEmptyIndex].item);
       setSelectedHotbarIndex(firstEmptyIndex);
@@ -82,7 +83,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       } else if (event.code === 'KeyF' && interactionMessage) {
         setShowDescription(true); // Show description when 'F' is pressed
       } else if (event.code === 'KeyE' && showDescription) {
-        addItemToInventory({ name: interactionItemName, imageUrl: `images/${interactionItemName}.png`, description: interactionItemDescription });
+        addItemToInventory({ name: interactionItemName, imageUrl: interactionItemImage, description: interactionItemDescription });
         setShowDescription(false); // Hide description when 'E' is pressed
       }
     };
@@ -92,7 +93,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [setAddItemToInventory, setIsInventoryLocked, setRemoveItemFromInventory, setItemInHand, isVisible, activeQuestion, interactionMessage, interactionItemName, interactionItemDescription, showDescription]);
+  }, [setAddItemToInventory, setIsInventoryLocked, setRemoveItemFromInventory, setItemInHand, isVisible, activeQuestion, interactionMessage, interactionItemName, interactionItemDescription, interactionItemImage, showDescription]);
 
   // Обработчики перетаскивания
   const [draggedItem, setDraggedItem] = useState(null);
@@ -146,6 +147,21 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
 
   return (
     <>
+      {/* Interaction Message */}
+      {interactionMessage && (
+        <div className="centre-panel">
+          <div className="interaction-block">
+          <div className="interaction-item-name">{interactionItemName}</div>
+          <div className="interaction-label-row">
+            <div className="interaction-text">E</div>
+            <div className="interaction-description">Подобрать</div>
+            <div className="interaction-text">F</div>
+            <div className="interaction-description">Описание</div>
+          </div>
+        </div>
+        </div>
+      )}
+
       {/* Левая часть интерфейса */}
       {!isVisible && (
         <div className="left-panel">
@@ -229,6 +245,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
           <div className="description-title">{contextMenu.item.name}</div>
           <div className="description-divider"></div>
           <div className="description-text">{contextMenu.item.description}</div>
+          <img src={contextMenu.item.imageUrl} alt={contextMenu.item.name} />
         </div>
       )}
 
@@ -238,14 +255,6 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
           <div className="inspection-content">
             <img src={inspectedItem.imageUrl} alt={inspectedItem.name} />
           </div>
-        </div>
-      )}
-
-      {/* Interaction Message */}
-      {interactionMessage && (
-        <div className="interaction-message">
-          <div className="interaction-item-name">{interactionItemName}</div>
-          <button className="interaction-button" onClick={handleCloseInteraction}>Привет</button>
         </div>
       )}
 
