@@ -11,6 +11,7 @@ const AddableItem = ({
   cameraRef,
   threshold = 2,
   image,
+  addItemToInventory,
   name,
   mesh,
   size = 2,
@@ -29,6 +30,7 @@ const AddableItem = ({
   const [isDeleted, setIsDeleted] = useState(false);
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, z: 0 });
   const [isInspecting, setIsInspecting] = useState(false);
+  const [showDescription, setShowDescription] = useState(false); // New state for description visibility
   const objectMesh = useLoader(GLTFLoader, mesh);
 
   useFrame(() => {
@@ -61,6 +63,16 @@ const AddableItem = ({
       closeContextMenu();
       closeInspect();
     }
+        // Handle 'F' key press to show description
+        if (intersects.length > 0 && intersects[0].distance < threshold && keys['KeyF']) {
+          setShowDescription(true);
+        }
+    
+        // Handle 'E' key press to add item to inventory when description is visible
+        if (showDescription && keys['KeyE']) {
+          handlePickup();
+          setShowDescription(false);
+        }
   });
 
   // Закрыть контекстное меню
@@ -73,6 +85,21 @@ const AddableItem = ({
     setIsInspecting(true);
     closeContextMenu();
   };
+
+// Подобрать предмет
+const handlePickup = () => {
+  if (addItemToInventory) {
+    addItemToInventory({ name: name, imageUrl: image, description: name.includes('Телефон') ? descriptionAddedPhone : description });
+    if(name.includes('Телефон'))
+      {
+        console.log('Ответ появляется')
+        setActiveQuestion(true);
+        setQuestionType(questionType)
+      }
+    setIsDeleted(true);
+    closeContextMenu();
+  }
+};
 
   // Закрыть описание
   const closeInspect = () => {
@@ -103,6 +130,9 @@ const AddableItem = ({
           center
         >
           <div className="context-menu">
+            <div className="context-menu-item" onClick={handlePickup}>
+              Подобрать предмет
+            </div>
             <div className="context-menu-item" onClick={handleInspect}>
               Описание
             </div>
