@@ -124,6 +124,18 @@ const BoxUndertable = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) =
   );
 };
 
+const PaperNoText = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/paper1_notext.glb');
+  return (
+    <primitive
+      object={gltf.scene}
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
 const Cup2 = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   const gltf = useLoader(GLTFLoader, 'src/models/cup2.glb');
   const ref = useRef();
@@ -354,6 +366,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
   const [haveBullets,setHaveBullets] = useState(false);
   const [aquariumActive,setAquariumActive] = useState(false);
   const [piranhaFollowMeat, setPiranhaFollowMeat] = useState(false);
+  const [paperUnderLamp, setPaperUnderLamp] = useState(false);
+  const [spawnPaperText, setPaperTextSpawn] = useState(false);
   const [spawn2Telephone, setSpawn2Telephone] = useState(false);
   const [spawn3Telephone, setSpawn3Telephone] = useState(true);
   const [spawn4Telephone, setSpawn4Telephone] = useState(false);
@@ -392,7 +406,14 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       if(lampModel=='src/models/lamp_empty.glb')
         setLampModel('src/models/lamp_wbulb_off.glb')
       else
-        setWardrobeActive(true);
+      {
+        setPaperUnderLamp(true);
+        setTimeout(() =>{
+          setWardrobeActive(true);
+          setPaperTextSpawn(true);
+          setPaperUnderLamp(false);
+        },3 * 1000);
+      }
     }
     
     const handleChangeWardrobePosition = () =>
@@ -572,7 +593,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Интерактивная лампа в которую вставляется УФ лампа
       <IteractableItem 
-      position={[3.7, 0.9, 1]} 
+      position={[4, 0.9, 1]} 
       size={1}
       cameraRef={camera} 
       threshold={3} 
@@ -586,6 +607,21 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshBeforeIteract={lampModel} 
       meshAfterIteract='src/models/lamp_wbulb_on.glb'
       keys={keys}/>
+
+      {paperUnderLamp && (<PaperNoText position={[3.65 , 0.9, 1]} scale={1} rotation={[0,0,0]}/>)}
+
+      {spawnPaperText && (<AddableItem
+      position={[3.65 , 0.9, 1]} 
+      size={1} 
+      rotation={[0,0,0]}
+      cameraRef={camera}
+      threshold={3}
+      keys={keys}
+      mesh={'src/models/paper1_withtext.glb'}
+      image={'images/Подсказка.png'}
+      description='Лист с изображением лампочки. После применения на нем ультрафиолетового излучения проявилась надпись: “Проверь за шкафом”.'
+      name='Листок c изображением лампочки и текстом'
+      addItemToInventory={addItemToInventory}/>)}
 
       Шкаф который можно сдвинуть после активции подсказки
       <IteractableItem 
@@ -736,7 +772,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Подсказка для УФ лампы
       <AddableItem 
-      position={[-4.75, 1, 1.2]} 
+      position={[-4.75, 0.95, 1.2]} 
       size={1.3}
       cameraRef={camera} 
       threshold={3} 

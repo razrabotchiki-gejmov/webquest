@@ -94,9 +94,8 @@ const IteractableItem = ({
         {
             removeItemFromInventory(itemInHand);
             setIsIteracted(true);
+            activateItem();
             setTimeout(() =>{
-              addItemToInventory({name: 'Листок с изображение шкафа', imageUrl: 'images/Подсказка.png'});
-              activateItem();
               setIsIteracted(false);
             },3 * 1000);
         }
