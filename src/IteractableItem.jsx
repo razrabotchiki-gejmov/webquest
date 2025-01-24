@@ -135,12 +135,15 @@ const IteractableItem = ({
       {
         setLock5Active(true);
       }
-      if(name == 'Ящик' || name == 'Холодильник')
+      if(name == 'Ящик')
       {
         console.log('Ящик со стрелкой открыт?'+ isIteracted);
         setIsIteracted((prev) => !prev);
-        if(activateItem)
-          activateItem();
+        activateItem();
+      }
+      if(name == 'Холодильник')
+      {
+        setIsIteracted((prev) => !prev);
       }
       if(name == 'Ящик c кодовым замком' && !isIteracted)
       {
