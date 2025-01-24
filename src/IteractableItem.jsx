@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, act } from 'react';
 import {useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -86,15 +86,18 @@ const IteractableItem = ({
       { 
         if(name == 'Лампа' && itemInHand.name =='уф лампа')
         {
-          setIsIteracted(true);
-            removeItemFromInventory(itemInHand);
+          if(activateItem)
+            activateItem();
+          removeItemFromInventory(itemInHand);
         }
-        if(name == 'Лампа' && itemInHand.name =='Листок с изображением лампочки' && isIteracted)
+        if(name == 'Лампа' && itemInHand.name =='Листок с изображением лампочки')
         {
             removeItemFromInventory(itemInHand);
+            setIsIteracted(true);
             setTimeout(() =>{
               addItemToInventory({name: 'Листок с изображение шкафа', imageUrl: 'images/Подсказка.png'});
               activateItem();
+              setIsIteracted(false);
             },3 * 1000);
         }
         if(name == 'Часы' && (itemInHand.name === 'Часовая стрелка' || itemInHand.name === 'Минутная стрелка'))

@@ -99,6 +99,49 @@ const Phone = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
       />
     );
 };
+
+const Books = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/books_ondesk.glb');
+  return (
+    <primitive
+      object={gltf.scene}
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const BoxUndertable = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/box_undertable.glb');
+  return (
+    <primitive
+      object={gltf.scene}
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
+
+const Cup2 = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
+  const gltf = useLoader(GLTFLoader, 'src/models/cup2.glb');
+  const ref = useRef();
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.add(gltf.scene.clone());
+    }
+  }, [gltf]);
+  return (
+    <group
+      ref={ref}
+      object={gltf.scene}
+      position={position}
+      rotation={rotation}
+      scale={Array.isArray(scale) ? scale : [scale, scale, scale]}
+    />
+  );
+};
   
 const Table = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
     const gltf = useLoader(GLTFLoader, 'src/models/table_thin.glb');
@@ -119,8 +162,16 @@ const Table = ({ position = [0, 0, 0], scale = 1, rotation = 0}) => {
     );
 };
 
-const Shlef = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
-  const gltf = useLoader(GLTFLoader, 'src/models/shelf.glb');
+const Shlef = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0], type = 1}) => {
+  let gltf
+  if(type == 1)
+  {
+    gltf = useLoader(GLTFLoader, 'src/models/shelf_wbox.glb');
+  }
+  else
+  {
+    gltf = useLoader(GLTFLoader, 'src/models/shelf_wbooks.glb');
+  }
   const ref = useRef();
   useEffect(() => {
     if (ref.current) {
@@ -293,6 +344,7 @@ const HintYellow = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
 const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory, setActiveQuestion, activeQuestion, setQuestionType}) => {
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [lampModel, setLampModel] = useState('src/models/lamp_empty.glb')
   const [wardrobeActive, setWardrobeActive] = useState(false);
   const [changedWardrobePosition, setChangeWardrobePosition] = useState([4.27,0,-3.5])
   const [keys, setKeys] = useState({ KeyW: false, KeyS: false, KeyA: false, KeyD: false, KeyE: false, Escape: false });
@@ -335,9 +387,12 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
     };
   }, [isInventoryLocked, activeQuestion]);
 
-    const handleWardrobeActivate = () =>
+    const handleLampAction = () =>
     {
-      setWardrobeActive(true);
+      if(lampModel=='src/models/lamp_empty.glb')
+        setLampModel('src/models/lamp_wbulb_off.glb')
+      else
+        setWardrobeActive(true);
     }
     
     const handleChangeWardrobePosition = () =>
@@ -497,7 +552,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Подбираемая УФ лампочка
       <AddableItem 
-      position={[0.4, 1.48, 8]} 
+      position={[0.4, 1.48, 8.1]} 
       size={1}
       cameraRef={camera} 
       rotation={[Math.PI/2,0,0]} 
@@ -510,7 +565,10 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       keys={keys}/>
 
       Стол c лампой
-      <Table position={[3.9, 0, 0.4]} scale={1} rotation={[0, -Math.PI/2,0]}/>
+      <Table position={[3.9, 0, 0.4]} scale={1} rotation={[0, Math.PI/2,0]}/>
+
+      Ящики под столом
+      <BoxUndertable position={[3.9, 0.1, 0.2]} scale={1} rotation={[0, Math.PI/2,0]}/>
 
       Интерактивная лампа в которую вставляется УФ лампа
       <IteractableItem 
@@ -524,9 +582,9 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       descriptionAfter='Ультрафиолетовая лампа обладает уникальным свечением, способным проявлять скрытые послания.' 
       removeItemFromInventory={removeItemFromInventory} 
       addItemToInventory={addItemToInventory} 
-      activateItem={handleWardrobeActivate} 
-      meshBeforeIteract='src/models/lamp_empty.glb' 
-      meshAfterIteract='src/models/lamp_wbulb.glb'
+      activateItem={handleLampAction} 
+      meshBeforeIteract={lampModel} 
+      meshAfterIteract='src/models/lamp_wbulb_on.glb'
       keys={keys}/>
 
       Шкаф который можно сдвинуть после активции подсказки
@@ -590,7 +648,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Микроволоновка
       <IteractableItem 
-      position={[-3.4, 0.9, 5.3]}
+      position={[-2.6, 0.9, 5.6]}
       size={1}
       rotation={[0,Math.PI,0]}
       cameraRef={camera}
@@ -605,6 +663,10 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       keys={keys}
       activateItem={handleAquariumActive}
       itemInHand={itemInHand}/>
+
+      Кружки рядом с микроволновкой
+      <Cup2 position={[-3.3, 0.9, 5.6]} scale={1} rotation={[0,Math.PI/3,0]}/>
+      <Cup2 position={[-3.6, 0.9, 5.6]} scale={1} rotation={[0,-Math.PI/1.3,0]}/>
 
       Холодильник
       <IteractableItem 
@@ -649,6 +711,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshAfterIteract='src/models/desk_opened.glb'
       keys={keys}
       activateItem={handle2TelephoneSpawn}/>
+
+      <Books position={[-5.1,0.95,2.1]} scale={1} rotation={[0,Math.PI/2,0]} />
 
       Телефон 2
       {spawn2Telephone && (<AddableItem 
@@ -736,7 +800,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       isActive={piranhaFollowMeat}/>)}
 
       Стеллаж в рядом с часами
-      <Shlef position={[-4.5, 0, -5.68]} scale={1} rotation={[0,0,0]}/>
+      <Shlef position={[-4.5, 0, -5.68]} scale={1} rotation={[0,0,0]} type={2}/>
       
       Пирамида на стеллаже
       <IteractableItem 
@@ -826,7 +890,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       
       Ящик со стрелкой
       <IteractableItem 
-      position={[-1,0,-1.5]} 
+      position={[-1.1,0,-1.5]} 
       size={1.3} rotation={[0,Math.PI,0]} 
       cameraRef={camera} 
       threshold={3} 
@@ -887,7 +951,7 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       <MovableCube 
         position={[0, 0.5, 0]} 
         rotationSpeed={0.005} 
-        playerSpeed={0.1} 
+        playerSpeed={0.05} 
         camera={camera}
         isInventoryLocked={isInventoryLocked} 
         keys={keys}
