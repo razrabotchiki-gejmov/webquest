@@ -520,8 +520,8 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
 
       Карта
       <IteractableItem 
-      position={[2, 1.7, 10.33]}
-      size={1.3}
+      position={[2, 1.6, 10.33]}
+      size={1.1}
       rotation={[0,Math.PI/2,0]}
       cameraRef={camera}
       threshold={2}
