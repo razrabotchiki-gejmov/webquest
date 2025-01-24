@@ -286,3 +286,63 @@
   color: #333; /* Темно-серый цвет для текста */
   margin: 0;
 }
+
+/* Interaction Message */
+.interaction-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 3000;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.interaction-item-name {
+  margin-bottom: 10px;
+}
+
+.interaction-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.interaction-button:hover {
+  background-color: #0056b3;
+}
+
+/* Description Panel */
+.description-panel {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 3000;
+  font-size: 18px;
+  text-align: center;
+  width: 300px;
+}
+
+.description-panel-content h2 {
+  margin-bottom: 10px;
+}
+
+.description-panel-content p {
+  margin: 0;
+  color: #ddd;
+}
+

@@ -341,7 +341,17 @@ const HintYellow = ({ position = [0, 0, 0], scale = 1, rotation = [0,0,0]}) => {
   );
 };
 
-const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFromInventory, setActiveQuestion, activeQuestion, setQuestionType}) => {
+const Scene = ({addItemToInventory,
+  isInventoryLocked,
+  itemInHand,
+  removeItemFromInventory,
+  setQuestionType,
+  setActiveQuestion,
+  activeQuestion,
+  setInteractionMessage,
+  setInteractionItemName,
+  setInteractionItemDescription,
+}) => {
   const camera = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [lampModel, setLampModel] = useState('src/models/lamp_empty.glb')
@@ -504,19 +514,23 @@ const Scene = ({addItemToInventory, isInventoryLocked, itemInHand, removeItemFro
       meshAfterIteract='src/models/locker_opened.glb'
       keys={keys}/>
 
-      Патроны для пистолета
-      <AddableItem 
-      position={[3.5, 1.32, 8]} 
-      size={1}
-      rotation={[0,0,0]}
-      name='Патроны для пистолета'
-      description='Мягкие и безопасные для человека. Можно зарядить в игрушечный пистолет.'
-      mesh='src/models/toygun_bulletbox.glb'
-      image='images/Патроны.png'
-      keys={keys}
-      threshold={3}
+      Подсказка для УФ лампы
+      <AddableItem
+      position={[-4.75, 1, 1.2]}
+      size={1.3}
       cameraRef={camera}
-      addItemToInventory={addItemToInventory}/>
+      threshold={3}
+      image='images/Подсказка.png'
+      mesh='src/models/paper1_notext.glb'
+      description='Листок с изображением лампочки, возможно это намек чтобы воспользоваться чем то в комнате.'
+      addItemToInventory={addItemToInventory}
+      name='Листок с изображением лампочки'
+      keys={keys}
+      setInteractionTextVisible={setInteractionMessage} // Передано в AddableItem
+      setInteractionMessage={setInteractionMessage} // Передача функции
+      setInteractionItemName={setInteractionItemName}
+      setInteractionItemDescription={setInteractionItemDescription} // Passed function for item description
+      />
 
       Карта
       <IteractableItem 

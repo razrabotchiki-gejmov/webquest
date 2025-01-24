@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Inventory.css';
 
-function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand, setRemoveItemFromInventory, activeQuestion }) {
+function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand, setRemoveItemFromInventory, activeQuestion, interactionMessage, interactionItemName, interactionItemDescription, setInteractionMessage }) {
   const [isVisible, setIsVisible] = useState(false);
   const [grid, setGrid] = useState(
     Array(20).fill(null).map((_, index) => ({
@@ -15,6 +15,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
   const [selectedHotbarIndex, setSelectedHotbarIndex] = useState(0);
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, item: null });
   const [inspectedItem, setInspectedItem] = useState(null);
+  const [showDescription, setShowDescription] = useState(false); // New state for description visibility
 
   // Переключение видимости инвентаря
   const toggleInventory = () => {
@@ -39,7 +40,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
         newGrid[firstEmptyIndex].description = description;
       }
       setItemInHand(newGrid[firstEmptyIndex].item);
-      setSelectedHotbarIndex(firstEmptyIndex)
+      setSelectedHotbarIndex(firstEmptyIndex);
       return newGrid;
     });
   };
@@ -52,20 +53,17 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       if (index !== -1)
         newGrid[index].item = null;
       return newGrid;
-      }
-    );
+    });
   };
 
-  const recheckItem = (index) =>
-  {
-    if(!grid[index]) return;
+  const recheckItem = (index) => {
+    if (!grid[index]) return;
     setItemInHand(grid[index].item);
-    //console.log(grid[index].item)
-  }
+  };
 
   useEffect(() => {
     if (activeQuestion) return;
-    setInterval(() => recheckItem(activeIndex),1000);
+    setInterval(() => recheckItem(activeIndex), 1000);
     if (setAddItemToInventory) {
       setAddItemToInventory(() => addItemToInventory);
     }
@@ -73,7 +71,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       setRemoveItemFromInventory(() => removeItemFromInventory);
     }
 
-    let activeIndex
+    let activeIndex;
     const handleKeyDown = (event) => {
       if (event.code === 'KeyI') {
         toggleInventory();
@@ -81,6 +79,11 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
         activeIndex = parseInt(event.code.slice(-1)) - 1;
         recheckItem(activeIndex);
         setSelectedHotbarIndex(activeIndex);
+      } else if (event.code === 'KeyF' && interactionMessage) {
+        setShowDescription(true); // Show description when 'F' is pressed
+      } else if (event.code === 'KeyE' && showDescription) {
+        addItemToInventory({ name: interactionItemName, imageUrl: `images/${interactionItemName}.png`, description: interactionItemDescription });
+        setShowDescription(false); // Hide description when 'E' is pressed
       }
     };
 
@@ -89,7 +92,7 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [setAddItemToInventory, setIsInventoryLocked, setRemoveItemFromInventory, setItemInHand, isVisible, activeQuestion]);
+  }, [setAddItemToInventory, setIsInventoryLocked, setRemoveItemFromInventory, setItemInHand, isVisible, activeQuestion, interactionMessage, interactionItemName, interactionItemDescription, showDescription]);
 
   // Обработчики перетаскивания
   const [draggedItem, setDraggedItem] = useState(null);
@@ -136,37 +139,42 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
     setInspectedItem(null); // Закрыть окно осмотра
   };
 
+  const handleCloseInteraction = () => {
+    setInteractionMessage(false); // Закрыть окно взаимодействия
+    setShowDescription(false); // Hide description when interaction message is closed
+  };
+
   return (
     <>
-    {/* Левая часть интерфейса */}
+      {/* Левая часть интерфейса */}
       {!isVisible && (
-      <div className="left-panel">
-        <div className="movement-block">
-          <div className="movement-label">Передвижение</div>
-          <div className="wasd-block">
-            <div className="movement-text">W</div>
-            <div className="asd-block">
-              <div className="movement-text">A</div>
-              <div className="movement-text">S</div>
-              <div className="movement-text">D</div>
+        <div className="left-panel">
+          <div className="movement-block">
+            <div className="movement-label">Передвижение</div>
+            <div className="wasd-block">
+              <div className="movement-text">W</div>
+              <div className="asd-block">
+                <div className="movement-text">A</div>
+                <div className="movement-text">S</div>
+                <div className="movement-text">D</div>
+              </div>
+            </div>
+          </div>
+          <div className="interaction-block">
+            <div className="interaction-label-row">
+              <div className="interaction-text">E</div>
+              <div className="interaction-description">Взаимодействие</div>
+            </div>
+            <div className="interaction-label-row">
+              <div className="interaction-text">F</div>
+              <div className="interaction-description">Прочитать описание</div>
+            </div>
+            <div className="interaction-label-row">
+              <div className="interaction-text">I</div>
+              <div className="interaction-description">Открыть инвентарь</div>
             </div>
           </div>
         </div>
-        <div className="interaction-block">
-          <div className="interaction-label-row">
-            <div className="interaction-text">E</div>
-            <div className="interaction-description">Взаимодействие</div>
-          </div>
-          <div className="interaction-label-row">
-            <div className="interaction-text">F</div>
-            <div className="interaction-description">Прочитать описание</div>
-          </div>
-          <div className="interaction-label-row">
-            <div className="interaction-text">I</div>
-            <div className="interaction-description">Открыть инвентарь</div>
-          </div>
-        </div>
-      </div>
       )}
       {/* Инвентарь */}
       {isVisible && (
@@ -174,21 +182,17 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
           <div key="divider" className="divider"></div>
           <div className="inventory-items">
             {grid.map((cell, index) => (
-              <>
-                <div
-                  key={cell.id}
-                  className="inventory-item"
-                  onMouseDown={() => handleMouseDown(index)}
-                  onMouseUp={() => handleMouseUp(index)}
-                  onContextMenu={(e) => cell.item && handleContextMenu(e, cell.item)}
-                >
-                  {cell.item && (
-                    <>
-                      <img src={cell.item.imageUrl} alt={cell.item.name} />
-                    </>
-                  )}
-                </div>
-              </>
+              <div
+                key={cell.id}
+                className="inventory-item"
+                onMouseDown={() => handleMouseDown(index)}
+                onMouseUp={() => handleMouseUp(index)}
+                onContextMenu={(e) => cell.item && handleContextMenu(e, cell.item)}
+              >
+                {cell.item && (
+                  <img src={cell.item.imageUrl} alt={cell.item.name} />
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -220,13 +224,11 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
       )}
 
       {/* Описание предмета */}
-      {contextMenu.visible && (
-        <div
-          className="description-window"
-        >
-          <div class="description-title">{contextMenu.item.name}</div>
-          <div class="description-divider"></div>
-          <div class="description-text">{contextMenu.item.description}</div>
+      {contextMenu.visible && contextMenu.item && (
+        <div className="description-window">
+          <div className="description-title">{contextMenu.item.name}</div>
+          <div className="description-divider"></div>
+          <div className="description-text">{contextMenu.item.description}</div>
         </div>
       )}
 
@@ -235,6 +237,24 @@ function Inventory({ setAddItemToInventory, setIsInventoryLocked, setItemInHand,
         <div className="inspection-modal" onClick={closeInspectedItem}>
           <div className="inspection-content">
             <img src={inspectedItem.imageUrl} alt={inspectedItem.name} />
+          </div>
+        </div>
+      )}
+
+      {/* Interaction Message */}
+      {interactionMessage && (
+        <div className="interaction-message">
+          <div className="interaction-item-name">{interactionItemName}</div>
+          <button className="interaction-button" onClick={handleCloseInteraction}>Привет</button>
+        </div>
+      )}
+
+      {/* Description Panel */}
+      {showDescription && (
+        <div className="description-panel">
+          <div className="description-panel-content">
+            <h2>{interactionItemName}</h2>
+            <p>{interactionItemDescription}</p>
           </div>
         </div>
       )}
